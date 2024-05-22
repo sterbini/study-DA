@@ -29,29 +29,34 @@ class Distribution:
         # Variables to split the distribution for parallelization
         self.n_split: int = configuration["n_split"]
 
-    @property
-    def radial_list(self):
-        return np.linspace(self.r_min, self.r_max, self.n_r, endpoint=False)
+    def get_radial_list(self, lower_crop: float | None = None, upper_crop: float | None = None):
+        radial_list = np.linspace(self.r_min, self.r_max, self.n_r, endpoint=False)
+        if upper_crop:
+            radial_list = radial_list[radial_list <= 7.5]
+        if lower_crop:
+            radial_list = radial_list[radial_list >= 2.5]
+        return radial_list
 
-    @property
-    def angular_list(self):
+    def get_angular_list(self):
         return np.linspace(0, 90, self.n_angles + 2)[1:-1]
 
     def return_distribution_as_list(
-        self, lower_crop: float | None = None, upper_crop: float | None = None, split: bool = True
+        self, split: bool = True, lower_crop: float | None = None, upper_crop: float | None = None
     ) -> list:
+        # Get radial list and angular list
+        radial_list = self.get_radial_list(lower_crop=lower_crop, upper_crop=upper_crop)
+        angular_list = self.get_angular_list()
+
         # Define particle distribution as a cartesian product of the radial and angular lists
-        particle_list = np.array(
+        l_particles = np.array(
             [
                 (particle_id, ii[1], ii[0])
-                for particle_id, ii in enumerate(
-                    itertools.product(self.angular_list, self.radial_list)
-                )
+                for particle_id, ii in enumerate(itertools.product(angular_list, radial_list))
             ]
         )
 
-        # Split distribution into several chunks for parallelization
-        particle_list = [list(x) for x in np.array_split(particle_list, self.n_split)]
+        # Split the distribution to parallelize the computation
+        if split:
+            return list(np.array_split(l_particles, self.n_split))
 
-        # Return distribution
-        return particle_list
+        return [l_particles]
