@@ -6,9 +6,11 @@
 
 # Import standard library modules
 import itertools
+import os
 
 # Import third-party modules
 import numpy as np
+import pandas as pd
 
 # Import user-defined modules
 
@@ -42,7 +44,7 @@ class Distribution:
 
     def return_distribution_as_list(
         self, split: bool = True, lower_crop: float | None = None, upper_crop: float | None = None
-    ) -> list:
+    ) -> list[np.ndarray]:
         # Get radial list and angular list
         radial_list = self.get_radial_list(lower_crop=lower_crop, upper_crop=upper_crop)
         angular_list = self.get_angular_list()
@@ -55,8 +57,30 @@ class Distribution:
             ]
         )
 
-        # Split the distribution to parallelize the computation
+        # Potentially split the distribution to parallelize the computation
         if split:
             return list(np.array_split(l_particles, self.n_split))
 
         return [l_particles]
+
+    def write_particle_distribution_to_disk(
+        self, ll_particles, path_distribution_folder: str
+    ) -> list[str]:
+        # Define folder to store the distributions
+        os.makedirs(path_distribution_folder, exist_ok=True)
+
+        # Write the distribution to disk
+        l_path_files = []
+        for idx_chunk, l_particles in enumerate(ll_particles):
+            path_file = f"{path_distribution_folder}/{idx_chunk:02}.parquet"
+            pd.DataFrame(
+                l_particles,
+                columns=[
+                    "particle_id",
+                    "normalized amplitude in xy-plane",
+                    "angle in xy-plane [deg]",
+                ],
+            ).to_parquet(path_file)
+            l_path_files.append(path_file)
+
+        return l_path_files
