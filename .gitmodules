@@ -1,0 +1,3 @@
+[submodule "external_dependencies/xmask"]
+	path = external_dependencies/xmask
+	url = https://github.com/xsuite/xmask.git
