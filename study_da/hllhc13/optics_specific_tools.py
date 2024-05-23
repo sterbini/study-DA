@@ -1,31 +1,21 @@
-import numpy as np
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+# Import standard library modules
+
+# Import third-party modules
 from xmask.lhc import install_errors_placeholders_hllhc
 
-
-def check_madx_lattices(mad):
-    assert mad.globals["qxb1"] == mad.globals["qxb2"]
-    assert mad.globals["qyb1"] == mad.globals["qyb2"]
-    assert mad.globals["qpxb1"] == mad.globals["qpxb2"]
-    assert mad.globals["qpyb1"] == mad.globals["qpyb2"]
-
-    assert np.isclose(mad.table.summ.q1, mad.globals["qxb1"], atol=1e-02)
-    assert np.isclose(mad.table.summ.q2, mad.globals["qyb1"], atol=1e-02)
-
-    try:
-        assert np.isclose(mad.table.summ.dq1, mad.globals["qpxb1"], atol=1e-01)
-        assert np.isclose(mad.table.summ.dq2, mad.globals["qpyb1"], atol=1e-01)
-
-        df = mad.table.twiss.dframe()
-        for my_ip in [1, 2, 5, 8]:
-            assert np.isclose(df.loc[f"ip{my_ip}"].betx, mad.globals[f"betx_IP{my_ip}"], rtol=1e-02)
-            assert np.isclose(df.loc[f"ip{my_ip}"].bety, mad.globals[f"bety_IP{my_ip}"], rtol=1e-02)
-
-        assert df["x"].std() < 1e-6
-        assert df["y"].std() < 1e-6
-    except AssertionError:
-        print("WARNING: Some sanity checks have failed during the madx lattice check")
+# Import user-defined modules
+from ..hllhc16.optics_specific_tools import (  # noqa: F401
+    apply_optics,
+    check_madx_lattices,
+)
 
 
+# ==================================================================================================
+# --- Functions specific to each (HL-)LHC version
+# ==================================================================================================
 def build_sequence(
     mad,
     mylhcbeam,
@@ -85,10 +75,3 @@ def build_sequence(
         ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
         exec, twiss_opt;
         """)
-
-
-def apply_optics(mad, optics_file):
-    mad.call(optics_file)
-    # A knob redefinition
-    mad.input("on_alice := on_alice_normalized * 7000./nrj;")
-    mad.input("on_lhcb := on_lhcb_normalized * 7000./nrj;")

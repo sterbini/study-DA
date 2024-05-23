@@ -1,7 +1,16 @@
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+# Import standard library modules
+
+# Import third-party modules
 import numpy as np
 from xmask.lhc import install_errors_placeholders_hllhc
 
 
+# ==================================================================================================
+# --- Functions specific to each (HL-)LHC version
+# ==================================================================================================
 def check_madx_lattices(mad):
     assert mad.globals["qxb1"] == mad.globals["qxb2"]
     assert mad.globals["qyb1"] == mad.globals["qyb2"]
