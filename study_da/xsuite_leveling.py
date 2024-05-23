@@ -16,6 +16,8 @@ from scipy.optimize import minimize_scalar
 # --- Functions used for leveling
 # ==================================================================================================
 
+# TODO : Add type hints
+
 
 def luminosity_leveling(
     collider, config_lumi_leveling, config_beambeam, additional_targets_lumi=None, crab=False
