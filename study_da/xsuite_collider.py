@@ -5,14 +5,16 @@
 # ==================================================================================================
 
 # Import standard library modules
-import os
-import shutil
+import json
 
 # Import third-party modules
+import numpy as np
 import xmask as xm
 import xtrack as xt
 
 # Import user-defined modules
+from scheme_utils import get_worst_bunch, load_and_check_filling_scheme
+
 from .hllhc13.orbit_correction import (
     generate_orbit_correction_setup as gen_corr_hllhc13,
 )
@@ -116,3 +118,77 @@ class XsuiteCollider:
                 line_co_ref=collider[f"{line_name}_co_ref"],
                 co_corr_config=self.dict_orbit_correction[line_name],
             )
+
+    def set_filling_and_bunch_tracked(self, ask_worst_bunch=False):
+        # Get the filling scheme path
+        filling_scheme_path = self.config_beambeam["mask_with_filling_pattern"]["pattern_fname"]
+
+        # Load and check filling scheme, potentially convert it
+        filling_scheme_path = load_and_check_filling_scheme(filling_scheme_path)
+
+        # Correct filling scheme in config, as it might have been converted
+        self.config_beambeam["mask_with_filling_pattern"]["pattern_fname"] = filling_scheme_path
+
+        # Get number of LR to consider
+        n_LR = self.config_beambeam["num_long_range_encounters_per_side"]["ip1"]
+
+        # If the bunch number is None, the bunch with the largest number of long-range interactions is used
+        if self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] is None:
+            # Case the bunch number has not been provided
+            worst_bunch_b1 = get_worst_bunch(
+                filling_scheme_path, numberOfLRToConsider=n_LR, beam="beam_1"
+            )
+            if ask_worst_bunch:
+                while self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] is None:
+                    bool_inp = input(
+                        "The bunch number for beam 1 has not been provided. Do you want to use the bunch"
+                        " with the largest number of long-range interactions? It is the bunch number "
+                        + str(worst_bunch_b1)
+                        + " (y/n): "
+                    )
+                    if bool_inp == "y":
+                        self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] = (
+                            worst_bunch_b1
+                        )
+                    elif bool_inp == "n":
+                        self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] = int(
+                            input("Please enter the bunch number for beam 1: ")
+                        )
+            else:
+                self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] = worst_bunch_b1
+
+        if self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b2"] is None:
+            worst_bunch_b2 = get_worst_bunch(
+                filling_scheme_path, numberOfLRToConsider=n_LR, beam="beam_2"
+            )
+            # For beam 2, just select the worst bunch by default
+            self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b2"] = worst_bunch_b2
+
+        return self.config_beambeam
+
+    def compute_collision_from_scheme(self):
+        # Get the filling scheme path (in json or csv format)
+        filling_scheme_path = self.config_beambeam["mask_with_filling_pattern"]["pattern_fname"]
+
+        # Load the filling scheme
+        if not filling_scheme_path.endswith(".json"):
+            raise ValueError(
+                f"Unknown filling scheme file format: {filling_scheme_path}. It you provided a csv"
+                " file, it should have been automatically convert when running the script"
+                " 001_make_folders.py. Something went wrong."
+            )
+
+        with open(filling_scheme_path, "r") as fid:
+            filling_scheme = json.load(fid)
+
+        # Extract booleans beam arrays
+        array_b1 = np.array(filling_scheme["beam1"])
+        array_b2 = np.array(filling_scheme["beam2"])
+
+        # Assert that the arrays have the required length, and do the convolution
+        assert len(array_b1) == len(array_b2) == 3564
+        n_collisions_ip1_and_5 = array_b1 @ array_b2
+        n_collisions_ip2 = np.roll(array_b1, 891) @ array_b2
+        n_collisions_ip8 = np.roll(array_b1, 2670) @ array_b2
+
+        return n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8
