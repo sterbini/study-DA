@@ -1,4 +1,4 @@
-def generate_orbit_correction_setup():
+def generate_orbit_correction_setup() -> dict:
     return {
         "lhcb1": {
             "IR1 left": dict(

@@ -14,10 +14,9 @@ import xmask.lhc as xlhc
 import xtrack as xt
 from cpymad.madx import Madx
 
+# Import user-defined modules
 from .hllhc13 import optics_specific_tools as ost_hllhc13
 from .hllhc16 import optics_specific_tools as ost_hllhc16
-
-# Import user-defined modules
 from .runIII import optics_specific_tools as ost_runIII
 from .runIII_ions import optics_specific_tools as ost_runIII_ions
 
@@ -38,6 +37,7 @@ class MadCollider:
         self.pars_for_imperfections: dict = configuration["pars_for_imperfections"]
         self.ver_lhc_run: float | None = configuration["ver_lhc_run"]
         self.ver_hllhc_optics: float | None = configuration["ver_hllhc_optics"]
+        self.ions: bool = configuration["ions"]
         self.phasing: dict = configuration["phasing"]
 
         # Optics specific tools
@@ -60,13 +60,7 @@ class MadCollider:
                     case _:
                         raise ValueError("No optics specific tools for this configuration")
             elif self.ver_lhc_run == 3.0:
-                if (
-                    "particle_charge" in self.beam_config["lhcb1"]
-                    and self.beam_config["lhcb1"]["particle_charge"] == 82
-                ):
-                    self._ost = ost_runIII_ions
-                else:
-                    self._ost = ost_runIII
+                self._ost = ost_runIII_ions if self.ions else ost_runIII
             else:
                 raise ValueError("No optics specific tools for the provided configuration")
 
@@ -142,7 +136,7 @@ class MadCollider:
 
         return collider
 
-    def check_xsuite_lattices(self, line):
+    def check_xsuite_lattices(self, line: xt.Line) -> None:
         tw = line.twiss(method="6d", matrix_stability_tol=100)
         print(f"--- Now displaying Twiss result at all IPS for line {line}---")
         print(tw[:, "ip.*"])
@@ -151,7 +145,7 @@ class MadCollider:
         print(tw.qx, tw.qy)
 
     @staticmethod
-    def clean_temporary_files():
+    def clean_temporary_files() -> None:
         # Remove all the temporaty files created in the process of building collider
         os.remove("mad_collider.log")
         os.remove("mad_b4.log")

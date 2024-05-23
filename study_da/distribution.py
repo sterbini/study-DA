@@ -31,7 +31,9 @@ class Distribution:
         # Variables to split the distribution for parallelization
         self.n_split: int = configuration["n_split"]
 
-    def get_radial_list(self, lower_crop: float | None = None, upper_crop: float | None = None):
+    def get_radial_list(
+        self, lower_crop: float | None = None, upper_crop: float | None = None
+    ) -> np.ndarray:
         radial_list = np.linspace(self.r_min, self.r_max, self.n_r, endpoint=False)
         if upper_crop:
             radial_list = radial_list[radial_list <= 7.5]
