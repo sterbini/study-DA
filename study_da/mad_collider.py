@@ -15,10 +15,10 @@ import xtrack as xt
 from cpymad.madx import Madx
 
 # Import user-defined modules
-from .hllhc13 import optics_specific_tools as ost_hllhc13
-from .hllhc16 import optics_specific_tools as ost_hllhc16
-from .runIII import optics_specific_tools as ost_runIII
-from .runIII_ions import optics_specific_tools as ost_runIII_ions
+from .version_specific_files.hllhc13 import optics_specific_tools as ost_hllhc13
+from .version_specific_files.hllhc16 import optics_specific_tools as ost_hllhc16
+from .version_specific_files.runIII import optics_specific_tools as ost_runIII
+from .version_specific_files.runIII_ions import optics_specific_tools as ost_runIII_ions
 
 # ==================================================================================================
 # --- Class definition
