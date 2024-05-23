@@ -25,39 +25,31 @@ def check_madx_lattices(mad):
         print("WARNING: Some sanity checks have failed during the madx lattice check")
 
 
-def check_xsuite_lattices(my_line):
-    tw = my_line.twiss(method="6d", matrix_stability_tol=100)
-    print(f"--- Now displaying Twiss result at all IPS for line {my_line}---")
-    print(tw[:, "ip.*"])
-    # print qx and qy
-    print(f"--- Now displaying Qx and Qy for line {my_line}---")
-    print(tw.qx, tw.qy)
-
-
 def build_sequence(
     mad,
     mylhcbeam,
     beam_config,  # Not used but important for consistency with other optics
     ignore_cycling=False,
     slice_factor=4,
+    BFPP=False, # Not used but important for consistency with other optics
 ):
     # Select beam
     mad.input(f"mylhcbeam = {mylhcbeam}")
 
-    mad.input(f"""
+    mad.input("""
       ! Get the toolkit
       call,file=
         "acc-models-lhc/toolkit/macro.madx";
       """)
 
-    mad.input(f"""
+    mad.input("""
       ! Build sequence
       option, -echo,-warn,-info;
-      if (mylhcbeam==4){{
+      if (mylhcbeam==4){
         call,file="acc-models-lhc/lhc_acc-models-lhc_b4.seq";
-      }} else {{
+      } else {
         call,file="acc-models-lhc/lhc_acc-models-lhc.seq";
-      }};
+      };
       option, -echo, warn,-info;
       """)
 
@@ -67,7 +59,7 @@ def build_sequence(
     # Slice nominal sequence
     mad.input("exec, myslice;")
 
-    mad.input(f"""
+    mad.input("""
     nrj=6800;
     beam,particle=proton,sequence=lhcb1,energy=nrj,npart=1.15E11,sige=4.5e-4;
     beam,particle=proton,sequence=lhcb2,energy=nrj,bv = -1,npart=1.15E11,sige=4.5e-4;

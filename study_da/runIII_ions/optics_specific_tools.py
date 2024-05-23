@@ -33,21 +33,13 @@ def check_madx_lattices(mad):
         print("Warning: the standard deviation of x and y are not close to zero")
 
 
-def check_xsuite_lattices(my_line):
-    tw = my_line.twiss(method="6d", matrix_stability_tol=100)
-    print(f"--- Now displaying Twiss result at all IPS for line {my_line}---")
-    print(tw[:, "ip.*"])
-    # print qx and qy
-    print(f"--- Now displaying Qx and Qy for line {my_line}---")
-    print(tw.qx, tw.qy)
-
-
 def build_sequence(
     mad,
     mylhcbeam,
     beam_config,  # Not used but important for consistency with other optics
     ignore_cycling=False,
     slice_factor=8,
+    BFPP=True,
 ):
     # Select beam
     mad.input(f"mylhcbeam = {mylhcbeam}")
@@ -95,16 +87,61 @@ def build_sequence(
                 )
 
     # BFPP
-    # ! FIND A WAY TO ONLY USE THAT FOR B1
-    if "BFPP" in config_mad and config_mad["BFPP"]:
+    if mylhcbeam == 1 and BFPP:
         apply_BFPP(mad)
 
 
 def apply_optics(mad, optics_file):
     mad.call(optics_file)
-    mad.call("ir7_strengths.madx")
+    apply_ir7_strengths(mad)
     mad.input("on_alice := on_alice_normalized * 7000. / nrj;")
     mad.input("on_lhcb := on_lhcb_normalized * 7000. / nrj;")
+
+
+def apply_ir7_strengths(mad):
+    mad.input("""!***IR7 Optics***
+            KQ4.LR7     :=    0.131382724100E-02 ;
+            KQT4.L7     :=    0.331689344000E-03 ;
+            KQT4.R7     :=    0.331689344000E-03 ;
+            KQ5.LR7     :=   -0.133553657300E-02 ;
+            KQT5.L7     :=    0.000000000000E+00 ;
+            KQT5.R7     :=    0.000000000000E+00 ;
+
+            !Beam1
+            KQ6.L7B1    :=    0.332380383100E-02 ;
+            KQ6.R7B1    :=   -0.281821059300E-02 ;
+            KQTL7.L7B1  :=    0.307231360100E-03 ;
+            KQTL7.R7B1  :=    0.411775382800E-02 ;
+            KQTL8.L7B1  :=    0.535631538200E-03 ;
+            KQTL8.R7B1  :=    0.180061251400E-02 ;
+            KQTL9.L7B1  :=    0.104649831600E-03 ;
+            KQTL9.R7B1  :=    0.316515736800E-02 ;
+            KQTL10.L7B1 :=    0.469149843300E-02 ;
+            KQTL10.R7B1 :=    0.234006504200E-03 ;
+            KQTL11.L7B1 :=    0.109300381500E-02 ;
+            KQTL11.R7B1 :=   -0.129517571700E-03 ;
+            KQT12.L7B1  :=    0.203869506000E-02 ;
+            KQT12.R7B1  :=    0.414855502900E-03 ;
+            KQT13.L7B1  :=   -0.647047560500E-03 ;
+            KQT13.R7B1  :=    0.163470209700E-03 ;
+
+            !Beam2
+            KQ6.L7B2    :=   -0.278052285800E-02 ;
+            KQ6.R7B2    :=    0.330261896100E-02 ;
+            KQTL7.L7B2  :=    0.391109869200E-02 ;
+            KQTL7.R7B2  :=    0.307913213400E-03 ;
+            KQTL8.L7B2  :=    0.141328062600E-02 ;
+            KQTL8.R7B2  :=    0.139274871000E-02 ;
+            KQTL9.L7B2  :=    0.363516060400E-02 ;
+            KQTL9.R7B2  :=    0.692028108000E-04 ;
+            KQTL10.L7B2 :=    0.156243369200E-03 ;
+            KQTL10.R7B2 :=    0.451207010600E-02 ;
+            KQTL11.L7B2 :=    0.360602594900E-03 ;
+            KQTL11.R7B2 :=    0.131920025500E-02 ;
+            KQT12.L7B2  :=   -0.705199531300E-03 ;
+            KQT12.R7B2  :=   -0.138620184600E-02 ;
+            KQT13.L7B2  :=   -0.606647736700E-03 ;
+            KQT13.R7B2  :=   -0.585571959400E-03 ;""")
 
 
 def apply_BFPP(mad):

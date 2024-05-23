@@ -26,21 +26,13 @@ def check_madx_lattices(mad):
         print("WARNING: Some sanity checks have failed during the madx lattice check")
 
 
-def check_xsuite_lattices(my_line):
-    tw = my_line.twiss(method="6d", matrix_stability_tol=100)
-    print(f"--- Now displaying Twiss result at all IPS for line {my_line}---")
-    print(tw[:, "ip.*"])
-    # print qx and qy
-    print(f"--- Now displaying Qx and Qy for line {my_line}---")
-    print(tw.qx, tw.qy)
-
-
 def build_sequence(
     mad,
     mylhcbeam,
     beam_config,  # Not used but important for consistency with other optics
     ignore_cycling=False,
-    slice_factor=None, # Not used but important for consistency with other optics
+    slice_factor=None,  # Not used but important for consistency with other optics
+    BFPP=False,  # Not used but important for consistency with other optics
 ):
     # Select beam
     mad.input(f"mylhcbeam = {mylhcbeam}")
