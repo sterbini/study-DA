@@ -6,27 +6,22 @@
 
 # Import standard library modules
 import json
+import logging
 
 # Import third-party modules
 import numpy as np
 import xmask as xm
+import xmask.lhc as xlhc
 import xtrack as xt
 
-# Import user-defined modules
-from scheme_utils import get_worst_bunch, load_and_check_filling_scheme
-
-from .hllhc13.orbit_correction import (
-    generate_orbit_correction_setup as gen_corr_hllhc13,
-)
-from .hllhc16.orbit_correction import (
-    generate_orbit_correction_setup as gen_corr_hllhc16,
-)
-from .runIII.orbit_correction import (  # type: ignore
-    generate_orbit_correction_setup as gen_corr_runIII,
-)
-from .runIII_ions.orbit_correction import (  # type: ignore
-    generate_orbit_correction_setup as gen_corr_runIII_ions,
-)
+# Import user-defined modules and functions
+from .hllhc13 import apply_crab_fix
+from .hllhc13 import generate_orbit_correction_setup as gen_corr_hllhc13
+from .hllhc16 import generate_orbit_correction_setup as gen_corr_hllhc16
+from .runIII import generate_orbit_correction_setup as gen_corr_runIII
+from .runIII_ions import generate_orbit_correction_setup as gen_corr_runIII_ions
+from .scheme_utils import get_worst_bunch, load_and_check_filling_scheme
+from .xsuite_leveling import luminosity_leveling, luminosity_leveling_ip1_5
 
 # ==================================================================================================
 # --- Class definition
@@ -40,6 +35,10 @@ class XsuiteCollider:
         # Configuration variables
         self.config_beambeam: dict = configuration["config_beambeam"]
         self.config_knobs_and_tuning: dict = configuration["config_knobs_and_tuning"]
+        self.config_lumi_leveling: dict = configuration["config_lumi_leveling"]
+
+        # self.config_lumi_leveling_ip1_5 will be None if not present in the configuration
+        self.config_lumi_leveling_ip1_5 = configuration.get("config_lumi_leveling_ip1_5")
 
         # Optics version (needed to select the appropriate optics specific functions)
         self.ver_hllhc_optics: float = ver_hllhc_optics
@@ -93,6 +92,10 @@ class XsuiteCollider:
         # experimental magnets, etc.)
         for kk, vv in self.config_knobs_and_tuning["knob_settings"].items():
             collider.vars[kk] = vv
+
+        # Crab fix (if needed)
+        if self.ver_hllhc_optics is not None and self.ver_hllhc_optics == 1.3:
+            apply_crab_fix(collider, self.config_knobs_and_tuning)
 
     def match_tune_and_chroma(
         self, collider: xt.Multiline, match_linear_coupling_to_zero: bool = True
@@ -192,3 +195,119 @@ class XsuiteCollider:
         n_collisions_ip8 = np.roll(array_b1, 2670) @ array_b2
 
         return n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8
+
+    def level_all_by_separation(
+        self,
+        n_collisions_ip2,
+        n_collisions_ip8,
+        collider,
+        n_collisions_ip1_and_5,
+        crab,
+    ) -> None:
+        # Update the number of bunches in the configuration file
+        self.config_lumi_leveling["ip1"]["num_colliding_bunches"] = int(n_collisions_ip1_and_5)
+        self.config_lumi_leveling["ip5"]["num_colliding_bunches"] = int(n_collisions_ip1_and_5)
+        self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = int(n_collisions_ip2)
+        self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = int(n_collisions_ip8)
+
+        # Level by separation
+        try:
+            luminosity_leveling(
+                collider,
+                config_lumi_leveling=self.config_lumi_leveling,
+                config_beambeam=self.config_beambeam,
+                crab=crab,
+            )
+        except Exception:
+            print("Leveling failed..continuing")
+
+        self.update_knob(collider, self.config_lumi_leveling["ip1"], "on_sep1")
+        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2")
+        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2h")
+        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2v")
+        self.update_knob(collider, self.config_lumi_leveling["ip5"], "on_sep5")
+        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8")
+        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8h")
+        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8v")
+
+    def level_ip1_5_by_bunch_intensity(
+        self,
+        collider,
+        n_collisions_ip1_and_5,
+        crab,
+    ):
+        # Initial intensity
+        bunch_intensity = self.config_beambeam["num_particles_per_bunch"]
+
+        # First level luminosity in IP 1/5 changing the intensity
+        if (
+            self.config_lumi_leveling_ip1_5 is not None
+            and not self.config_lumi_leveling_ip1_5["skip_leveling"]
+        ):
+            logging.info("Leveling luminosity in IP 1/5 varying the intensity")
+            # Update the number of bunches in the configuration file
+            self.config_lumi_leveling_ip1_5["num_colliding_bunches"] = int(n_collisions_ip1_and_5)
+
+            # Do the levelling
+            try:
+                bunch_intensity = luminosity_leveling_ip1_5(
+                    collider,
+                    self.config_lumi_leveling_ip1_5,
+                    self.config_beambeam,
+                    crab=crab,
+                    cross_section=self.config_beambeam["cross_section"],
+                )
+            except ValueError:
+                print("There was a problem during the luminosity leveling in IP1/5... Ignoring it.")
+
+        # Update the configuration
+        self.config_beambeam["final_num_particles_per_bunch"] = float(bunch_intensity)
+
+    def level_ip2_8_by_separation(
+        self,
+        n_collisions_ip2,
+        n_collisions_ip8,
+        collider,
+        crab,
+    ):
+        # Update the number of bunches in the configuration file
+        self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = int(n_collisions_ip2)
+        self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = int(n_collisions_ip8)
+
+        # Set up the constraints for lumi optimization in IP8
+        additional_targets_lumi = []
+        if "constraints" in self.config_lumi_leveling["ip8"]:
+            for constraint in self.config_lumi_leveling["ip8"]["constraints"]:
+                obs, beam, sign, val, at = constraint.split("_")
+                if sign == "<":
+                    ineq = xt.LessThan(float(val))
+                elif sign == ">":
+                    ineq = xt.GreaterThan(float(val))
+                else:
+                    raise ValueError(
+                        f"Unsupported sign for luminosity optimization constraint: {sign}"
+                    )
+                target = xt.Target(obs, ineq, at=at, line=beam, tol=1e-6)
+                additional_targets_lumi.append(target)
+
+        # Then level luminosity in IP 2/8 changing the separation
+        collider = luminosity_leveling(
+            collider,
+            config_lumi_leveling=self.config_lumi_leveling,
+            config_beambeam=self.config_beambeam,
+            additional_targets_lumi=additional_targets_lumi,
+            crab=crab,
+        )
+
+        # Update configuration
+        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2")
+        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2h")
+        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2v")
+        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8")
+        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8h")
+        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8v")
+
+    @staticmethod
+    def update_knob(collider, dictionnary, knob_name):
+        if knob_name in collider.vars.keys():
+            dictionnary[f"final_{knob_name}"] = collider.vars[knob_name]._value
