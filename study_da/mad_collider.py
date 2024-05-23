@@ -28,6 +28,7 @@ from .version_specific_files.runIII_ions import optics_specific_tools as ost_run
 class MadCollider:
     def __init__(self, configuration: dict):
         # Configuration variables
+        self.sanity_checks: bool = configuration["sanity_checks"]
         self.links: str = configuration["links"]
         self.beam_config: dict = configuration["beam_config"]
         self.optics: str = configuration["optics_file"]
@@ -42,6 +43,9 @@ class MadCollider:
 
         # Optics specific tools
         self._ost = None
+
+        # Path to disk
+        self.path_collider = configuration["path_collider"]
 
     @property
     def ost(self):
@@ -66,7 +70,7 @@ class MadCollider:
 
         return self._ost
 
-    def prepare_mad_collider(self, sanity_checks: bool = True) -> tuple[Madx, Madx]:
+    def prepare_mad_collider(self) -> tuple[Madx, Madx]:
         # Make mad environment
         xm.make_mad_environment(links=self.links)
 
@@ -81,7 +85,7 @@ class MadCollider:
         # Apply optics (only for b1b2, b4 will be generated from b1b2)
         self.ost.apply_optics(mad_b1b2, optics_file=self.optics)
 
-        if sanity_checks:
+        if self.sanity_checks:
             mad_b1b2.use(sequence="lhcb1")
             mad_b1b2.twiss()
             self.ost.check_madx_lattices(mad_b1b2)
@@ -91,16 +95,14 @@ class MadCollider:
 
         # Apply optics (only for b4, just for check)
         self.ost.apply_optics(mad_b4, optics_file=self.optics)
-        if sanity_checks:
+        if self.sanity_checks:
             mad_b4.use(sequence="lhcb2")
             mad_b4.twiss()
             self.ost.check_madx_lattices(mad_b1b2)
 
         return mad_b1b2, mad_b4
 
-    def build_collider(
-        self, mad_b1b2: Madx, mad_b4: Madx, sanity_checks: bool = True
-    ) -> xt.Multiline:
+    def build_collider(self, mad_b1b2: Madx, mad_b4: Madx) -> xt.Multiline:
         # Build xsuite collider
         collider = xlhc.build_xsuite_collider(
             sequence_b1=mad_b1b2.sequence.lhcb1,
@@ -116,25 +118,21 @@ class MadCollider:
         )
         collider.build_trackers()
 
-        if sanity_checks:
+        if self.sanity_checks:
             collider["lhcb1"].twiss(method="4d")
             collider["lhcb2"].twiss(method="4d")
 
         return collider
 
-    def activate_RF_and_twiss(
-        self, collider: xt.Multiline, sanity_checks: bool = True
-    ) -> xt.Multiline:
+    def activate_RF_and_twiss(self, collider: xt.Multiline) -> None:
         # Define a RF knobs
         collider.vars["vrf400"] = self.phasing["vrf400"]
         collider.vars["lagrf400.b1"] = self.phasing["lagrf400.b1"]
         collider.vars["lagrf400.b2"] = self.phasing["lagrf400.b2"]
 
-        if sanity_checks:
+        if self.sanity_checks:
             for my_line in ["lhcb1", "lhcb2"]:
                 self.check_xsuite_lattices(collider[my_line])
-
-        return collider
 
     def check_xsuite_lattices(self, line: xt.Line) -> None:
         tw = line.twiss(method="6d", matrix_stability_tol=100)
@@ -143,6 +141,11 @@ class MadCollider:
         # print qx and qy
         print(f"--- Now displaying Qx and Qy for line {line}---")
         print(tw.qx, tw.qy)
+
+    def write_collider_to_json(self, collider: xt.Multiline) -> None:
+        # Save collider to json, creating the folder if it does not exist
+        os.makedirs(self.path_collider, exist_ok=True)
+        collider.to_json(self.path_collider)
 
     @staticmethod
     def clean_temporary_files() -> None:

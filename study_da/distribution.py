@@ -31,6 +31,9 @@ class Distribution:
         # Variables to split the distribution for parallelization
         self.n_split: int = configuration["n_split"]
 
+        # Variable to write the distribution to disk
+        self.path_distribution_folder: str = configuration["path_distribution_folder"]
+
     def get_radial_list(
         self, lower_crop: float | None = None, upper_crop: float | None = None
     ) -> np.ndarray:
@@ -65,16 +68,14 @@ class Distribution:
 
         return [l_particles]
 
-    def write_particle_distribution_to_disk(
-        self, ll_particles, path_distribution_folder: str
-    ) -> list[str]:
+    def write_particle_distribution_to_disk(self, ll_particles) -> list[str]:
         # Define folder to store the distributions
-        os.makedirs(path_distribution_folder, exist_ok=True)
+        os.makedirs(self.path_distribution_folder, exist_ok=True)
 
         # Write the distribution to disk
         l_path_files = []
         for idx_chunk, l_particles in enumerate(ll_particles):
-            path_file = f"{path_distribution_folder}/{idx_chunk:02}.parquet"
+            path_file = f"{self.path_distribution_folder}/{idx_chunk:02}.parquet"
             pd.DataFrame(
                 l_particles,
                 columns=[
