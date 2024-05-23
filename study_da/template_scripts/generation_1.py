@@ -10,15 +10,15 @@ import logging
 
 # Import third-party modules
 # Import user-defined modules
-from study_da import Distribution, MadCollider, load_configuration_from_path
+from study_da import MadCollider, ParticlesDistribution, load_configuration_from_path
 
 
 # ==================================================================================================
 # --- Script
 # ==================================================================================================
 def build_distribution(config_particles):
-    # Build class for generating particle distribution
-    distr = Distribution(config_particles)
+    # Build object for generating particle distribution
+    distr = ParticlesDistribution(config_particles)
 
     # Build particle distribution
     particle_list = distr.return_distribution_as_list()
@@ -28,7 +28,7 @@ def build_distribution(config_particles):
 
 
 def build_collider(config_mad):
-    # Build class for generating collider from mad
+    # Build object for generating collider from mad
     mc = MadCollider(config_mad)
 
     # Build mad model
@@ -44,7 +44,7 @@ def build_collider(config_mad):
     mc.clean_temporary_files()
 
     # Save collider to json
-    mc.write_collider_to_json(collider)
+    mc.write_collider_to_disk(collider)
 
 
 # ==================================================================================================
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     logging.info("Starting script to build particle distribution and collider")
 
     # Load full configuration
-    full_configuration = load_configuration_from_path(config_filepath)
+    full_configuration, ryaml = load_configuration_from_path(config_filepath)
 
     # Get configuration
     config_particles = full_configuration["config_particles"]

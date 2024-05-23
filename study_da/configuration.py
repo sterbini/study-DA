@@ -7,7 +7,7 @@
 # Import standard library modules
 
 # Import third-party modules
-import yaml
+import ruamel.yaml
 
 # Import user-defined modules
 
@@ -17,9 +17,13 @@ import yaml
 # ==================================================================================================
 
 
-def load_configuration_from_path(path: str) -> dict:
+def load_configuration_from_path(path: str, ryaml=None) -> tuple[dict, ruamel.yaml.YAML]:
+    if ryaml is None:
+        # Initialize yaml reader
+        ryaml = ruamel.yaml.YAML()
+
     # Load configuration
     with open(path, "r") as fid:
-        configuration = yaml.safe_load(fid)
+        configuration = ryaml.load(fid)
 
-    return configuration
+    return configuration, ryaml

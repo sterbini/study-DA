@@ -20,7 +20,7 @@ import pandas as pd
 # ==================================================================================================
 
 
-class Distribution:
+class ParticlesDistribution:
     def __init__(self, configuration: dict):
         # Variables used to define the distribution
         self.r_min: int = configuration["r_min"]

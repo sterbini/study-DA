@@ -142,7 +142,7 @@ class MadCollider:
         print(f"--- Now displaying Qx and Qy for line {line}---")
         print(tw.qx, tw.qy)
 
-    def write_collider_to_json(self, collider: xt.Multiline) -> None:
+    def write_collider_to_disk(self, collider: xt.Multiline) -> None:
         # Save collider to json, creating the folder if it does not exist
         os.makedirs(self.path_collider, exist_ok=True)
         collider.to_json(self.path_collider)

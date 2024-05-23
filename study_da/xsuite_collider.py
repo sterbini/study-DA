@@ -38,7 +38,11 @@ from .xsuite_leveling import compute_PU, luminosity_leveling, luminosity_levelin
 
 class XsuiteCollider:
     def __init__(
-        self, configuration: dict, ver_hllhc_optics: float, ver_lhc_run: float, ions: bool
+        self,
+        configuration: dict,
+        ver_hllhc_optics: float,
+        ver_lhc_run: float,
+        ions: bool,
     ):
         # Configuration variables
         self.config_beambeam: dict = configuration["config_beambeam"]
@@ -53,6 +57,13 @@ class XsuiteCollider:
         self.ver_lhc_run: float = ver_lhc_run
         self.ions: bool = ions
         self._dict_orbit_correction: dict | None = None
+
+        # Crab cavities
+        self._crab: bool | None = None
+
+        # Save collider to disk
+        self.save_final_collider = configuration["save_final_collider"]
+        self.path_final_collider = configuration["path_final_collider"]
 
     @property
     def dict_orbit_correction(self) -> dict:
@@ -202,13 +213,23 @@ class XsuiteCollider:
 
         return int(n_collisions_ip1_and_5), int(n_collisions_ip2), int(n_collisions_ip8)
 
+    @property
+    def crab(self):
+        if self._crab is None:
+            # Get crab cavities
+            self._crab = False
+            if "on_crab1" in self.config_knobs_and_tuning["knob_settings"]:
+                crab_val = float(self.config_knobs_and_tuning["knob_settings"]["on_crab1"])
+                if abs(crab_val) > 0:
+                    self._crab = True
+        return self._crab
+
     def level_all_by_separation(
         self,
         n_collisions_ip2: int,
         n_collisions_ip8: int,
         collider: xt.Multiline,
         n_collisions_ip1_and_5: int,
-        crab: bool,
     ) -> None:
         # Update the number of bunches in the configuration file
         self.config_lumi_leveling["ip1"]["num_colliding_bunches"] = n_collisions_ip1_and_5
@@ -222,7 +243,7 @@ class XsuiteCollider:
                 collider,
                 config_lumi_leveling=self.config_lumi_leveling,
                 config_beambeam=self.config_beambeam,
-                crab=crab,
+                crab=self.crab,
             )
         except Exception:
             print("Leveling failed..continuing")
@@ -240,7 +261,6 @@ class XsuiteCollider:
         self,
         collider: xt.Multiline,
         n_collisions_ip1_and_5: int,
-        crab: bool,
     ) -> None:
         # Initial intensity
         bunch_intensity = self.config_beambeam["num_particles_per_bunch"]
@@ -260,7 +280,7 @@ class XsuiteCollider:
                     collider,
                     self.config_lumi_leveling_ip1_5,
                     self.config_beambeam,
-                    crab=crab,
+                    crab=self.crab,
                     cross_section=self.config_beambeam["cross_section"],
                 )
             except ValueError:
@@ -274,7 +294,6 @@ class XsuiteCollider:
         n_collisions_ip2: int,
         n_collisions_ip8: int,
         collider: xt.Multiline,
-        crab: bool,
     ) -> None:
         # Update the number of bunches in the configuration file
         self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = n_collisions_ip2
@@ -302,7 +321,7 @@ class XsuiteCollider:
             config_lumi_leveling=self.config_lumi_leveling,
             config_beambeam=self.config_beambeam,
             additional_targets_lumi=additional_targets_lumi,
-            crab=crab,
+            crab=self.crab,
         )
 
         # Update configuration
@@ -401,7 +420,7 @@ class XsuiteCollider:
                 i_bunch_acw=i_bunch_acw,
             )
 
-    def record_final_luminosity(self, collider, l_n_collisions, crab):
+    def record_final_luminosity(self, collider, l_n_collisions):
         # Get the final luminoisty in all IPs
         twiss_b1 = collider["lhcb1"].twiss()
         twiss_b2 = collider["lhcb2"].twiss()
@@ -419,7 +438,7 @@ class XsuiteCollider:
                     sigma_z=self.config_beambeam["sigma_z"],
                     twiss_b1=twiss_b1,
                     twiss_b2=twiss_b2,
-                    crab=crab,
+                    crab=self.crab,
                 )
                 PU = compute_PU(
                     L,
@@ -440,6 +459,12 @@ class XsuiteCollider:
         for ip, L, PU in zip(l_ip, l_lumi, l_PU):
             self.config_beambeam[f"luminosity_{ip}_after_optimization"] = float(L)
             self.config_beambeam[f"Pile-up_{ip}_after_optimization"] = float(PU)
+
+    def write_collider_to_disk(self, collider, full_configuration):
+        if self.save_final_collider:
+            logging.info('Saving "collider.json')
+            collider.metadata = full_configuration
+            collider.to_json(self.path_final_collider)
 
     @staticmethod
     def update_knob(collider: xt.Multiline, dictionnary: dict, knob_name: str) -> None:

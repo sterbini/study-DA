@@ -19,9 +19,9 @@ import xobjects as xo
 
 
 class XsuiteTracking:
-    def __init__(self, context, configuration: dict, nemitt_x, nemitt_y):
+    def __init__(self, configuration: dict, nemitt_x, nemitt_y):
         # Context parameters
-        self.context_str = context
+        self.context_str = configuration["context"]
         self._context = None
 
         # Simulation parameters
@@ -50,6 +50,11 @@ class XsuiteTracking:
         return self._context
 
     def prepare_particle_distribution_for_tracking(self, collider):
+        # Reset the tracker to go to GPU if needed
+        if self.context_str in ["cupy", "opencl"]:
+            collider.discard_trackers()
+            collider.build_trackers(_context=self.context)
+
         particle_df = pd.read_parquet(self.particle_file)
 
         r_vect = particle_df["normalized amplitude in xy-plane"].values
@@ -87,4 +92,4 @@ class XsuiteTracking:
             f"Elapsed time per particle per turn: {(b-a)/particles._capacity/num_turns*1e6} us"
         )
 
-        return particles
+        return particles.to_dict()
