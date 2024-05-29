@@ -13,22 +13,21 @@ import numpy as np
 import xmask as xm
 import xtrack as xt
 
-from .scheme_utils import get_worst_bunch, load_and_check_filling_scheme
-
 # Import user-defined modules and functions
-from .version_specific_files.hllhc13 import apply_crab_fix
-from .version_specific_files.hllhc13 import (
+from ..version_specific_files.hllhc13 import apply_crab_fix
+from ..version_specific_files.hllhc13 import (
     generate_orbit_correction_setup as gen_corr_hllhc13,
 )
-from .version_specific_files.hllhc16 import (
+from ..version_specific_files.hllhc16 import (
     generate_orbit_correction_setup as gen_corr_hllhc16,
 )
-from .version_specific_files.runIII import (
+from ..version_specific_files.runIII import (
     generate_orbit_correction_setup as gen_corr_runIII,
 )
-from .version_specific_files.runIII_ions import (
+from ..version_specific_files.runIII_ions import (
     generate_orbit_correction_setup as gen_corr_runIII_ions,
 )
+from .scheme_utils import get_worst_bunch, load_and_check_filling_scheme
 from .xsuite_leveling import compute_PU, luminosity_leveling, luminosity_leveling_ip1_5
 
 # ==================================================================================================

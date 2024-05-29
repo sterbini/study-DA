@@ -1,8 +1,8 @@
-from .configuration import load_configuration_from_path
-from .mad_collider import MadCollider
-from .particles_distribution import ParticlesDistribution
-from .xsuite_collider import XsuiteCollider
-from .xsuite_tracking import XsuiteTracking
+from .master_classes.configuration import load_configuration_from_path
+from .master_classes.mad_collider import MadCollider
+from .master_classes.particles_distribution import ParticlesDistribution
+from .master_classes.xsuite_collider import XsuiteCollider
+from .master_classes.xsuite_tracking import XsuiteTracking
 
 __all__ = [
     "MadCollider",
