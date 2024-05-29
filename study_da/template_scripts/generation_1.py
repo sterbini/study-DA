@@ -14,7 +14,7 @@ from study_da import MadCollider, ParticlesDistribution, load_configuration_from
 
 
 # ==================================================================================================
-# --- Script
+# --- Script functions
 # ==================================================================================================
 def build_distribution(config_particles):
     # Build object for generating particle distribution
@@ -48,9 +48,14 @@ def build_collider(config_mad):
 
 
 # ==================================================================================================
-# --- Script for execution
+# --- Parameters definition
 # ==================================================================================================
 config_filepath = "config.yaml"
+
+
+# ==================================================================================================
+# --- Script for execution
+# ==================================================================================================
 
 if __name__ == "__main__":
     logging.info("Starting script to build particle distribution and collider")
