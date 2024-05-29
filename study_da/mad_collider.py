@@ -98,7 +98,7 @@ class MadCollider:
         if self.sanity_checks:
             mad_b4.use(sequence="lhcb2")
             mad_b4.twiss()
-            self.ost.check_madx_lattices(mad_b1b2)
+            self.ost.check_madx_lattices(mad_b4)
 
         return mad_b1b2, mad_b4
 
