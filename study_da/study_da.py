@@ -183,7 +183,6 @@ class StudyDA:
 
     def create_scans(
         self,
-        gen: str,
         generation: str,
         generation_path: str,
         template_name: str,
@@ -230,7 +229,7 @@ class StudyDA:
             l_study_path.append(path)
             l_study_str.append(
                 self.generate_render_write(
-                    gen,
+                    generation,
                     path,
                     template_name,
                     template_path,
@@ -275,7 +274,7 @@ class StudyDA:
             ryaml.dump(dictionary_tree, yaml_file)
 
     def create_study_for_current_gen(
-        self, idx_gen: int, gen: str, study_path: str, dictionary_tree: dict
+        self, idx_gen: int, generation: str, study_path: str, dictionary_tree: dict
     ) -> tuple[list[str], list[str]]:
         """
         Creates study files for the current generation.
@@ -289,20 +288,18 @@ class StudyDA:
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
-        template_name = self.config[gen].get("template_name", self.default_template_name)
-        template_path = self.config[gen].get("template_path", self.default_template_path)
+        template_name = self.config[generation].get("template_name", self.default_template_name)
+        template_path = self.config[generation].get("template_path", self.default_template_path)
         if "scans" in self.config["structure"][layer]:
             l_study_scan_str, l_study_path_next_layer = self.create_scans(
-                gen, layer, study_path, template_name, template_path
+                gen, generation, study_path, template_name, template_path
             )
             return l_study_scan_str, l_study_path_next_layer
             # l_study_str.extend(l_study_scan_str)
         else:
             # Always give the layer the name of the first generation file,
             # except if very first layer
-            layer_temp = (
-                "base" if idx_layer == 0 else self.config["structure"][layer]["generations"][0]
-            )
+            layer_temp = "base" if idx_gen == 0 else self.config["structure"][gen]["generations"][0]
             study_str, l_study_path_next_layer = self.generate_render_write(
                 gen,
                 layer_temp,
@@ -337,7 +334,7 @@ class StudyDA:
             for study_path in l_study_path:
                 for gen in self.config["structure"][layer]["generations"]:
                     l_curr_study_str, l_study_path_next_layer = self.create_study_for_current_gen(
-                        idx, layer, gen, study_path, dictionary_tree
+                        idx, gen, study_path, dictionary_tree
                     )
                     l_study_str.extend(l_curr_study_str)
                     dictionary_tree = self.complete_tree(
