@@ -19,6 +19,7 @@ from study_da import (
     XsuiteCollider,
     XsuiteTracking,
     load_configuration_from_path,
+    write_configuration_to_path,
 )
 
 
@@ -97,28 +98,7 @@ def configure_collider(full_configuration):
     return collider
 
 
-# ==================================================================================================
-# --- Parameters definition
-# ==================================================================================================
-config_filepath = "config.yaml"
-
-# ==================================================================================================
-# --- Script for execution
-# ==================================================================================================
-
-if __name__ == "__main__":
-    logging.info("Starting script to configure collider and track")
-
-    # Load full configuration
-    full_configuration, ryaml = load_configuration_from_path(config_filepath)
-
-    # Configure collider
-    collider = configure_collider(full_configuration)
-
-    # Drop updated configuration
-    with open(config_filepath, "w") as fid:
-        ryaml.dump(full_configuration, fid)
-
+def track_particles(full_configuration, collider):
     # Get emittances
     n_emitt_x = full_configuration["config_collider"]["config_beambeam"]["n_emitt_x"]
     n_emitt_y = full_configuration["config_collider"]["config_beambeam"]["n_emitt_y"]
@@ -143,7 +123,37 @@ if __name__ == "__main__":
     # Save output
     particles_df.to_parquet(full_configuration["config_simulation"]["path_output_particles"])
 
+
+def clean():
     # Remote the correction folder, and potential C files remaining
     with contextlib.suppress(Exception):
         os.system("rm -rf correction")
         os.system("rm -f *.cc")
+
+
+# ==================================================================================================
+# --- Parameters definition
+# ==================================================================================================
+config_filepath = "config.yaml"
+
+# ==================================================================================================
+# --- Script for execution
+# ==================================================================================================
+
+if __name__ == "__main__":
+    logging.info("Starting script to configure collider and track")
+
+    # Load full configuration
+    full_configuration, ryaml = load_configuration_from_path(config_filepath)
+
+    # Configure collider
+    collider = configure_collider(full_configuration)
+
+    # Drop updated configuration
+    write_configuration_to_path(full_configuration, config_filepath, ryaml)
+
+    # Track particles and save to disk
+    track_particles(full_configuration, collider)
+
+    # Clean temporary files
+    clean()

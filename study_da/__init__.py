@@ -1,4 +1,7 @@
-from .master_classes.configuration import load_configuration_from_path
+from .master_classes.configuration import (
+    load_configuration_from_path,
+    write_configuration_to_path,
+)
 from .master_classes.mad_collider import MadCollider
 from .master_classes.particles_distribution import ParticlesDistribution
 from .master_classes.xsuite_collider import XsuiteCollider
@@ -10,4 +13,5 @@ __all__ = [
     "ParticlesDistribution",
     "XsuiteCollider",
     "load_configuration_from_path",
+    "write_configuration_to_path",
 ]

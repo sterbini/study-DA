@@ -17,7 +17,9 @@ import ruamel.yaml
 # ==================================================================================================
 
 
-def load_configuration_from_path(path: str, ryaml=None) -> tuple[dict, ruamel.yaml.YAML]:
+def load_configuration_from_path(
+    path: str, ryaml: ruamel.yaml.YAML | None = None
+) -> tuple[dict, ruamel.yaml.YAML]:
     if ryaml is None:
         # Initialize yaml reader
         ryaml = ruamel.yaml.YAML()
@@ -27,3 +29,15 @@ def load_configuration_from_path(path: str, ryaml=None) -> tuple[dict, ruamel.ya
         configuration = ryaml.load(fid)
 
     return configuration, ryaml
+
+
+def write_configuration_to_path(
+    configuration: dict, path: str, ryaml: ruamel.yaml.YAML | None = None
+) -> None:
+    if ryaml is None:
+        # Initialize yaml reader
+        ryaml = ruamel.yaml.YAML()
+
+    # Write configuration
+    with open(path, "w") as fid:
+        ryaml.dump(configuration, fid)

@@ -63,16 +63,10 @@ if __name__ == "__main__":
     # Load full configuration
     full_configuration, ryaml = load_configuration_from_path(config_filepath)
 
-    # Get configuration
-    config_particles = full_configuration["config_particles"]
+    # Build and save particle distribution
+    build_distribution(full_configuration["config_particles"])
 
-    # Build particle distribution
-    build_distribution(config_particles)
-
-    # Get mad configuration
-    config_mad = full_configuration["config_mad"]
-
-    # Build collider
-    build_collider(config_mad)
+    # Build and save collider
+    build_collider(full_configuration["config_mad"])
 
     logging.info("Script finished")
