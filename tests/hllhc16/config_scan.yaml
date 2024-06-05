@@ -2,8 +2,15 @@
 # --- Structure of the study ---
 # ==================================================================================================
 name: example_tune_scan
-configuration: config_hllhc16.yaml
 structure:
+  base:
+    # List all useful files that will be used by executable in generations below
+    # These files are placed at the root of the study
+    dependencies:
+      - config_hllhc16.yaml
+
+  # First generation is always at the root of the study
+  # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
   generation_1:
     executable:
       name: generation_1.py
@@ -12,6 +19,9 @@ structure:
       beam_energy_tot:
         list: [6800, 7000]
         for_each_beam: true
+
+  # Same for second generation, which depends from first generation,
+  # such that config_hllhc16.yaml is accessible as ../../config_hllhc16.yaml
   generation_2:
     name: generation_2.py
     template: true

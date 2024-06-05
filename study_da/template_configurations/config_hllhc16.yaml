@@ -4,6 +4,7 @@ config_particles:
   n_r: 256
   n_angles: 5
   n_split: 5
+  path_distribution_folder: particles
 
 config_mad:
   # Links to be made for tools and scripts
@@ -55,6 +56,9 @@ config_mad:
 
   # To make some specifics checks
   sanity_checks: true
+
+  # Path of the collider file to be saved
+  path_collider: collider.json
 
 # Configuration for tuning of the collider
 config_collider:
@@ -229,10 +233,10 @@ config_collider:
 
 config_simulation:
   # Collider file
-  collider_file: ../generation_1/collider.json
+  collider_file: ../collider.json
 
   # Distribution in the normalized xy space
-  particle_file: ../generation_1/particles/00.parquet
+  particle_file: ../particles/00.parquet
 
   # Initial off-momentum
   delta_max: 27.e-5
