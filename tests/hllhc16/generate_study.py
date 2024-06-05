@@ -4,17 +4,18 @@
 
 # Import standard library modules
 import logging
+import os
 
 # Import third-party modules
 # Import user-defined modules
-from study_da import load_configuration_from_path
+from study_da import StudyDA
 
 # ==================================================================================================
-# --- Script to generate configuration (to generate a study)
+# --- Script to generate a study
 # ==================================================================================================
 
-# Load template config hllhc16
-configuration, ryaml = load_configuration_from_path(
-    "../../study_da/template_configurations/config_hllhc16.yaml"
-)
+# First copy the template configuration in the local directory
+os.system("cp ../../study_da/template_configurations/config_hllhc16.yaml .")
 
+# Now generate the study in the local directory
+study_da = StudyDA(path_config="configuration_scan.yaml")

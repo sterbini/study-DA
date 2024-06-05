@@ -157,3 +157,5 @@ if __name__ == "__main__":
 
     # Clean temporary files
     clean()
+
+    logging.info("Script finished")
