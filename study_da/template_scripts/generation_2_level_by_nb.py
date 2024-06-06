@@ -101,8 +101,8 @@ def configure_collider(full_configuration):
 
 def track_particles(full_configuration, collider):
     # Get emittances
-    n_emitt_x = full_configuration["config_collider"]["config_beambeam"]["n_emitt_x"]
-    n_emitt_y = full_configuration["config_collider"]["config_beambeam"]["n_emitt_y"]
+    n_emitt_x = full_configuration["config_collider"]["config_beambeam"]["nemitt_x"]
+    n_emitt_y = full_configuration["config_collider"]["config_beambeam"]["nemitt_y"]
     xst = XsuiteTracking(full_configuration["config_simulation"], n_emitt_x, n_emitt_y)
 
     # Prepare particle distribution

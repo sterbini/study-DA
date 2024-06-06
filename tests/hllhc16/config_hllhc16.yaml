@@ -9,7 +9,7 @@ config_particles:
 config_mad:
   # Links to be made for tools and scripts
   links:
-    acc-models-lhc: ../../../../../external_dependencies/acc-models-lhc
+    acc-models-lhc: ../../../../external_dependencies/acc-models-lhc
 
   # Optics file
   optics_file: acc-models-lhc/strengths/flat/opt_flathv_500_2000_thin.madx
@@ -20,6 +20,9 @@ config_mad:
       beam_energy_tot: 7000 # [GeV]
     lhcb2:
       beam_energy_tot: 7000 # [GeV]
+
+  # Ions being simulated
+  ions: false
 
   # Enable machine imperfections
   enable_imperfections: false
@@ -54,6 +57,12 @@ config_mad:
     par_on_errors_NLC: 0
     par_write_errortable: 1
 
+  phasing:
+    # RF voltage and phases
+    vrf400: 16.0 # [MV]
+    lagrf400.b1: 0.5 # [rad]
+    lagrf400.b2: 0.5 # [rad]
+
   # To make some specifics checks
   sanity_checks: true
 
@@ -86,8 +95,8 @@ config_collider:
       on_disp: 1 # Value to choose could be optics-dependent
 
       # Crab cavities
-      on_crab1: -190 # [urad]
-      on_crab5: -190 # [urad]
+      on_crab1: 0 # [urad]
+      on_crab5: 0 # [urad]
 
       # Magnets of the experiments
       on_alice_normalized: 1
@@ -95,11 +104,6 @@ config_collider:
       on_sol_atlas: 0
       on_sol_cms: 0
       on_sol_alice: 0
-
-      # RF voltage and phases
-      vrf400: 16.0 # [MV]
-      lagrf400.b1: 0.5 # [rad]
-      lagrf400.b2: 0.5 # [rad]
 
       # Octupoles
       i_oct_b1: -60. # [A]
@@ -153,9 +157,10 @@ config_collider:
     nemitt_x: 2.5e-6
     nemitt_y: 2.5e-6
     mask_with_filling_pattern:
-      pattern_fname: ../../filling_scheme/8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
+      pattern_fname: 8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
       i_bunch_b1:      # If not specified, the bunch with the worst schedule is chosen
       i_bunch_b2:      # Same. A value for i_bunch_b1 and i_bunch_b2 must be specified if pattern_fname is specified
+    cross_section: 81e-27
 
   config_lumi_leveling_ip1_5:
     skip_leveling: false
@@ -231,12 +236,19 @@ config_collider:
       - corr_co_acbyvs5.r8b1
       - corr_co_acbyhs5.r8b1
 
+  # Save collider or not
+  save_final_collider: false
+  path_final_collider: collider.json
+
 config_simulation:
   # Collider file
   collider_file: ../collider.json
 
   # Distribution in the normalized xy space
   particle_file: ../particles/00.parquet
+
+  # Output particle file
+  path_output_particles: output_particles.parquet
 
   # Initial off-momentum
   delta_max: 27.e-5
@@ -249,7 +261,3 @@ config_simulation:
 
   # Context for the simulation
   context: cpu   # 'cupy' # opencl
-
-  # Save collider or not
-  save_final_collider: false
-  path_final_collider: collider.json

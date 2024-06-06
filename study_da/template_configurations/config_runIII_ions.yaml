@@ -26,6 +26,9 @@ config_mad:
       particle_mass: 193.6872729 # [GeV]
       particle_charge: 82
 
+  # Ions being simulated
+  ions: true
+
   # Enable machine imperfections
   enable_imperfections: false
 
@@ -59,6 +62,12 @@ config_mad:
     par_on_errors_NLC: 0
     par_write_errortable: 1
 
+  phasing:
+    # RF voltage and phases
+    vrf400: 1148.0 # [MV]
+    lagrf400.b1: 0.5 # [rad]
+    lagrf400.b2: 0. # [rad]
+
   # To make some specifics checks
   sanity_checks: true
 
@@ -89,11 +98,6 @@ config_collider:
       on_sol_atlas: 0
       on_sol_cms: 0
       on_sol_alice: 0
-
-      # RF voltage and phases
-      vrf400: 1148 # [MV]
-      lagrf400.b1: 0.5 # [rad]
-      lagrf400.b2: 0. # [rad]
 
       # Octupoles
       i_oct_b1: 100. # [A]
@@ -148,9 +152,10 @@ config_collider:
     nemitt_x: 1.65e-6
     nemitt_y: 1.65e-6
     mask_with_filling_pattern:
-      pattern_fname: ../../filling_scheme/50ns_1240b_1088_1088_398_56bpi_PbPb_converted.json
+      pattern_fname: 50ns_1240b_1088_1088_398_56bpi_PbPb_converted.json
       i_bunch_b1: null # If not specified, the bunch with the worst schedule is chosen
       i_bunch_b2: null # Same. A value for i_bunch_b1 and i_bunch_b2 must be specified if pattern_fname is specified
+    cross_section: 281e-24
 
   skip_leveling: false
   config_lumi_leveling:
@@ -274,12 +279,19 @@ config_collider:
         - corr_co_acbyvs5.r8b1
         - corr_co_acbyhs5.r8b1
 
+  # Save collider or not
+  save_final_collider: false
+  path_final_collider: collider.json
+
 config_simulation:
   # Collider file
   collider_file: ../generation_1/collider.json
 
   # Distribution in the normalized xy space
   particle_file: ../generation_1/particles/00.parquet
+
+  # Output particle file
+  path_output_particles: output_particles.parquet
 
   # Initial off-momentum
   delta_max: 0.00024
@@ -293,6 +305,3 @@ config_simulation:
   # Context for the simulation
   context: "cpu" # 'cupy' # opencl
 
-  # Save collider or not
-  save_final_collider: false
-  path_final_collider: collider.json

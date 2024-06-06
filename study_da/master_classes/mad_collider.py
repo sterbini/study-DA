@@ -38,7 +38,7 @@ class MadCollider:
         self.enable_knob_synthesis: bool = configuration["enable_knob_synthesis"]
         self.rename_coupling_knobs: bool = configuration["rename_coupling_knobs"]
         self.pars_for_imperfections: dict = configuration["pars_for_imperfections"]
-        self.ver_lhc_run: float | None = configuration["ver_lhc_run"]
+        self.ver_lhc_run: int | None = configuration["ver_lhc_run"]
         self.ver_hllhc_optics: float | None = configuration["ver_hllhc_optics"]
         self.ions: bool = configuration["ions"]
         self.phasing: dict = configuration["phasing"]
@@ -105,6 +105,12 @@ class MadCollider:
         return mad_b1b2, mad_b4
 
     def build_collider(self, mad_b1b2: Madx, mad_b4: Madx) -> xt.Multiline:
+        # Ensure proper types to avoid assert errors
+        if self.ver_lhc_run is not None:
+            self.ver_lhc_run = int(self.ver_lhc_run)
+        if self.ver_hllhc_optics is not None:
+            self.ver_hllhc_optics = float(self.ver_hllhc_optics)
+
         # Build xsuite collider
         collider = xlhc.build_xsuite_collider(
             sequence_b1=mad_b1b2.sequence.lhcb1,
@@ -146,7 +152,8 @@ class MadCollider:
 
     def write_collider_to_disk(self, collider: xt.Multiline) -> None:
         # Save collider to json, creating the folder if it does not exist
-        os.makedirs(self.path_collider, exist_ok=True)
+        if "/" in self.path_collider:
+            os.makedirs(self.path_collider, exist_ok=True)
         collider.to_json(self.path_collider)
 
     @staticmethod

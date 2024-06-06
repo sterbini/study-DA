@@ -5,8 +5,11 @@
 # ==================================================================================================
 
 # Import standard library modules
+import copy
 import json
 import logging
+import os
+import pathlib
 
 # Import third-party modules
 import numpy as np
@@ -143,6 +146,12 @@ class XsuiteCollider:
     def set_filling_and_bunch_tracked(self, ask_worst_bunch: bool = False) -> None:
         # Get the filling scheme path
         filling_scheme_path = self.config_beambeam["mask_with_filling_pattern"]["pattern_fname"]
+
+        # Check if the filling scheme path must be obtained from the template schemes
+        scheme_folder = pathlib.Path(__file__).parent.parent.resolve().joinpath("filling_schemes")
+        if filling_scheme_path in os.listdir(scheme_folder):
+            filling_scheme_path = str(scheme_folder.joinpath(filling_scheme_path))
+            self.config_beambeam["mask_with_filling_pattern"]["pattern_fname"] = filling_scheme_path
 
         # Load and check filling scheme, potentially convert it
         filling_scheme_path = load_and_check_filling_scheme(filling_scheme_path)
@@ -462,10 +471,10 @@ class XsuiteCollider:
     def write_collider_to_disk(self, collider, full_configuration):
         if self.save_final_collider:
             logging.info('Saving "collider.json')
-            collider.metadata = full_configuration
+            collider.metadata = copy.deepcopy(full_configuration)
             collider.to_json(self.path_final_collider)
 
     @staticmethod
     def update_knob(collider: xt.Multiline, dictionnary: dict, knob_name: str) -> None:
         if knob_name in collider.vars.keys():
-            dictionnary[f"final_{knob_name}"] = collider.vars[knob_name]._value
+            dictionnary[f"final_{knob_name}"] = float(collider.vars[knob_name]._value)
