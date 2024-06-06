@@ -34,6 +34,7 @@ class StudyDA:
         str_parameters: str,
         template_path: str,
         template_name: str,
+        dependencies: dict[str, str] = {},
     ) -> str:
         """
         Renders the study file using a template.
@@ -42,6 +43,7 @@ class StudyDA:
             str_parameters (str): The string representation of parameters to declare/mutate.
             template_path (str): The path to the template file.
             template_name (str): The name of the template file.
+            dependencies (dict[str, str], optional): The dictionary of dependencies. Defaults to {}.
 
         Returns:
             str: The rendered study file.
@@ -50,7 +52,7 @@ class StudyDA:
         environment = Environment(loader=FileSystemLoader(template_path))
         template = environment.get_template(template_name)
 
-        return template.render(parameters=str_parameters)
+        return template.render(parameters=str_parameters, **dependencies)
 
     def write(self, study_str: str, file_path: str):
         """
@@ -100,9 +102,19 @@ class StudyDA:
             f"{key} = {value}\n" for key, value in dic_mutated_parameters.items()
         )
 
+        # Adapt the dict of dependencies to the current generation
+        dic_dependencies = self.config["dependencies"] if "dependencies" in self.config else {}
+        depth_gen = directory_path_gen.count("/") - 1
+        dic_dependencies = {
+            key: "../" * depth_gen + value for key, value in dic_dependencies.items()
+        }
+
         # Render and write the study file
         study_str = self.render(
-            str_parameters, template_name=template_name, template_path=template_path
+            str_parameters,
+            template_name=template_name,
+            template_path=template_path,
+            dependencies=dic_dependencies,
         )
 
         self.write(study_str, file_path_gen)
@@ -344,8 +356,8 @@ class StudyDA:
 
         # Add dependencies to the study
         if "dependencies" in self.config:
-            for dependency in self.config["dependencies"]:
-                shutil.copy2(dependency, self.config["name"])
+            for dependency, path in self.config["dependencies"].items():
+                shutil.copy2(path, self.config["name"])
 
         if tree_file:
             self.write_tree(dictionary_tree)

@@ -6,7 +6,7 @@ name: example_tune_scan
 # List all useful files that will be used by executable in generations below
 # These files are placed at the root of the study
 dependencies:
-  - config_hllhc16.yaml
+  main_configuration: config_hllhc16.yaml
 
 structure:
   # First generation is always at the root of the study

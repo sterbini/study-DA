@@ -62,7 +62,7 @@ if __name__ == "__main__":
     logging.info("Starting script to build particle distribution and collider")
 
     # Load full configuration
-    full_configuration, ryaml = load_configuration_from_path(config_filepath)
+    full_configuration, ryaml = load_configuration_from_path("{{main_configuration}}")
 
     # Build and save particle distribution
     build_distribution(full_configuration["config_particles"])
