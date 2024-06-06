@@ -8,14 +8,22 @@ import os
 
 # Import third-party modules
 # Import user-defined modules
-from study_da import StudyDA
+from study_da import StudyDA, load_configuration_from_path, write_configuration_to_path
 
 # ==================================================================================================
 # --- Script to generate a study
 # ==================================================================================================
 
-# First copy the template configuration in the local directory
-os.system("cp ../../study_da/template_configurations/config_hllhc16.yaml .")
+# Load the configuration
+config, ryaml = load_configuration_from_path(
+    "../../study_da/template_configurations/config_hllhc16.yaml"
+)
+
+# Adapt the number of turns
+config["config_simulation"]["n_turns"] = 100
+
+# Drop the configuration locally
+write_configuration_to_path(config, "config_hllhc16.yaml", ryaml)
 
 # Now generate the study in the local directory
 study_da = StudyDA(path_config="config_scan.yaml")
