@@ -1,3 +1,7 @@
 [submodule "external_dependencies/xmask"]
 	path = external_dependencies/xmask
 	url = https://github.com/xsuite/xmask.git
+[submodule "external_dependencies/acc-models-lhc"]
+	path = external_dependencies/acc-models-lhc
+	url = https://gitlab.cern.ch/acc-models/acc-models-lhc.git
+	branch = hl16
