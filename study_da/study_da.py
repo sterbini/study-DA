@@ -289,8 +289,8 @@ class StudyDA:
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
-        executable_name = self.config[generation]["executable"]["name"]
-        template = self.config[generation]["executable"]["template"]
+        executable_name = self.config["structure"][generation]["executable"]["name"]
+        template = self.config["structure"][generation]["executable"]["template"]
         if template:
             executable_path = f"{os.path.dirname(inspect.getfile(StudyDA))}/template_scripts/"
         else:
@@ -302,11 +302,8 @@ class StudyDA:
             )
             return l_study_scan_str, l_study_path_next_gen
         else:
-            # Always give the gen the name of the first generation file,
-            # except if very first layer
-            gen_temp = "base" if idx_gen == 0 else self.config["structure"][generation]
             study_str, l_study_path_next_gen = self.generate_render_write(
-                gen_temp,
+                self.config["structure"][generation],
                 study_path,
                 executable_name,
                 executable_path,
@@ -332,20 +329,23 @@ class StudyDA:
             shutil.rmtree(self.config["name"])
 
         for idx, generation in enumerate(sorted(self.config["structure"].keys())):
-            # Each generaration inside of a layer should yield the same l_study_path_next_layer
             l_study_path_next_generation = []
             for study_path in l_study_path:
-                for gen in self.config["structure"]:
-                    l_curr_study_str, l_study_path_next_generation = (
-                        self.create_study_for_current_gen(idx, gen, study_path)
-                    )
-                    l_study_str.extend(l_curr_study_str)
-                    dictionary_tree = self.complete_tree(
-                        dictionary_tree, l_study_path_next_generation, gen
-                    )
+                l_curr_study_str, l_study_path_next_generation = self.create_study_for_current_gen(
+                    idx, generation, study_path
+                )
+                l_study_str.extend(l_curr_study_str)
+                dictionary_tree = self.complete_tree(
+                    dictionary_tree, l_study_path_next_generation, generation
+                )
 
             # Update study path for next later
             l_study_path = l_study_path_next_generation
+
+        # Add dependencies to the study
+        if "dependencies" in self.config:
+            for dependency in self.config["dependencies"]:
+                shutil.copy2(dependency, self.config["name"])
 
         if tree_file:
             self.write_tree(dictionary_tree)

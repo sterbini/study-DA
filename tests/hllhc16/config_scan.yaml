@@ -2,13 +2,13 @@
 # --- Structure of the study ---
 # ==================================================================================================
 name: example_tune_scan
-structure:
-  base:
-    # List all useful files that will be used by executable in generations below
-    # These files are placed at the root of the study
-    dependencies:
-      - config_hllhc16.yaml
 
+# List all useful files that will be used by executable in generations below
+# These files are placed at the root of the study
+dependencies:
+  - config_hllhc16.yaml
+
+structure:
   # First generation is always at the root of the study
   # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
   generation_1:
@@ -23,8 +23,9 @@ structure:
   # Same for second generation, which depends from first generation,
   # such that config_hllhc16.yaml is accessible as ../../config_hllhc16.yaml
   generation_2:
-    name: generation_2.py
-    template: true
+    executable:
+      name: generation_2_level_by_nb.py
+      template: true
     scans:
       qx:
         linspace: [62.31, 62.32, 2]

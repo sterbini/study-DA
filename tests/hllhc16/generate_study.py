@@ -18,4 +18,5 @@ from study_da import StudyDA
 os.system("cp ../../study_da/template_configurations/config_hllhc16.yaml .")
 
 # Now generate the study in the local directory
-study_da = StudyDA(path_config="configuration_scan.yaml")
+study_da = StudyDA(path_config="config_scan.yaml")
+study_da.create_study(tree_file=True, force_overwrite=True)
