@@ -6,6 +6,7 @@ and potentially a set of template files."""
 # ==================================================================================================
 
 # Import standard library modules
+import inspect
 import itertools
 import os
 import shutil
@@ -274,41 +275,43 @@ class StudyDA:
             ryaml.dump(dictionary_tree, yaml_file)
 
     def create_study_for_current_gen(
-        self, idx_gen: int, generation: str, study_path: str, dictionary_tree: dict
+        self, idx_gen: int, generation: str, study_path: str
     ) -> tuple[list[str], list[str]]:
         """
         Creates study files for the current generation.
 
         Args:
             idx_gen (int): The index of the current layer.
-            gen (str): The name of the current generation.
+            generation (str): The name of the current generation.
             study_path (str): The path to the study folder.
             dictionary_tree (dict): The dictionary representing the study tree structure.
 
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
-        template_name = self.config[generation].get("template_name", self.default_template_name)
-        template_path = self.config[generation].get("template_path", self.default_template_path)
-        if "scans" in self.config["structure"][layer]:
-            l_study_scan_str, l_study_path_next_layer = self.create_scans(
-                gen, generation, study_path, template_name, template_path
-            )
-            return l_study_scan_str, l_study_path_next_layer
-            # l_study_str.extend(l_study_scan_str)
+        executable_name = self.config[generation]["executable"]["name"]
+        template = self.config[generation]["executable"]["template"]
+        if template:
+            executable_path = f"{os.path.dirname(inspect.getfile(StudyDA))}/template_scripts/"
         else:
-            # Always give the layer the name of the first generation file,
-            # except if very first layer
-            layer_temp = "base" if idx_gen == 0 else self.config["structure"][gen]["generations"][0]
-            study_str, l_study_path_next_layer = self.generate_render_write(
-                gen,
-                layer_temp,
-                study_path,
-                template_name,
-                template_path,
+            raise ValueError("Executables that are not templates are not implemented yet.")
+
+        if "scans" in self.config["structure"][generation]:
+            l_study_scan_str, l_study_path_next_gen = self.create_scans(
+                generation, study_path, executable_name, executable_path
             )
-            # l_study_str.append(study_str)
-            return [study_str], l_study_path_next_layer
+            return l_study_scan_str, l_study_path_next_gen
+        else:
+            # Always give the gen the name of the first generation file,
+            # except if very first layer
+            gen_temp = "base" if idx_gen == 0 else self.config["structure"][generation]
+            study_str, l_study_path_next_gen = self.generate_render_write(
+                gen_temp,
+                study_path,
+                executable_name,
+                executable_path,
+            )
+            return [study_str], l_study_path_next_gen
 
     def create_study(self, tree_file: bool = True, force_overwrite: bool = False) -> list[str]:
         l_study_str = []
@@ -328,21 +331,21 @@ class StudyDA:
         if force_overwrite and os.path.exists(self.config["name"]):
             shutil.rmtree(self.config["name"])
 
-        for idx, layer in enumerate(sorted(self.config["structure"].keys())):
+        for idx, generation in enumerate(sorted(self.config["structure"].keys())):
             # Each generaration inside of a layer should yield the same l_study_path_next_layer
-            l_study_path_next_layer = []
+            l_study_path_next_generation = []
             for study_path in l_study_path:
-                for gen in self.config["structure"][layer]["generations"]:
-                    l_curr_study_str, l_study_path_next_layer = self.create_study_for_current_gen(
-                        idx, gen, study_path, dictionary_tree
+                for gen in self.config["structure"]:
+                    l_curr_study_str, l_study_path_next_generation = (
+                        self.create_study_for_current_gen(idx, gen, study_path)
                     )
                     l_study_str.extend(l_curr_study_str)
                     dictionary_tree = self.complete_tree(
-                        dictionary_tree, l_study_path_next_layer, gen
+                        dictionary_tree, l_study_path_next_generation, gen
                     )
 
             # Update study path for next later
-            l_study_path = l_study_path_next_layer
+            l_study_path = l_study_path_next_generation
 
         if tree_file:
             self.write_tree(dictionary_tree)
