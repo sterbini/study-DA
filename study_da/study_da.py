@@ -78,7 +78,7 @@ class StudyDA:
         template_name: str,
         template_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
-    ) -> tuple[str, list[str]]:  # sourcery skip: default-mutable-arg
+    ) -> list[str]:  # sourcery skip: default-mutable-arg
         """
         Generates, renders, and writes the study file.
 
@@ -98,13 +98,16 @@ class StudyDA:
         file_path_gen = f"{directory_path_gen}{gen_name}.py"
 
         # Generate the string of parameters
-        str_parameters = "".join(
-            f"{key} = {value}\n" for key, value in dic_mutated_parameters.items()
+        str_parameters = (
+            "{"
+            + "".join(f"'{key}' : {value}, " for key, value in dic_mutated_parameters.items())
+            + "}"
         )
 
         # Adapt the dict of dependencies to the current generation
         dic_dependencies = self.config["dependencies"] if "dependencies" in self.config else {}
-        depth_gen = directory_path_gen.count("/") - 1
+        # Always load configuration from above generation
+        depth_gen = 1  # directory_path_gen.count("/") - 1
         dic_dependencies = {
             key: "../" * depth_gen + value for key, value in dic_dependencies.items()
         }
@@ -118,7 +121,7 @@ class StudyDA:
         )
 
         self.write(study_str, file_path_gen)
-        return study_str, [directory_path_gen]
+        return [directory_path_gen]
 
     def get_dic_parametric_scans(self, generation) -> tuple[dict[str, Any], dict[str, Any]]:
         """
@@ -134,9 +137,14 @@ class StudyDA:
         if generation == "base":
             raise ValueError("Generation 'base' should not have scans.")
 
-        def test_convert_for_each_beam(parameter_dict: dict, parameter_list: list) -> list:
-            if "for_each_beam" in parameter_dict and parameter_dict["for_each_beam"]:
-                parameter_list = [{"lhcb1": value, "lhcb2": value} for value in parameter_list]
+        def test_convert_for_subvariables(parameter_dict: dict, parameter_list: list) -> list:
+            if "subvariables" in parameter_dict:
+                subvariables = self.config["structure"][generation]["scans"][parameter][
+                    "subvariables"
+                ]
+                parameter_list = [
+                    {subvar: value for subvar in subvariables} for value in parameter_list
+                ]
             return parameter_list
 
         dic_parameter_lists = {}
@@ -187,7 +195,7 @@ class StudyDA:
             else:
                 raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
 
-            parameter_list_updated = test_convert_for_each_beam(
+            parameter_list_updated = test_convert_for_subvariables(
                 self.config["structure"][generation]["scans"][parameter], parameter_list
             )
             dic_parameter_lists[parameter] = parameter_list_updated
@@ -200,13 +208,12 @@ class StudyDA:
         generation_path: str,
         template_name: str,
         template_path: str,
-    ) -> tuple[list[str], list[str]]:
+    ) -> list[str]:
         """
         Creates study files for parametric scans.
 
         Args:
-            gen (str): The generation name.
-            generation (str): The layer name.
+            generation (str): The generation name.
             generation_path (str): The path to the layer folder.
             template_name (str): The name of the template file.
             template_path (str): The path to the template folder.
@@ -219,7 +226,6 @@ class StudyDA:
             generation
         )
         # Generate render write for cartesian product of all parameters
-        l_study_str = []
         l_study_path = []
         for l_values, l_values_for_naming in zip(
             itertools.product(*dic_parameter_lists.values()),
@@ -240,16 +246,15 @@ class StudyDA:
                 + "/"
             )
             l_study_path.append(path)
-            l_study_str.append(
-                self.generate_render_write(
-                    generation,
-                    path,
-                    template_name,
-                    template_path,
-                    dic_mutated_parameters=dic_mutated_parameters,
-                )
+            self.generate_render_write(
+                generation,
+                path,
+                template_name,
+                template_path,
+                dic_mutated_parameters=dic_mutated_parameters,
             )
-        return l_study_str, l_study_path
+
+        return l_study_path
 
     def complete_tree(
         self, dictionary_tree: dict, l_study_path_next_gen: list[str], gen: str
@@ -286,14 +291,11 @@ class StudyDA:
             ryaml.indent(sequence=4, offset=2)
             ryaml.dump(dictionary_tree, yaml_file)
 
-    def create_study_for_current_gen(
-        self, idx_gen: int, generation: str, study_path: str
-    ) -> tuple[list[str], list[str]]:
+    def create_study_for_current_gen(self, generation: str, study_path: str) -> list[str]:
         """
         Creates study files for the current generation.
 
         Args:
-            idx_gen (int): The index of the current layer.
             generation (str): The name of the current generation.
             study_path (str): The path to the study folder.
             dictionary_tree (dict): The dictionary representing the study tree structure.
@@ -308,22 +310,22 @@ class StudyDA:
         else:
             raise ValueError("Executables that are not templates are not implemented yet.")
 
-        if "scans" in self.config["structure"][generation]:
-            l_study_scan_str, l_study_path_next_gen = self.create_scans(
-                generation, study_path, executable_name, executable_path
-            )
-            return l_study_scan_str, l_study_path_next_gen
-        else:
-            study_str, l_study_path_next_gen = self.generate_render_write(
+        return (
+            self.create_scans(generation, study_path, executable_name, executable_path)
+            if "scans" in self.config["structure"][generation]
+            else self.generate_render_write(
                 self.config["structure"][generation],
                 study_path,
                 executable_name,
                 executable_path,
             )
-            return [study_str], l_study_path_next_gen
+        )
 
-    def create_study(self, tree_file: bool = True, force_overwrite: bool = False) -> list[str]:
-        l_study_str = []
+    def create_study(
+        self,
+        tree_file: bool = True,
+        force_overwrite: bool = False,
+    ) -> None:
         l_study_path = [self.config["name"] + "/"]
         dictionary_tree = {}
         """
@@ -340,13 +342,14 @@ class StudyDA:
         if force_overwrite and os.path.exists(self.config["name"]):
             shutil.rmtree(self.config["name"])
 
-        for idx, generation in enumerate(sorted(self.config["structure"].keys())):
+        # Browse through the generations
+        l_generations = list(self.config["structure"].keys())
+        for idx, generation in enumerate(l_generations):
             l_study_path_next_generation = []
             for study_path in l_study_path:
-                l_curr_study_str, l_study_path_next_generation = self.create_study_for_current_gen(
-                    idx, generation, study_path
+                l_study_path_next_generation = self.create_study_for_current_gen(
+                    generation, study_path
                 )
-                l_study_str.extend(l_curr_study_str)
                 dictionary_tree = self.complete_tree(
                     dictionary_tree, l_study_path_next_generation, generation
                 )
@@ -361,5 +364,3 @@ class StudyDA:
 
         if tree_file:
             self.write_tree(dictionary_tree)
-
-        return l_study_str

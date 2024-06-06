@@ -7,6 +7,8 @@
 # Import standard library modules
 
 # Import third-party modules
+from typing import Any
+
 import ruamel.yaml
 
 # Import user-defined modules
@@ -75,3 +77,47 @@ def nested_set(dic, keys, value):
     for key in keys[:-1]:
         dic = dic.setdefault(key, {})
     dic[keys[-1]] = value
+
+
+def find_item_in_dict(obj: dict, key: str) -> Any:
+    """Find an item in a nested dictionary.
+
+    Args:
+        obj (dict): The nested dictionary.
+        key (str): The key to find in the nested dictionary.
+
+    Returns:
+        Any: The value corresponding to the key in the nested dictionary.
+
+    """
+    if key in obj:
+        return obj[key]
+    for v in obj.values():
+        if isinstance(v, dict):
+            item = find_item_in_dict(v, key)
+            if item is not None:
+                return item
+
+
+def set_item_in_dict(obj: dict, key: str, value: Any, found: bool = False):
+    """Set an item in a nested dictionary.
+
+    Args:
+        obj (dict): The nested dictionary.
+        key (str): The key to set in the nested dictionary.
+        value (Any): The value to set in the nested dictionary.
+        found (bool): Whether the key has been found in the nested dictionary.
+
+    Returns:
+        None
+
+    """
+    if key in obj:
+        if found:
+            raise ValueError(f"Key {key} found more than once in the nested dictionary.")
+
+        obj[key] = value
+        found = True
+    for v in obj.values():
+        if isinstance(v, dict):
+            set_item_in_dict(v, key, value, found)

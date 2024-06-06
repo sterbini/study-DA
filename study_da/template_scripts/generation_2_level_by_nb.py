@@ -19,6 +19,7 @@ from study_da import (
     XsuiteCollider,
     XsuiteTracking,
     load_configuration_from_path,
+    set_item_in_dict,
     write_configuration_to_path,
 )
 
@@ -134,7 +135,8 @@ def clean():
 # ==================================================================================================
 # --- Parameters definition
 # ==================================================================================================
-config_filepath = "config.yaml"
+dict_mutated_parameters = {{parameters}}
+path_configuration = "{{main_configuration}}"
 
 # ==================================================================================================
 # --- Script for execution
@@ -144,13 +146,17 @@ if __name__ == "__main__":
     logging.info("Starting script to configure collider and track")
 
     # Load full configuration
-    full_configuration, ryaml = load_configuration_from_path(config_filepath)
+    full_configuration, ryaml = load_configuration_from_path(path_configuration)
+
+    # Mutate parameters in configuration
+    for key, value in dict_mutated_parameters.items():
+        set_item_in_dict(full_configuration, key, value)
 
     # Configure collider
     collider = configure_collider(full_configuration)
 
     # Drop updated configuration
-    write_configuration_to_path(full_configuration, config_filepath, ryaml)
+    write_configuration_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
 
     # Track particles and save to disk
     track_particles(full_configuration, collider)

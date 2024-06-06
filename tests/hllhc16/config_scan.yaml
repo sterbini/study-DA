@@ -16,20 +16,18 @@ structure:
       name: generation_1.py
       template: true
     scans:
-      beam_energy_tot:
-        list: [6800, 7000]
-        for_each_beam: true
+      n_angles:
+        list: [5, 6]
 
-  # Same for second generation, which depends from first generation,
-  # such that config_hllhc16.yaml is accessible as ../../config_hllhc16.yaml
+  # Second generation depends on the config from the first generation
   generation_2:
     executable:
       name: generation_2_level_by_nb.py
       template: true
     scans:
       qx:
+        subvariables: lhcb1, lhcb2
         linspace: [62.31, 62.32, 2]
-        for_each_beam: true
       qy:
+        subvariables: lhcb1, lhcb2
         list: [60.32, 60.33]
-        for_each_beam: true
