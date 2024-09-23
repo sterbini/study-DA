@@ -25,6 +25,8 @@ structure:
       name: generation_2_level_by_nb.py
       template: true
     scans:
+      particle_file:
+        path_list: [../particles/____.parquet, 0, n_split] # ! This needs to be debugged
       qx:
         subvariables: [lhcb1, lhcb2]
         linspace: [62.31, 62.32, 2]
