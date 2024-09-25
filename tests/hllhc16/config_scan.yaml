@@ -18,6 +18,10 @@ structure:
     scans:
       n_angles:
         list: [5, 6]
+    common_parameters:
+      # Needs to be redeclared as it's used for parallelization
+      # And re-used ine the second generation
+      n_split: 5
 
   # Second generation depends on the config from the first generation
   generation_2:
@@ -26,7 +30,8 @@ structure:
       template: true
     scans:
       particle_file:
-        path_list: [../particles/____.parquet, 0, n_split] # ! This needs to be debugged
+        # Number of paths is set by n_split in the main config
+        path_list: ["../particles/____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
         linspace: [62.31, 62.32, 2]

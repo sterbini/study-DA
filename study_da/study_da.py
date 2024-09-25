@@ -18,7 +18,7 @@ import ruamel.yaml as yaml
 from jinja2 import Environment, FileSystemLoader
 
 # Import user-defined modules
-from . import load_configuration_from_path, nested_set
+from . import find_item_in_dict, load_configuration_from_path, nested_set
 
 
 # ==================================================================================================
@@ -28,6 +28,9 @@ class StudyDA:
     def __init__(self, path_config: str):
         # Load configuration
         self.config, self.ryaml = load_configuration_from_path(path_config)
+
+        # Parameters common across all generations (e.g. for parallelization)
+        self.dic_common_parameters: dict[str, Any] = {}
 
     def render(
         self,
@@ -98,11 +101,13 @@ class StudyDA:
         file_path_gen = f"{directory_path_gen}{gen_name}.py"
 
         # Generate the string of parameters
-        str_parameters = (
-            "{"
-            + "".join(f"'{key}' : {value}, " for key, value in dic_mutated_parameters.items())
-            + "}"
-        )
+        str_parameters = "{"
+        for key, value in dic_mutated_parameters.items():
+            if isinstance(value, str):
+                str_parameters += f"'{key}' : '{value}', "
+            else:
+                str_parameters += f"'{key}' : {value}, "
+        str_parameters += "}"
 
         # Adapt the dict of dependencies to the current generation
         dic_dependencies = self.config["dependencies"] if "dependencies" in self.config else {}
@@ -182,13 +187,16 @@ class StudyDA:
                 l_values_path_list = self.config["structure"][generation]["scans"][parameter][
                     "path_list"
                 ]
+                n_path_arg = l_values_path_list[1]
+                n_path = find_item_in_dict(self.dic_common_parameters, n_path_arg)
+                if n_path is None:
+                    raise ValueError(
+                        f"Parameter {n_path_arg} is not defined in the scan configuration."
+                    )
                 parameter_list = [
-                    l_values_path_list[0].replace("____", f"{n:02d}")
-                    for n in range(l_values_path_list[1], l_values_path_list[2])
+                    l_values_path_list[0].replace("____", f"{n:02d}") for n in range(n_path)
                 ]
-                dic_parameter_lists_for_naming[parameter] = [
-                    f"{n:02d}" for n in range(l_values_path_list[1], l_values_path_list[2])
-                ]
+                dic_parameter_lists_for_naming[parameter] = [f"{n:02d}" for n in range(n_path)]
             elif "list" in self.config["structure"][generation]["scans"][parameter]:
                 parameter_list = self.config["structure"][generation]["scans"][parameter]["list"]
                 dic_parameter_lists_for_naming[parameter] = parameter_list
@@ -199,6 +207,13 @@ class StudyDA:
                 self.config["structure"][generation]["scans"][parameter], parameter_list
             )
             dic_parameter_lists[parameter] = parameter_list_updated
+
+        if "common_parameters" in self.config["structure"][generation]:
+            self.dic_common_parameters[generation] = {}
+            for parameter in self.config["structure"][generation]["common_parameters"]:
+                self.dic_common_parameters[generation][parameter] = self.config["structure"][
+                    generation
+                ]["common_parameters"][parameter]
 
         return dic_parameter_lists, dic_parameter_lists_for_naming
 
@@ -245,7 +260,12 @@ class StudyDA:
                 )
                 + "/"
             )
-            l_study_path.append(path)
+
+            # Add common parameters
+            if generation in self.dic_common_parameters:
+                dic_mutated_parameters |= self.dic_common_parameters[generation]
+
+            # Generate the study for current generation
             self.generate_render_write(
                 generation,
                 path,
@@ -253,6 +273,9 @@ class StudyDA:
                 template_path,
                 dic_mutated_parameters=dic_mutated_parameters,
             )
+
+            # Append the list of study paths to build the tree later on
+            l_study_path.append(path)
 
         return l_study_path
 
