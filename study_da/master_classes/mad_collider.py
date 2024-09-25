@@ -7,6 +7,7 @@
 # Import standard library modules
 import os
 import shutil
+from zipfile import ZipFile
 
 # Import third-party modules
 import xmask as xm
@@ -150,11 +151,16 @@ class MadCollider:
         print(f"--- Now displaying Qx and Qy for line {line}---")
         print(tw.qx, tw.qy)
 
-    def write_collider_to_disk(self, collider: xt.Multiline) -> None:
+    def write_collider_to_disk(self, collider: xt.Multiline, compress: bool = True) -> None:
         # Save collider to json, creating the folder if it does not exist
         if "/" in self.path_collider:
             os.makedirs(self.path_collider, exist_ok=True)
         collider.to_json(self.path_collider)
+
+        # Compress the collider file to zip to ease the load on afs
+        if compress:
+            with ZipFile(f"{self.path_collider}.zip", "w") as zipf:
+                zipf.write(self.path_collider)
 
     @staticmethod
     def clean_temporary_files() -> None:

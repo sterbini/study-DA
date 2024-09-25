@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import pathlib
+from zipfile import ZipFile
 
 # Import third-party modules
 import numpy as np
@@ -42,10 +43,14 @@ class XsuiteCollider:
     def __init__(
         self,
         configuration: dict,
+        collider_filepath: str,
         ver_hllhc_optics: float,
         ver_lhc_run: float,
         ions: bool,
     ):
+        # Collider file path
+        self.collider_filepath = collider_filepath
+
         # Configuration variables
         self.config_beambeam: dict = configuration["config_beambeam"]
         self.config_knobs_and_tuning: dict = configuration["config_knobs_and_tuning"]
@@ -91,6 +96,15 @@ class XsuiteCollider:
                 raise ValueError("No optics specific tools for the provided configuration")
 
         return self._dict_orbit_correction
+
+    def load_collider(self) -> xt.Multiline:
+        if not self.collider_filepath.endswith(".zip"):
+            return xt.Multiline.from_json(self.collider_filepath)
+
+        # Uncompress file locally
+        with ZipFile(self.collider_filepath, "r") as zip_ref:
+            zip_ref.extractall()
+        return xt.Multiline.from_json(self.collider_filepath.split("/")[-1].replace(".zip", ""))
 
     def install_beam_beam_wrapper(self, collider: xt.Multiline) -> None:
         # Install beam-beam lenses (inactive and not configured)
@@ -247,7 +261,7 @@ class XsuiteCollider:
 
         # Level by separation
         try:
-            luminosity_leveling(
+            xm.lhc.luminosity_leveling(
                 collider,
                 config_lumi_leveling=self.config_lumi_leveling,
                 config_beambeam=self.config_beambeam,
@@ -256,6 +270,7 @@ class XsuiteCollider:
         except Exception:
             print("Leveling failed..continuing")
 
+        # Update configuration
         self.update_knob(collider, self.config_lumi_leveling["ip1"], "on_sep1")
         self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2")
         self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2h")
@@ -307,29 +322,11 @@ class XsuiteCollider:
         self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = n_collisions_ip2
         self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
 
-        # Set up the constraints for lumi optimization in IP8
-        additional_targets_lumi = []
-        if "constraints" in self.config_lumi_leveling["ip8"]:
-            for constraint in self.config_lumi_leveling["ip8"]["constraints"]:
-                obs, beam, sign, val, at = constraint.split("_")
-                if sign == "<":
-                    ineq = xt.LessThan(float(val))
-                elif sign == ">":
-                    ineq = xt.GreaterThan(float(val))
-                else:
-                    raise ValueError(
-                        f"Unsupported sign for luminosity optimization constraint: {sign}"
-                    )
-                target = xt.Target(obs, ineq, at=at, line=beam, tol=1e-6)
-                additional_targets_lumi.append(target)
-
-        # Then level luminosity in IP 2/8 changing the separation
-        collider = luminosity_leveling(
+        # Do levelling in IP2 and IP8
+        xm.lhc.luminosity_leveling(
             collider,
             config_lumi_leveling=self.config_lumi_leveling,
             config_beambeam=self.config_beambeam,
-            additional_targets_lumi=additional_targets_lumi,
-            crab=self.crab,
         )
 
         # Update configuration
@@ -470,7 +467,7 @@ class XsuiteCollider:
 
     def write_collider_to_disk(self, collider, full_configuration):
         if self.save_final_collider:
-            logging.info('Saving "collider.json')
+            logging.info("Saving collider as json")
             collider.metadata = copy.deepcopy(full_configuration)
             collider.to_json(self.path_final_collider)
 
@@ -478,3 +475,80 @@ class XsuiteCollider:
     def update_knob(collider: xt.Multiline, dictionnary: dict, knob_name: str) -> None:
         if knob_name in collider.vars.keys():
             dictionnary[f"final_{knob_name}"] = float(collider.vars[knob_name]._value)
+
+    @staticmethod
+    def return_fingerprint(collider, line_name="lhcb1"):
+        line = collider[line_name]
+
+        tw = line.twiss()
+        tt = line.get_table()
+
+        det = line.get_amplitude_detuning_coefficients(a0_sigmas=0.1, a1_sigmas=0.2, a2_sigmas=0.3)
+
+        det_table = xt.Table(
+            {
+                "name": np.array(list(det.keys())),
+                "value": np.array(list(det.values())),
+            }
+        )
+
+        nl_chrom = line.get_non_linear_chromaticity(
+            delta0_range=(-2e-4, 2e-4), num_delta=5, fit_order=3
+        )
+
+        out = ""
+
+        out += f"Line: {line_name}\n"
+        out += "\n"
+
+        out += "Installed element types:\n"
+        out += repr([nn for nn in sorted(list(set(tt.element_type))) if len(nn) > 0]) + "\n"
+        out += "\n"
+
+        out += f'Tunes:        Qx  = {tw["qx"]:.5f}       Qy = {tw["qy"]:.5f}\n'
+        out += f"""Chromaticity: Q'x = {tw["dqx"]:.2f}     Q'y = """ + f'{tw["dqy"]:.2f}\n'
+        out += f'c_minus:      {tw["c_minus"]:.5e}\n'
+        out += "\n"
+
+        out += f'Synchrotron tune: {tw["qs"]:5e}\n'
+        out += f'Slip factor:      {tw["slip_factor"]:.5e}\n'
+        out += "\n"
+
+        out += "Twiss parameters and phases at IPs:\n"
+        out += (
+            tw.rows["ip.*"]
+            .cols["name s betx bety alfx alfy mux muy"]
+            .show(output=str, max_col_width=int(1e6), digits=8)
+        )
+        out += "\n\n"
+
+        out += "Dispersion at IPs:\n"
+        out += (
+            tw.rows["ip.*"]
+            .cols["name s dx dy dpx dpy"]
+            .show(output=str, max_col_width=int(1e6), digits=8)
+        )
+        out += "\n\n"
+
+        out += "Crab dispersion at IPs:\n"
+        out += (
+            tw.rows["ip.*"]
+            .cols["name s dx_zeta dy_zeta dpx_zeta dpy_zeta"]
+            .show(output=str, max_col_width=int(1e6), digits=8)
+        )
+        out += "\n\n"
+
+        out += "Amplitude detuning coefficients:\n"
+        out += det_table.show(output=str, max_col_width=int(1e6), digits=6)
+        out += "\n\n"
+
+        out += "Non-linear chromaticity:\n"
+        out += f'dnqx = {list(nl_chrom["dnqx"])}\n'
+        out += f'dnqy = {list(nl_chrom["dnqy"])}\n'
+        out += "\n\n"
+
+        out += "Tunes and momentum compaction vs delta:\n"
+        out += nl_chrom.show(output=str, max_col_width=int(1e6), digits=6)
+        out += "\n\n"
+
+        return out

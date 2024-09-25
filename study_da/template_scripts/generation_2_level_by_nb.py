@@ -9,10 +9,11 @@ particle distribution and a collider from a MAD-X model."""
 import contextlib
 import logging
 import os
+import time
 
 # Import third-party modules
+import numpy as np
 import pandas as pd
-import xtrack as xt
 
 # Import user-defined modules
 from study_da import (
@@ -35,11 +36,11 @@ def configure_collider(full_configuration):
     ions = full_configuration["config_mad"]["ions"]
     collider_filepath = full_configuration["config_simulation"]["collider_file"]
 
-    # Rebuild collider
-    collider = xt.Multiline.from_json(collider_filepath)
-
     # Build object for configuring collider
-    xc = XsuiteCollider(config_collider, ver_hllhc_optics, ver_lhc_run, ions)
+    xc = XsuiteCollider(config_collider, collider_filepath, ver_hllhc_optics, ver_lhc_run, ions)
+
+    # Load collider
+    collider = xc.load_collider()
 
     # Install beam-beam
     xc.install_beam_beam_wrapper(collider)
@@ -93,20 +94,25 @@ def configure_collider(full_configuration):
     ]
     xc.record_final_luminosity(collider, l_n_collisions)
 
-    # Save collider to json
+    # Save collider to json (flag to save or not is inside function)
     xc.write_collider_to_disk(collider, full_configuration)
 
-    return collider
+    # Get fingerprint
+    fingerprint = xc.return_fingerprint(collider)
+
+    return collider, fingerprint
 
 
-def track_particles(full_configuration, collider):
+def track_particles(full_configuration, collider, fingerprint):
     # Get emittances
     n_emitt_x = full_configuration["config_collider"]["config_beambeam"]["nemitt_x"]
     n_emitt_y = full_configuration["config_collider"]["config_beambeam"]["nemitt_y"]
     xst = XsuiteTracking(full_configuration["config_simulation"], n_emitt_x, n_emitt_y)
 
     # Prepare particle distribution
-    particles, particle_id = xst.prepare_particle_distribution_for_tracking(collider)
+    particles, particle_id, l_amplitude, l_angle = xst.prepare_particle_distribution_for_tracking(
+        collider
+    )
 
     # Track
     particles_dict = xst.track(collider, particles)
@@ -120,6 +126,16 @@ def track_particles(full_configuration, collider):
 
     # Assign the old id to the sorted dataframe
     particles_df["particle_id"] = particle_id
+
+    # Register the amplitude and angle in the dataframe
+    particles_df["normalized amplitude in xy-plane"] = l_amplitude
+    particles_df["angle in xy-plane [deg]"] = l_angle * 180 / np.pi
+
+    # Add some metadata to the output for better interpretability
+    particles_df.attrs["hash"] = hash(fingerprint)
+    particles_df.attrs["fingerprint"] = fingerprint
+    particles_df.attrs["configuration"] = full_configuration
+    particles_df.attrs["date"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     # Save output
     particles_df.to_parquet(full_configuration["config_simulation"]["path_output_particles"])
@@ -153,13 +169,13 @@ if __name__ == "__main__":
         set_item_in_dict(full_configuration, key, value)
 
     # Configure collider
-    collider = configure_collider(full_configuration)
+    collider, fingerprint = configure_collider(full_configuration)
 
     # Drop updated configuration
     write_configuration_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
 
     # Track particles and save to disk
-    track_particles(full_configuration, collider)
+    track_particles(full_configuration, collider, fingerprint)
 
     # Clean temporary files
     clean()

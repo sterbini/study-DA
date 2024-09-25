@@ -6,6 +6,7 @@
 
 # Import standard library modules
 import json
+import os
 
 # Import third-party modules
 import numpy as np
@@ -18,7 +19,9 @@ import numpy as np
 # ==================================================================================================
 
 
-def reformat_filling_scheme_from_lpc(filling_scheme_path: str) -> tuple[np.ndarray, np.ndarray]:
+def reformat_filling_scheme_from_lpc(
+    filling_scheme_path: str, filling_scheme_path_converted: str
+) -> tuple[np.ndarray, np.ndarray]:
     """
     This function is used to convert the filling scheme from the LPC to the format used in the
     xtrack library. The filling scheme from the LPC is a list of bunches for each beam, where each
@@ -63,7 +66,7 @@ def reformat_filling_scheme_from_lpc(filling_scheme_path: str) -> tuple[np.ndarr
 
     data_json = {"beam1": [int(ii) for ii in B1], "beam2": [int(ii) for ii in B2]}
 
-    with open(filling_scheme_path.split(".json")[0] + "_converted.json", "w") as file_bool:
+    with open(filling_scheme_path_converted, "w") as file_bool:
         json.dump(data_json, file_bool)
     return B1, B2
 
@@ -73,6 +76,11 @@ def load_and_check_filling_scheme(filling_scheme_path: str) -> str:
     format if needed."""
     if not filling_scheme_path.endswith(".json"):
         raise ValueError("Filling scheme must be in json format")
+
+    # Check that the converted filling scheme doesn't already exist
+    filling_scheme_path_converted = filling_scheme_path.replace(".json", "_converted.json")
+    if os.path.exists(filling_scheme_path_converted):
+        return filling_scheme_path_converted
 
     with open(filling_scheme_path, "r") as fid:
         d_filling_scheme = json.load(fid)
@@ -87,16 +95,17 @@ def load_and_check_filling_scheme(filling_scheme_path: str) -> str:
                 k: v for k, v in d_filling_scheme.items() if k in ["beam1", "beam2"]
             }
             # Dump the dictionary back to the file
-            filling_scheme_path = filling_scheme_path.replace(".json", "_converted.json")
-            with open(filling_scheme_path, "w") as fid:
+            with open(filling_scheme_path_converted, "w") as fid:
                 json.dump(d_filling_scheme, fid)
 
             # Else, do nothing
 
     else:
         # One can potentially use b1_array, b2_array to scan the bunches later
-        b1_array, b2_array = reformat_filling_scheme_from_lpc(filling_scheme_path)
-        filling_scheme_path = filling_scheme_path.replace(".json", "_converted.json")
+        b1_array, b2_array = reformat_filling_scheme_from_lpc(
+            filling_scheme_path, filling_scheme_path_converted
+        )
+        filling_scheme_path = filling_scheme_path_converted
 
     return filling_scheme_path
 

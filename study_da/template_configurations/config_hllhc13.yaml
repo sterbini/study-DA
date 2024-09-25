@@ -65,6 +65,9 @@ config_mad:
   # To make some specifics checks
   sanity_checks: true
 
+  # Path of the collider file to be saved
+  path_collider: collider.json
+
 # Configuration for tuning of the collider
 config_collider:
   config_knobs_and_tuning:
@@ -234,11 +237,11 @@ config_collider:
 
   # Save collider or not
   save_final_collider: false
-  path_final_collider: collider.json
+  path_final_collider: collider_final.json
 
 config_simulation:
   # Collider file
-  collider_file: ../generation_1/collider.json
+  collider_file: ../generation_1/collider.json.zip
 
   # Distribution in the normalized xy space
   particle_file: ../generation_1/particles/00.parquet
@@ -258,3 +261,5 @@ config_simulation:
   # Context for the simulation
   context: "cpu" # 'cupy' # opencl
 
+  # Device number for GPU simulation
+  device_number: # 0

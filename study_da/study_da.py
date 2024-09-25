@@ -362,7 +362,15 @@ class StudyDA:
             list[str]: The list of study file strings.
         """
         # Remove existing study if force_overwrite
-        if force_overwrite and os.path.exists(self.config["name"]):
+        if os.path.exists(self.config["name"]):
+            if not force_overwrite:
+                answer = input(
+                    "The folder already exists. You might delete an existing study. "
+                    "Do you want to overwrite it? [y/n]"
+                )
+                if answer != "y":
+                    print("Aborting...")
+                    exit()
             shutil.rmtree(self.config["name"])
 
         # Browse through the generations

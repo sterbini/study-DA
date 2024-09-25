@@ -22,6 +22,7 @@ class XsuiteTracking:
     def __init__(self, configuration: dict, nemitt_x, nemitt_y):
         # Context parameters
         self.context_str = configuration["context"]
+        self.device_number = configuration["device_number"]
         self._context = None
 
         # Simulation parameters
@@ -37,9 +38,14 @@ class XsuiteTracking:
     @property
     def context(self):
         if self._context is None:
+            if self.device_number is not None and self.context_str not in ["cupy"]:
+                logging.warning("Device number will be ignored since context is not cupy")
             match self.context_str:
                 case "cupy":
-                    self._context = xo.ContextCupy()
+                    if self.device_number is not None:
+                        self._context = xo.ContextCupy(device=self.device_number)
+                    else:
+                        self._context = xo.ContextCupy()
                 case "opencl":
                     self._context = xo.ContextPyopencl()
                 case "cpu":
@@ -75,7 +81,7 @@ class XsuiteTracking:
         )
 
         particle_id = particle_df.particle_id.values
-        return particles, particle_id
+        return particles, particle_id, r_vect, theta_vect
 
     def track(self, collider, particles):
         # Optimize line for tracking

@@ -238,11 +238,11 @@ config_collider:
 
   # Save collider or not
   save_final_collider: false
-  path_final_collider: collider.json
+  path_final_collider: collider_final.json
 
 config_simulation:
   # Collider file
-  collider_file: ../collider.json
+  collider_file: ../collider.json.zip
 
   # Distribution in the normalized xy space
   particle_file: ../particles/00.parquet
@@ -261,3 +261,6 @@ config_simulation:
 
   # Context for the simulation
   context: "cpu" # 'cupy' # opencl
+
+  # Device number for GPU simulation
+  device_number: # 0
