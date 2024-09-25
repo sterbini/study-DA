@@ -32,7 +32,7 @@ from ..version_specific_files.runIII_ions import (
     generate_orbit_correction_setup as gen_corr_runIII_ions,
 )
 from .scheme_utils import get_worst_bunch, load_and_check_filling_scheme
-from .xsuite_leveling import compute_PU, luminosity_leveling, luminosity_leveling_ip1_5
+from .xsuite_leveling import compute_PU, luminosity_leveling_ip1_5
 
 # ==================================================================================================
 # --- Class definition
