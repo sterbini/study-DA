@@ -5,3 +5,6 @@
 	path = external_dependencies/acc-models-lhc
 	url = https://gitlab.cern.ch/acc-models/acc-models-lhc.git
 	branch = hl16
+[submodule "external_dependencies/acc-models-lhc-v13"]
+	path = external_dependencies/acc-models-lhc-v13
+	url = https://github.com/ColasDroin/hllhc13.git
