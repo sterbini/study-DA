@@ -203,6 +203,10 @@ class StudyDA:
             else:
                 raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
 
+            # Ensure that all values are not numpy types (to avoid serialization issues)
+            parameter_list = [x.item() if isinstance(x, np.generic) else x for x in parameter_list]
+
+            # Handle nested parameters
             parameter_list_updated = test_convert_for_subvariables(
                 self.config["structure"][generation]["scans"][parameter], parameter_list
             )
