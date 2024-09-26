@@ -162,4 +162,4 @@ cython_debug/
 #.idea/
 
 # Folders produced by test
-tests/hllhc16/example*
+tests/**/example*

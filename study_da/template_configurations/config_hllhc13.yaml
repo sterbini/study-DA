@@ -4,14 +4,15 @@ config_particles:
   n_r: 256
   n_angles: 5
   n_split: 5
+  path_distribution_folder: particles
 
 config_mad:
   # Links to be made for tools and scripts
   links:
-    acc-models-lhc: ../../../../../external_dependencies/acc-models-lhc-v13
+    acc-models-lhc: ../../../../external_dependencies/acc-models-lhc-v13
 
   # Optics file
-  optics_file: ../../../../external_dependencies/acc-models-lhc-v13/opt_500_500_500_500_thin.madx
+  optics_file: acc-models-lhc/opt_500_500_500_500_thin.madx
 
   # Beam parameters
   beam_config:
@@ -241,10 +242,10 @@ config_collider:
 
 config_simulation:
   # Collider file
-  collider_file: ../generation_1/collider.json.zip
+  collider_file: ../collider.json.zip
 
   # Distribution in the normalized xy space
-  particle_file: ../generation_1/particles/00.parquet
+  particle_file: ../particles/00.parquet
 
   # Output particle file
   path_output_particles: output_particles.parquet

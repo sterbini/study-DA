@@ -1,0 +1,40 @@
+# ==================================================================================================
+# --- Structure of the study ---
+# ==================================================================================================
+name: example_tune_scan
+
+# List all useful files that will be used by executable in generations below
+# These files are placed at the root of the study
+dependencies:
+  main_configuration: config_runIII.yaml
+
+structure:
+  # First generation is always at the root of the study
+  # such that config_runIII.yaml is accessible as ../config_runIII.yaml
+  generation_1:
+    executable:
+      name: generation_1.py
+      template: true
+    scans:
+      n_angles:
+        list: [5, 6]
+    common_parameters:
+      # Needs to be redeclared as it's used for parallelization
+      # And re-used ine the second generation
+      n_split: 5
+
+  # Second generation depends on the config from the first generation
+  generation_2:
+    executable:
+      name: generation_2_level_by_nb.py
+      template: true
+    scans:
+      particle_file:
+        # Number of paths is set by n_split in the main config
+        path_list: ["../particles/____.parquet", n_split]
+      qx:
+        subvariables: [lhcb1, lhcb2]
+        linspace: [62.31, 62.32, 2]
+      qy:
+        subvariables: [lhcb1, lhcb2]
+        list: [60.32, 60.33]
