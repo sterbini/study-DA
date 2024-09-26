@@ -9,10 +9,10 @@ config_particles:
 config_mad:
   # Links to be made for tools and scripts
   links:
-    acc-models-lhc: /afs/cern.ch/eng/lhc/optics/runIII
+    acc-models-lhc: /afs/cern.ch/eng/lhc/optics
 
   # Optics file
-  optics_file: acc-models-lhc/RunIII_dev/ION_2024/opticsfile.21 #
+  optics_file: acc-models-lhc/runIII/RunIII_dev/ION_2024/opticsfile.21
 
   # Beam parameters
   beam_config:
@@ -289,10 +289,10 @@ config_collider:
 
 config_simulation:
   # Collider file
-  collider_file: ../generation_1/collider.json.zip
+  collider_file: ../collider.json.zip
 
   # Distribution in the normalized xy space
-  particle_file: ../generation_1/particles/00.parquet
+  particle_file: ../particles/00.parquet
 
   # Output particle file
   path_output_particles: output_particles.parquet

@@ -43,7 +43,7 @@ def build_collider(config_mad):
     # Build collider from mad model
     collider = mc.build_collider(mad_b1b2, mad_b4)
 
-    # Twiss to ensure eveyrthing is ok
+    # Twiss to ensure everything is ok
     mc.activate_RF_and_twiss(collider)
 
     # Clean temporary files
