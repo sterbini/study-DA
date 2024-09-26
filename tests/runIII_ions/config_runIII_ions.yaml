@@ -157,8 +157,8 @@ config_collider:
     nemitt_y: 1.65e-6
     mask_with_filling_pattern:
       pattern_fname: 50ns_1240b_1088_1088_398_56bpi_PbPb_converted.json
-      i_bunch_b1: # If not specified, the bunch with the worst schedule is chosen
-      i_bunch_b2: # Same. A value for i_bunch_b1 and i_bunch_b2 must be specified if pattern_fname is specified
+      i_bunch_b1:      # If not specified, the bunch with the worst schedule is chosen
+      i_bunch_b2:      # Same. A value for i_bunch_b1 and i_bunch_b2 must be specified if pattern_fname is specified
     cross_section: 281e-24
 
   skip_leveling: false
@@ -168,120 +168,120 @@ config_collider:
       num_colliding_bunches:
       impose_separation_orthogonal_to_crossing: false
       knobs:
-        - on_sep1
+      - on_sep1
       bump_range:
         lhcb1:
-          - e.ds.l1.b1
-          - s.ds.r1.b1
+        - e.ds.l1.b1
+        - s.ds.r1.b1
         lhcb2:
-          - s.ds.r1.b2
-          - e.ds.l1.b2
+        - s.ds.r1.b2
+        - e.ds.l1.b2
       preserve_angles_at_ip: true
       preserve_bump_closure: true
       corrector_knob_names:
-        - corr_co_acbyvs4.l1b1
-        - corr_co_acbyhs4.l1b1
-        - corr_co_acbyvs4.r1b2
-        - corr_co_acbyhs4.r1b2
-        - corr_co_acbyhs4.r1b1
-        - corr_co_acbyvs4.r1b1
-        - corr_co_acbyhs4.l1b2
-        - corr_co_acbyvs4.l1b2
-        - corr_co_acbcv5.l1b1
-        - corr_co_acbch5.r1b1
-        - corr_co_acbcv5.r1b2
-        - corr_co_acbch5.l1b2
+      - corr_co_acbyvs4.l1b1
+      - corr_co_acbyhs4.l1b1
+      - corr_co_acbyvs4.r1b2
+      - corr_co_acbyhs4.r1b2
+      - corr_co_acbyhs4.r1b1
+      - corr_co_acbyvs4.r1b1
+      - corr_co_acbyhs4.l1b2
+      - corr_co_acbyvs4.l1b2
+      - corr_co_acbcv5.l1b1
+      - corr_co_acbch5.r1b1
+      - corr_co_acbcv5.r1b2
+      - corr_co_acbch5.l1b2
 
     ip5:
       luminosity: 6.4e+27
       num_colliding_bunches:
       impose_separation_orthogonal_to_crossing: false
       knobs:
-        - on_sep5
+      - on_sep5
       bump_range:
         lhcb1:
-          - e.ds.l5.b1
-          - s.ds.r5.b1
+        - e.ds.l5.b1
+        - s.ds.r5.b1
         lhcb2:
-          - s.ds.r5.b2
-          - e.ds.l5.b2
+        - s.ds.r5.b2
+        - e.ds.l5.b2
       preserve_angles_at_ip: true
       preserve_bump_closure: true
       corrector_knob_names:
-        - corr_co_acbcv5.l5b1
-        - corr_co_acbch5.r5b1
-        - corr_co_acbyhs4.l5b1
-        - corr_co_acbyhs4.r5b1
-        - corr_co_acbyvs4.l5b1
-        - corr_co_acbyvs4.r5b1
-        - corr_co_acbcv5.r5b2
-        - corr_co_acbch5.l5b2
-        - corr_co_acbyhs4.l5b2
-        - corr_co_acbyhs4.r5b2
-        - corr_co_acbyvs4.l5b2
-        - corr_co_acbyvs4.r5b2
+      - corr_co_acbcv5.l5b1
+      - corr_co_acbch5.r5b1
+      - corr_co_acbyhs4.l5b1
+      - corr_co_acbyhs4.r5b1
+      - corr_co_acbyvs4.l5b1
+      - corr_co_acbyvs4.r5b1
+      - corr_co_acbcv5.r5b2
+      - corr_co_acbch5.l5b2
+      - corr_co_acbyhs4.l5b2
+      - corr_co_acbyhs4.r5b2
+      - corr_co_acbyvs4.l5b2
+      - corr_co_acbyvs4.r5b2
 
     ip2:
       luminosity: 6.4e+27
       num_colliding_bunches:
       impose_separation_orthogonal_to_crossing: false
       knobs:
-        - on_sep2h
+      - on_sep2h
       bump_range:
         lhcb1:
-          - e.ds.l2.b1
-          - s.ds.r2.b1
+        - e.ds.l2.b1
+        - s.ds.r2.b1
         lhcb2:
-          - s.ds.r2.b2
-          - e.ds.l2.b2
+        - s.ds.r2.b2
+        - e.ds.l2.b2
       preserve_angles_at_ip: true
       preserve_bump_closure: true
       corrector_knob_names:
         # to preserve angles at ip
-        - corr_co_acbyvs4.l2b1
-        - corr_co_acbyhs4.l2b1
-        - corr_co_acbyvs4.r2b2
-        - corr_co_acbyhs4.r2b2
+      - corr_co_acbyvs4.l2b1
+      - corr_co_acbyhs4.l2b1
+      - corr_co_acbyvs4.r2b2
+      - corr_co_acbyhs4.r2b2
           # to close the bumps
-        - corr_co_acbyvs4.l2b2
-        - corr_co_acbyhs4.l2b2
-        - corr_co_acbyvs4.r2b1
-        - corr_co_acbyhs4.r2b1
-        - corr_co_acbyhs5.l2b2
-        - corr_co_acbyvs5.l2b2
-        - corr_co_acbchs5.r2b1
-        - corr_co_acbcvs5.r2b1
+      - corr_co_acbyvs4.l2b2
+      - corr_co_acbyhs4.l2b2
+      - corr_co_acbyvs4.r2b1
+      - corr_co_acbyhs4.r2b1
+      - corr_co_acbyhs5.l2b2
+      - corr_co_acbyvs5.l2b2
+      - corr_co_acbchs5.r2b1
+      - corr_co_acbcvs5.r2b1
 
     ip8:
       luminosity: 1.0e+27
       num_colliding_bunches:
       impose_separation_orthogonal_to_crossing: false
       knobs:
-        - on_sep8v
+      - on_sep8v
       bump_range:
         lhcb1:
-          - e.ds.l8.b1
-          - s.ds.r8.b1
+        - e.ds.l8.b1
+        - s.ds.r8.b1
         lhcb2:
-          - s.ds.r8.b2
-          - e.ds.l8.b2
+        - s.ds.r8.b2
+        - e.ds.l8.b2
       preserve_angles_at_ip: true
       preserve_bump_closure: true
       corrector_knob_names:
         # to preserve angles at ip
-        - corr_co_acbyvs4.l8b1
-        - corr_co_acbyhs4.l8b1
-        - corr_co_acbyvs4.r8b2
-        - corr_co_acbyhs4.r8b2
+      - corr_co_acbyvs4.l8b1
+      - corr_co_acbyhs4.l8b1
+      - corr_co_acbyvs4.r8b2
+      - corr_co_acbyhs4.r8b2
           # to close the bumps
-        - corr_co_acbyvs4.l8b2
-        - corr_co_acbyhs4.l8b2
-        - corr_co_acbyvs4.r8b1
-        - corr_co_acbyhs4.r8b1
-        - corr_co_acbcvs5.l8b2
-        - corr_co_acbchs5.l8b2
-        - corr_co_acbyvs5.r8b1
-        - corr_co_acbyhs5.r8b1
+      - corr_co_acbyvs4.l8b2
+      - corr_co_acbyhs4.l8b2
+      - corr_co_acbyvs4.r8b1
+      - corr_co_acbyhs4.r8b1
+      - corr_co_acbcvs5.l8b2
+      - corr_co_acbchs5.l8b2
+      - corr_co_acbyvs5.r8b1
+      - corr_co_acbyhs5.r8b1
 
   # Save collider or not
   save_final_collider: false
@@ -301,13 +301,13 @@ config_simulation:
   delta_max: 0.00024
 
   # Tracking
-  n_turns: 100 # number of turns to track
+  n_turns: 100     # number of turns to track
 
   # Beam to track
   beam: lhcb1 #lhcb1 or lhcb2
 
   # Context for the simulation
-  context: cpu # 'cupy' # opencl
+  context: cpu   # 'cupy' # opencl
 
   # Device number for GPU simulation
   device_number: # 0

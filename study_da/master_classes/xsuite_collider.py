@@ -259,16 +259,12 @@ class XsuiteCollider:
         self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = n_collisions_ip2
         self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
 
-        # Level by separation
-        try:
-            xm.lhc.luminosity_leveling(
-                collider,
-                config_lumi_leveling=self.config_lumi_leveling,
-                config_beambeam=self.config_beambeam,
-                crab=self.crab,
-            )
-        except Exception:
-            print("Leveling failed..continuing")
+        # ! Crabs are not handled in the following function
+        xm.lhc.luminosity_leveling(
+            collider,
+            config_lumi_leveling=self.config_lumi_leveling,
+            config_beambeam=self.config_beambeam,
+        )
 
         # Update configuration
         self.update_knob(collider, self.config_lumi_leveling["ip1"], "on_sep1")
@@ -297,17 +293,14 @@ class XsuiteCollider:
             # Update the number of bunches in the configuration file
             self.config_lumi_leveling_ip1_5["num_colliding_bunches"] = n_collisions_ip1_and_5
 
-            # Do the levelling
-            try:
-                bunch_intensity = luminosity_leveling_ip1_5(
-                    collider,
-                    self.config_lumi_leveling_ip1_5,
-                    self.config_beambeam,
-                    crab=self.crab,
-                    cross_section=self.config_beambeam["cross_section"],
-                )
-            except ValueError:
-                print("There was a problem during the luminosity leveling in IP1/5... Ignoring it.")
+        # Do the levelling
+        bunch_intensity = luminosity_leveling_ip1_5(
+            collider,
+            self.config_lumi_leveling_ip1_5,
+            self.config_beambeam,
+            crab=self.crab,
+            cross_section=self.config_beambeam["cross_section"],
+        )
 
         # Update the configuration
         self.config_beambeam["final_num_particles_per_bunch"] = float(bunch_intensity)
@@ -436,7 +429,7 @@ class XsuiteCollider:
             try:
                 L = xt.lumi.luminosity_from_twiss(  # type: ignore
                     n_colliding_bunches=n_col,
-                    num_particles_per_bunch=self.config_beambeam["num_particles_per_bunch"],
+                    num_particles_per_bunch=self.config_beambeam["final_num_particles_per_bunch"],
                     ip_name=ip,
                     nemitt_x=self.config_beambeam["nemitt_x"],
                     nemitt_y=self.config_beambeam["nemitt_y"],
