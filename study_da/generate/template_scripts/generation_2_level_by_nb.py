@@ -17,12 +17,11 @@ import pandas as pd
 
 # Import user-defined modules
 from study_da import (
-    XsuiteCollider,
-    XsuiteTracking,
     load_configuration_from_path,
     set_item_in_dict,
     write_configuration_to_path,
 )
+from study_da.generate import XsuiteCollider, XsuiteTracking
 
 
 # ==================================================================================================

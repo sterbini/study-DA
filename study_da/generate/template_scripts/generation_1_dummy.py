@@ -11,12 +11,11 @@ import logging
 # Import third-party modules
 # Import user-defined modules
 from study_da import (
-    MadCollider,
-    ParticlesDistribution,
     load_configuration_from_path,
     set_item_in_dict,
     write_configuration_to_path,
 )
+from study_da.generate import ParticlesDistribution
 
 
 # ==================================================================================================
@@ -31,26 +30,6 @@ def build_distribution(config_particles):
 
     # Write particle distribution to file
     distr.write_particle_distribution_to_disk(particle_list)
-
-
-def build_collider(config_mad):
-    # Build object for generating collider from mad
-    mc = MadCollider(config_mad)
-
-    # Build mad model
-    mad_b1b2, mad_b4 = mc.prepare_mad_collider()
-
-    # Build collider from mad model
-    collider = mc.build_collider(mad_b1b2, mad_b4)
-
-    # Twiss to ensure everything is ok
-    mc.activate_RF_and_twiss(collider)
-
-    # Clean temporary files
-    mc.clean_temporary_files()
-
-    # Save collider to json
-    mc.write_collider_to_disk(collider)
 
 
 # ==================================================================================================
@@ -78,8 +57,5 @@ if __name__ == "__main__":
 
     # Build and save particle distribution
     build_distribution(full_configuration["config_particles"])
-
-    # Build and save collider
-    build_collider(full_configuration["config_mad"])
 
     logging.info("Script finished")

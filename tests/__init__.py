@@ -10,6 +10,6 @@ import importlib.metadata
 # --- Package version
 # ==================================================================================================
 try:
-    __version__ = importlib.metadata.version("study-gen")
+    __version__ = importlib.metadata.version("study-da")
 except importlib.metadata.PackageNotFoundError:
     __version__ = "unknown"

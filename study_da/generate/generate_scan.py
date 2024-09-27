@@ -24,7 +24,7 @@ from . import find_item_in_dict, load_configuration_from_path, nested_set
 # ==================================================================================================
 # --- Class definition
 # ==================================================================================================
-class StudyDA:
+class GenerateScan:
     def __init__(self, path_config: str):
         # Load configuration
         self.config, self.ryaml = load_configuration_from_path(path_config)
@@ -334,7 +334,7 @@ class StudyDA:
         executable_name = self.config["structure"][generation]["executable"]["name"]
         template = self.config["structure"][generation]["executable"]["template"]
         if template:
-            executable_path = f"{os.path.dirname(inspect.getfile(StudyDA))}/template_scripts/"
+            executable_path = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_scripts/"
         else:
             raise ValueError("Executables that are not templates are not implemented yet.")
 

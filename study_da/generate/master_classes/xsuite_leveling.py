@@ -9,7 +9,6 @@ import logging
 
 # Import third-party modules
 import xtrack as xt
-from scipy.constants import c as clight
 from scipy.optimize import minimize_scalar
 
 # ==================================================================================================
@@ -55,9 +54,9 @@ def luminosity_leveling_ip1_5(
 
     def f(bunch_intensity):
         luminosity = compute_lumi(bunch_intensity)
-        
+
         max_PU_IP_1_5 = config_lumi_leveling_ip1_5["constraints"]["max_PU"]
-        
+
         target_luminosity_IP_1_5 = config_lumi_leveling_ip1_5["luminosity"]
         PU = compute_PU(
             luminosity,
@@ -65,7 +64,9 @@ def luminosity_leveling_ip1_5(
             twiss_b1["T_rev0"],
             cross_section,
         )
-        print(f"Trying I={bunch_intensity:.2e} particles per bunch, L={luminosity:.2e} cm^-2 s^-1, PU={PU:.2e}")
+        print(
+            f"Trying I={bunch_intensity:.2e} particles per bunch, L={luminosity:.2e} cm^-2 s^-1, PU={PU:.2e}"
+        )
         penalty_PU = max(0, (PU - max_PU_IP_1_5) * 1e35)  # in units of 1e-35
         penalty_excess_lumi = max(
             0, (luminosity - target_luminosity_IP_1_5) * 10
