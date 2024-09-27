@@ -61,6 +61,9 @@ if __name__ == "__main__":
     for key, value in dict_mutated_parameters.items():
         set_item_in_dict(full_configuration, key, value)
 
+    # Update particle distribution
+    update_particles_distribution(full_configuration)
+
     # Drop updated configuration
     write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
 

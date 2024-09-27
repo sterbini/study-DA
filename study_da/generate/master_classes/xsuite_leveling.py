@@ -62,9 +62,7 @@ def luminosity_leveling_ip1_5(
             twiss_b1["T_rev0"],
             cross_section,
         )
-        print(
-            f"Trying I={bunch_intensity:.2e} particles per bunch, L={luminosity:.2e} cm^-2 s^-1, PU={PU:.2e}"
-        )
+
         penalty_PU = max(0, (PU - max_PU_IP_1_5) * 1e35)  # in units of 1e-35
         penalty_excess_lumi = max(
             0, (luminosity - target_luminosity_IP_1_5) * 10

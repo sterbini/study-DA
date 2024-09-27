@@ -6,7 +6,7 @@ name: example_dummy_scan
 # List all useful files that will be used by executable in generations below
 # These files are placed at the root of the study
 dependencies:
-  main_configuration: ../../study_da/generate/template_configurations/config_dummy.yaml
+  main_configuration: ../../../study_da/generate/template_configurations/config_dummy.yaml
 
 structure:
   # First generation is always at the root of the study
