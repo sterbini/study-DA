@@ -11,12 +11,10 @@ import logging
 import xtrack as xt
 from scipy.optimize import minimize_scalar
 
+
 # ==================================================================================================
 # --- Functions used for leveling
 # ==================================================================================================
-
-
-# TODO : Add type hints
 def compute_PU(luminosity, num_colliding_bunches, T_rev0, cross_section):
     return luminosity / num_colliding_bunches * cross_section * T_rev0
 

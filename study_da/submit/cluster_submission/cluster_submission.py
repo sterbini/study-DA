@@ -10,7 +10,7 @@ from typing import Self
 import psutil
 
 # Third party imports
-from study_gen._nested_dicts import nested_get
+from study_da.utils import nested_get
 
 # Local imports
 from .submission_statements import HTC, HTCDocker, LocalPC, Slurm, SlurmDocker

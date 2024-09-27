@@ -18,7 +18,7 @@ import ruamel.yaml as yaml
 from jinja2 import Environment, FileSystemLoader
 
 # Import user-defined modules
-from . import find_item_in_dict, load_configuration_from_path, nested_set
+from study_da.utils import find_item_in_dict, load_dic_from_path, nested_set
 
 
 # ==================================================================================================
@@ -27,7 +27,7 @@ from . import find_item_in_dict, load_configuration_from_path, nested_set
 class GenerateScan:
     def __init__(self, path_config: str):
         # Load configuration
-        self.config, self.ryaml = load_configuration_from_path(path_config)
+        self.config, self.ryaml = load_dic_from_path(path_config)
 
         # Parameters common across all generations (e.g. for parallelization)
         self.dic_common_parameters: dict[str, Any] = {}

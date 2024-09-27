@@ -7,20 +7,21 @@ from typing import Self
 
 # Third party imports
 from filelock import SoftFileLock
-from study_gen._nested_dicts import nested_get, nested_set
+
+from study_da.utils import load_dic_from_path, write_dic_to_path
 
 # Local imports
+from ..utils import nested_get, nested_set
 from .cluster_submission import ClusterSubmission
 from .dependency_graph import DependencyGraph
 from .generate_run import generate_run_file
-from .utils.config_utils import ConfigJobs
-from .utils.dict_yaml_utils import load_yaml, write_yaml
+from .config_jobs import ConfigJobs
 
 
 # ==================================================================================================
 # --- Class
 # ==================================================================================================
-class StudySub:
+class SubmitScan:
     def __init__(
         self: Self,
         path_tree: str,
@@ -65,12 +66,12 @@ class StudySub:
     # dic_tree as a property so that it is reloaded every time it is accessed
     @property
     def dic_tree(self: Self):
-        return load_yaml(self.path_tree)
+        return load_dic_from_path(self.path_tree)[0]
 
     # Setter for the dic_tree property
     @dic_tree.setter
     def dic_tree(self: Self, value: dict):
-        write_yaml(self.path_tree, value)
+        write_dic_to_path(value, self.path_tree)
 
     # Property for the same reason
     def configure_jobs(self: Self):
@@ -164,9 +165,7 @@ class StudySub:
                 list_of_jobs,
                 l_submission_filenames,
             ) in dic_submission_files.items():
-                cluster_submission.submit(
-                    list_of_jobs, l_submission_filenames, submission_type
-                )
+                cluster_submission.submit(list_of_jobs, l_submission_filenames, submission_type)
 
             # Update dic_tree from cluster_submission
             self.dic_tree = cluster_submission.dic_tree

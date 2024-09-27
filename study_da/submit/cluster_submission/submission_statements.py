@@ -41,7 +41,7 @@ class Slurm(SubmissionStatement):
         super().__init__(sub_filename, path_job_folder, context)
 
         self.head = "# Running on SLURM "
-        self.body = f"sbatch --ntasks=2 {self.slurm_queue_statement.split(' ')[1] if self.slurm_queue_statement != "" else self.slurm_queue_statement} --output=output.txt --error=error.txt --gres=gpu:{self.request_GPUs} {self.path_job_folder}/run.sh"
+        self.body = f"sbatch --ntasks=2 {self.slurm_queue_statement.split(' ')[1] if self.slurm_queue_statement != '' else self.slurm_queue_statement} --output=output.txt --error=error.txt --gres=gpu:{self.request_GPUs} {self.path_job_folder}/run.sh"
         self.tail = "# SLURM"
         self.submit_command = self.get_submit_command(sub_filename)
 

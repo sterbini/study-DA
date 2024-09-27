@@ -10,12 +10,12 @@ import logging
 
 # Import third-party modules
 # Import user-defined modules
-from study_da import (
-    load_configuration_from_path,
-    set_item_in_dict,
-    write_configuration_to_path,
-)
 from study_da.generate import MadCollider, ParticlesDistribution
+from study_da.utils import (
+    load_dic_from_path,
+    set_item_in_dict,
+    write_dic_to_path,
+)
 
 
 # ==================================================================================================
@@ -66,14 +66,14 @@ if __name__ == "__main__":
     logging.info("Starting script to build particle distribution and collider")
 
     # Load full configuration
-    full_configuration, ryaml = load_configuration_from_path(path_configuration)
+    full_configuration, ryaml = load_dic_from_path(path_configuration)
 
     # Mutate parameters in configuration
     for key, value in dict_mutated_parameters.items():
         set_item_in_dict(full_configuration, key, value)
 
     # Dump configuration
-    write_configuration_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
+    write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
 
     # Build and save particle distribution
     build_distribution(full_configuration["config_particles"])

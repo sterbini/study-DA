@@ -6,10 +6,9 @@ import sys
 
 # Third party imports
 from filelock import SoftFileLock
-from study_gen._nested_dicts import nested_set
 
 # Local imports
-from ..utils.dict_yaml_utils import load_yaml, write_yaml
+from study_da.utils import load_dic_from_path, nested_set, write_dic_to_path
 
 # ==================================================================================================
 # --- Script
@@ -25,10 +24,10 @@ lock = SoftFileLock(f"{tree_path}.lock", timeout=30)
 # Update tag
 with lock:
     # Load the tree
-    tree = load_yaml(tree_path)
+    tree = load_dic_from_path(tree_path)[0]
 
     # Update the tree
     nested_set(tree, l_keys + ["status"], "finished")
 
     # Write the tree
-    write_yaml(tree_path, tree)
+    write_dic_to_path(tree, tree_path)
