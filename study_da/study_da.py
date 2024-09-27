@@ -112,9 +112,10 @@ class StudyDA:
         # Adapt the dict of dependencies to the current generation
         dic_dependencies = self.config["dependencies"] if "dependencies" in self.config else {}
         # Always load configuration from above generation
-        depth_gen = 1  # directory_path_gen.count("/") - 1
+        depth_gen = 1
+        # Initial dependencies are always copied at the root of the study (hence value.split("/")[-1])
         dic_dependencies = {
-            key: "../" * depth_gen + value for key, value in dic_dependencies.items()
+            key: "../" * depth_gen + value.split("/")[-1] for key, value in dic_dependencies.items()
         }
 
         # Render and write the study file

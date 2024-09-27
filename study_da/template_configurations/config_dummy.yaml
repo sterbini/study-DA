@@ -1,0 +1,20 @@
+config_particles:
+  r_min: 4.0
+  r_max: 8.0
+  n_r: 256
+  n_angles: 5
+  n_split: 5
+  path_distribution_folder: particles
+
+config_simulation:
+  # Distribution in the normalized xy space
+  particle_file: ../particles/00.parquet
+
+  # Output particle file
+  path_output_particles: output_particles.parquet
+
+  # Context for the simulation
+  context: "cpu" # 'cupy' # opencl
+
+  # Device number for GPU simulation
+  device_number: # 0
