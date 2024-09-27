@@ -13,9 +13,9 @@ from study_da.utils import load_dic_from_path, write_dic_to_path
 # Local imports
 from ..utils import nested_get, nested_set
 from .cluster_submission import ClusterSubmission
+from .config_jobs import ConfigJobs
 from .dependency_graph import DependencyGraph
 from .generate_run import generate_run_file
-from .config_jobs import ConfigJobs
 
 
 # ==================================================================================================
