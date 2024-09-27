@@ -425,31 +425,34 @@ class XsuiteCollider:
         l_lumi = []
         l_PU = []
         l_ip = ["ip1", "ip2", "ip5", "ip8"]
+
+        # Ensure that the final number of particles per bunch is defined, even
+        # if the leveling has been done by separation
+        if "final_num_particles_per_bunch" not in self.config_beambeam:
+            self.config_beambeam["final_num_particles_per_bunch"] = self.config_beambeam[
+                "num_particles_per_bunch"
+            ]
+
+        # Loop over each IP and record the luminosity
         for n_col, ip in zip(l_n_collisions, l_ip):
-            try:
-                L = xt.lumi.luminosity_from_twiss(  # type: ignore
-                    n_colliding_bunches=n_col,
-                    num_particles_per_bunch=self.config_beambeam["final_num_particles_per_bunch"],
-                    ip_name=ip,
-                    nemitt_x=self.config_beambeam["nemitt_x"],
-                    nemitt_y=self.config_beambeam["nemitt_y"],
-                    sigma_z=self.config_beambeam["sigma_z"],
-                    twiss_b1=twiss_b1,
-                    twiss_b2=twiss_b2,
-                    crab=self.crab,
-                )
-                PU = compute_PU(
-                    L,
-                    n_col,
-                    twiss_b1["T_rev0"],
-                    cross_section=self.config_beambeam["cross_section"],
-                )
-            except Exception:
-                print(
-                    f"There was a problem during the luminosity computation in {ip}... Ignoring it."
-                )
-                L = 0
-                PU = 0
+            L = xt.lumi.luminosity_from_twiss(  # type: ignore
+                n_colliding_bunches=n_col,
+                num_particles_per_bunch=self.config_beambeam["final_num_particles_per_bunch"],
+                ip_name=ip,
+                nemitt_x=self.config_beambeam["nemitt_x"],
+                nemitt_y=self.config_beambeam["nemitt_y"],
+                sigma_z=self.config_beambeam["sigma_z"],
+                twiss_b1=twiss_b1,
+                twiss_b2=twiss_b2,
+                crab=self.crab,
+            )
+            PU = compute_PU(
+                L,
+                n_col,
+                twiss_b1["T_rev0"],
+                cross_section=self.config_beambeam["cross_section"],
+            )
+
             l_lumi.append(L)
             l_PU.append(PU)
 

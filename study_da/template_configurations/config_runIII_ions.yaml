@@ -252,36 +252,38 @@ config_collider:
         - corr_co_acbchs5.r2b1
         - corr_co_acbcvs5.r2b1
 
-    ip8:
-      luminosity: 1.0e+27
-      num_colliding_bunches:
-      impose_separation_orthogonal_to_crossing: false
-      knobs:
-        - on_sep8v
-      bump_range:
-        lhcb1:
-          - e.ds.l8.b1
-          - s.ds.r8.b1
-        lhcb2:
-          - s.ds.r8.b2
-          - e.ds.l8.b2
-      preserve_angles_at_ip: true
-      preserve_bump_closure: true
-      corrector_knob_names:
-        # to preserve angles at ip
-        - corr_co_acbyvs4.l8b1
-        - corr_co_acbyhs4.l8b1
-        - corr_co_acbyvs4.r8b2
-        - corr_co_acbyhs4.r8b2
-          # to close the bumps
-        - corr_co_acbyvs4.l8b2
-        - corr_co_acbyhs4.l8b2
-        - corr_co_acbyvs4.r8b1
-        - corr_co_acbyhs4.r8b1
-        - corr_co_acbcvs5.l8b2
-        - corr_co_acbchs5.l8b2
-        - corr_co_acbyvs5.r8b1
-        - corr_co_acbyhs5.r8b1
+    # ! There seems to be a problem with the lumi optimizer at IP8
+    # ! Not important for the moment as we only consider head-on, but will have to be solved
+    # ip8:
+    #   luminosity: 1.0e+27
+    #   num_colliding_bunches:
+    #   impose_separation_orthogonal_to_crossing: false
+    #   knobs:
+    #     - on_sep8v
+    #   bump_range:
+    #     lhcb1:
+    #       - e.ds.l8.b1
+    #       - s.ds.r8.b1
+    #     lhcb2:
+    #       - s.ds.r8.b2
+    #       - e.ds.l8.b2
+    #   preserve_angles_at_ip: true
+    #   preserve_bump_closure: true
+    #   corrector_knob_names:
+    #     # to preserve angles at ip
+    #     - corr_co_acbyvs4.l8b1
+    #     - corr_co_acbyhs4.l8b1
+    #     - corr_co_acbyvs4.r8b2
+    #     - corr_co_acbyhs4.r8b2
+    #       # to close the bumps
+    #     - corr_co_acbyvs4.l8b2
+    #     - corr_co_acbyhs4.l8b2
+    #     - corr_co_acbyvs4.r8b1
+    #     - corr_co_acbyhs4.r8b1
+    #     - corr_co_acbcvs5.l8b2
+    #     - corr_co_acbchs5.l8b2
+    #     - corr_co_acbyvs5.r8b1
+    #     - corr_co_acbyhs5.r8b1
 
   # Save collider or not
   save_final_collider: false
