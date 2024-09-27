@@ -1,14 +1,13 @@
-"""This class is used to access and modify the study configuration."""
+"""This class provide various functions to manipulate dictionaries (e.g. configuration)."""
 
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
 
 # Import standard library modules
-
-# Import third-party modules
 from typing import Any
 
+# Import third-party modules
 import ruamel.yaml
 
 # Import user-defined modules
@@ -19,30 +18,51 @@ import ruamel.yaml
 # ==================================================================================================
 
 
-def load_configuration_from_path(
+def load_dic_from_path(
     path: str, ryaml: ruamel.yaml.YAML | None = None
 ) -> tuple[dict, ruamel.yaml.YAML]:
+    """Load a dictionary from a yaml file.
+
+    Args:
+        path (str): The path to the yaml file.
+        ryaml (ruamel.yaml.YAML): The yaml reader.
+
+    Returns:
+        tuple[dict, ruamel.yaml.YAML]: The dictionary and the yaml reader.
+
+    """
+
     if ryaml is None:
         # Initialize yaml reader
         ryaml = ruamel.yaml.YAML()
 
-    # Load configuration
+    # Load dic
     with open(path, "r") as fid:
-        configuration = ryaml.load(fid)
+        dic = ryaml.load(fid)
 
-    return configuration, ryaml
+    return dic, ryaml
 
 
-def write_configuration_to_path(
-    configuration: dict, path: str, ryaml: ruamel.yaml.YAML | None = None
-) -> None:
+def write_dic_to_path(dic: dict, path: str, ryaml: ruamel.yaml.YAML | None = None) -> None:
+    """Write a dictionary to a yaml file.
+
+    Args:
+        dic (dict): The dictionary to write.
+        path (str): The path to the yaml file.
+        ryaml (ruamel.yaml.YAML): The yaml reader.
+
+    Returns:
+        None
+
+    """
+
     if ryaml is None:
         # Initialize yaml reader
         ryaml = ruamel.yaml.YAML()
 
-    # Write configuration
+    # Write dic
     with open(path, "w") as fid:
-        ryaml.dump(configuration, fid)
+        ryaml.dump(dic, fid)
 
 
 def nested_get(dic, keys):

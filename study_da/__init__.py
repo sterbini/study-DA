@@ -1,19 +1,23 @@
-from .generate import (
-    find_item_in_dict,
-    load_configuration_from_path,
-    nested_get,
-    nested_set,
-    set_item_in_dict,
-    write_configuration_to_path,
-)
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+
+# Standard library imports
+import importlib.metadata
+
+# Local imports
 from .generate.generate_scan import GenerateScan
+from .submit.submit_scan import SubmitScan
 
 __all__ = [
     "GenerateScan",
-    "load_configuration_from_path",
-    "write_configuration_to_path",
-    "find_item_in_dict",
-    "set_item_in_dict",
-    "nested_get",
-    "nested_set",
+    "SubmitScan",
 ]
+
+# ==================================================================================================
+# --- Package version
+# ==================================================================================================
+try:
+    __version__ = importlib.metadata.version("study-da")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"

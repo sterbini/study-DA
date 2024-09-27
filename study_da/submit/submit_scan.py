@@ -7,9 +7,9 @@ from typing import Self
 
 # Third party imports
 from filelock import SoftFileLock
-from study_gen._nested_dicts import nested_get, nested_set
 
 # Local imports
+from ..utils import nested_get, nested_set
 from .cluster_submission import ClusterSubmission
 from .dependency_graph import DependencyGraph
 from .generate_run import generate_run_file
@@ -20,7 +20,7 @@ from .utils.dict_yaml_utils import load_yaml, write_yaml
 # ==================================================================================================
 # --- Class
 # ==================================================================================================
-class StudySub:
+class SubmitScan:
     def __init__(
         self: Self,
         path_tree: str,
@@ -164,9 +164,7 @@ class StudySub:
                 list_of_jobs,
                 l_submission_filenames,
             ) in dic_submission_files.items():
-                cluster_submission.submit(
-                    list_of_jobs, l_submission_filenames, submission_type
-                )
+                cluster_submission.submit(list_of_jobs, l_submission_filenames, submission_type)
 
             # Update dic_tree from cluster_submission
             self.dic_tree = cluster_submission.dic_tree
