@@ -213,6 +213,7 @@ class GenerateScan:
             )
             dic_parameter_lists[parameter] = parameter_list_updated
 
+        # Remember common parameters as they might be used across generations
         if "common_parameters" in self.config["structure"][generation]:
             self.dic_common_parameters[generation] = {}
             for parameter in self.config["structure"][generation]["common_parameters"]:
@@ -381,17 +382,21 @@ class GenerateScan:
         # Browse through the generations
         l_generations = list(self.config["structure"].keys())
         for idx, generation in enumerate(l_generations):
-            l_study_path_next_generation = []
+            l_study_path_all_next_generation = []
             for study_path in l_study_path:
+                # Get list of paths for the children of the current study
                 l_study_path_next_generation = self.create_study_for_current_gen(
                     generation, study_path
                 )
+                # Update tree
                 dictionary_tree = self.complete_tree(
                     dictionary_tree, l_study_path_next_generation, generation
                 )
+                # Complete list of paths for the children of all studies (of the current generation)
+                l_study_path_all_next_generation.extend(l_study_path_next_generation)
 
             # Update study path for next later
-            l_study_path = l_study_path_next_generation
+            l_study_path = l_study_path_all_next_generation
 
         # Add dependencies to the study
         if "dependencies" in self.config:

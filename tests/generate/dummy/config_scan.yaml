@@ -32,3 +32,13 @@ structure:
       particle_file:
         # Number of paths is set by n_split in the main config
         path_list: ["../particles/____.parquet", n_split]
+
+  # Second generation depends on the config from the first generation
+  generation_3:
+    executable:
+      name: generation_3_dummy.py
+      template: true
+    scans:
+      device_number:
+        # Number of paths is set by n_split in the main config
+        list: [0, 1, 2]
