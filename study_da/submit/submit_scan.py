@@ -2,7 +2,9 @@
 # --- Imports
 # ==================================================================================================
 # Standard library imports
+import logging
 import os
+import time
 from typing import Self
 
 # Third party imports
@@ -83,6 +85,7 @@ class SubmitScan:
             dic_tree["python_environment"] = self.path_python_environment
             dic_tree["container_image"] = self.path_container_image
             dic_tree["absolute_path"] = self.abs_path
+            dic_tree["status"] = "To finish"
 
             # Explicitly set the dic_tree property to force rewrite
             self.dic_tree = dic_tree
@@ -132,7 +135,12 @@ class SubmitScan:
             dic_to_submit_by_gen = {}
             for job in dic_all_jobs:
                 l_dep = DependencyGraph(dic_tree, dic_all_jobs).get_unfinished_dependency(job)
-                if len(l_dep) == 0:
+                # If job parents are finished and job is not finished, submit it
+                if (
+                    len(l_dep) == 0
+                    and nested_get(self.dic_tree, dic_all_jobs[job]["l_keys"] + ["status"])
+                    != "finished"
+                ):
                     gen = dic_all_jobs[job]["gen"]
                     if gen not in dic_to_submit_by_gen:
                         dic_to_submit_by_gen[gen] = []
@@ -145,6 +153,13 @@ class SubmitScan:
 
             # Convert dic_to_submit_by_gen to contain all requested information
             l_jobs_to_submit = [job for dic_gen in dic_to_submit_by_gen.values() for job in dic_gen]
+
+            # Write to the tree if no more jobs are to be submitted
+            if not l_jobs_to_submit:
+                dic_tree["status"] = "finished"
+                self.dic_tree = dic_tree
+                print("All jobs are done.")
+                return
 
             path_submission_file = (
                 f"{self.abs_path}/{self.study_name}/submission/submission_file.sub"
@@ -168,3 +183,16 @@ class SubmitScan:
 
             # Update dic_tree from cluster_submission
             self.dic_tree = cluster_submission.dic_tree
+
+    def keep_submit_until_done(
+        self: Self, one_generation_at_a_time: bool = False, wait_time: float = 30
+    ):
+        if wait_time < 1 / 20:
+            logging.warning("Wait time should be at least 10 seconds to prevent locking errors.")
+            logging.warning("Setting wait time to 10 seconds.")
+            wait_time = 10 / 60
+
+        while self.dic_tree["status"] != "finished":
+            self.submit(one_generation_at_a_time)
+            # Wait for a certain amount of time before checking again
+            time.sleep(wait_time * 60)
