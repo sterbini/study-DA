@@ -131,7 +131,6 @@ class SubmitScan:
             # Collect dict of list of unfinished jobs for every tree branch and every gen
             dic_to_submit_by_gen = {}
             for job in dic_all_jobs:
-                # ! This hasn't been debuged properly for n_gen > 2
                 l_dep = DependencyGraph(dic_tree, dic_all_jobs).get_unfinished_dependency(job)
                 if len(l_dep) == 0:
                     gen = dic_all_jobs[job]["gen"]
