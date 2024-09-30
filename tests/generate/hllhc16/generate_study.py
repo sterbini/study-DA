@@ -14,7 +14,7 @@ from study_da.utils.configuration import load_dic_from_path, write_dic_to_path
 
 # Load the configuration from hllhc16
 config, ryaml = load_dic_from_path(
-    "../../../../study_da/generate/template_configurations/config_hllhc16.yaml"
+    "../../../study_da/generate/template_configurations/config_hllhc16.yaml"
 )
 
 # Adapt the number of turns
