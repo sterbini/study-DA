@@ -156,6 +156,12 @@ class ConfigJobs:
                         "dic_config_jobs and skip_configured_jobs should be set before calling this method"
                     )
 
+                # ! This hasn't been propertly tested
+                # Delete path_run key if it exists
+                if "path_run" in dic_gen:
+                    del dic_gen["path_run"]
+
+                # If all is fine so far, get job name and configure
                 job_name = value.split("/")[-1]
 
                 # Ensure configuration is not already set

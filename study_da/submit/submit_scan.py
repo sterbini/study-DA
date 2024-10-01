@@ -99,6 +99,7 @@ class SubmitScan:
 
     def generate_run_files(
         self: Self,
+        l_jobs_to_submit: list[str],
         dic_additional_commands_per_gen: dict[int, str] = {},
         dic_dependencies_per_gen: dict[int, list[str]] = {},
         name_config: str = "config.yaml",
@@ -107,7 +108,7 @@ class SubmitScan:
         # Lock since we are modifying the tree
         with self.lock:
             dic_tree = self.dic_tree
-            for job in dic_all_jobs:
+            for job in l_jobs_to_submit:
                 l_keys = dic_all_jobs[job]["l_keys"]
                 job_name = job.split("/")[-1]
                 relative_job_folder = "/".join(job.split("/")[:-1])
@@ -120,6 +121,12 @@ class SubmitScan:
                     if singularity
                     else self.path_python_environment
                 )
+
+                # Ensure that the run file does not already exist
+                if "path_run" in nested_get(dic_tree, l_keys):
+                    logging.warning(f"Run file already exists for job {job}. Skipping.")
+                    continue
+
                 run_str = generate_run_file(
                     absolute_job_folder,
                     job_name,
@@ -143,7 +150,13 @@ class SubmitScan:
             # Update the dict
             self.dic_tree = dic_tree
 
-    def submit(self: Self, one_generation_at_a_time: bool = False):
+    def submit(
+        self: Self,
+        one_generation_at_a_time: bool = False,
+        dic_additional_commands_per_gen: dict[int, str] = {},
+        dic_dependencies_per_gen: dict[int, list[str]] = {},
+        name_config: str = "config.yaml",
+    ):
         dic_all_jobs = self.get_all_jobs()
 
         with self.lock:
@@ -172,6 +185,14 @@ class SubmitScan:
 
             # Convert dic_to_submit_by_gen to contain all requested information
             l_jobs_to_submit = [job for dic_gen in dic_to_submit_by_gen.values() for job in dic_gen]
+
+            # Generate the run files if not already done
+            self.generate_run_files(
+                l_jobs_to_submit,
+                dic_additional_commands_per_gen,
+                dic_dependencies_per_gen,
+                name_config,
+            )
 
             # Write to the tree if no more jobs are to be submitted
             if not l_jobs_to_submit:
