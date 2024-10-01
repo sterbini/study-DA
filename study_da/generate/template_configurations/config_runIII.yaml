@@ -68,6 +68,7 @@ config_mad:
 
   # Path of the collider file to be saved
   path_collider: collider.json
+  compress: true # will compress the collider file, filename will end with .zip
 
 # Configuration for tuning of the collider
 config_collider:

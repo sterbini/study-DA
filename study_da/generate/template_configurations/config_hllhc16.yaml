@@ -68,6 +68,7 @@ config_mad:
 
   # Path of the collider file to be saved
   path_collider: collider.json
+  compress: true # will compress the collider file, filename will end with .zip
 
 # Configuration for tuning of the collider
 config_collider:
@@ -157,7 +158,7 @@ config_collider:
     nemitt_x: 2.5e-6
     nemitt_y: 2.5e-6
     mask_with_filling_pattern:
-      # If not already existing in the study-da package, pattern must have an absolute path or be 
+      # If not already existing in the study-da package, pattern must have an absolute path or be
       # added as a dependency for the run file
       pattern_fname: 8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
       i_bunch_b1: null # If not specified, the bunch with the worst schedule is chosen

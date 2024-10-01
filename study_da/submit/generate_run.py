@@ -4,6 +4,9 @@
 # Third party imports
 import yaml
 
+# Local imports
+from study_da.utils import find_item_in_dict, set_item_in_dict
+
 
 # ==================================================================================================
 # --- Functions
@@ -69,20 +72,26 @@ def _generate_run_file_htc(
     local_path = abs_path.split("/")[-1]
 
     # Mutate all paths in config to be absolute
-    with open(f"{abs_path}/{name_config}", "r") as f:
+    with open(f"{abs_path}/../{name_config}", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     # Mutate paths to be absolute, if they're not already absolute
     dic_to_mutate = {}
     for dependency in l_dependencies:
-        if not config[dependency].startswith("/"):
-            new_path_dependency = f"{abs_path}/{config[dependency]}"
-            dic_to_mutate[dependency] = new_path_dependency
+        # Check if dependency exist, otherwise throw an error
+        dependency_value = find_item_in_dict(config, dependency)
+        if dependency_value is None:
+            raise KeyError("The dependency you want to update doesn't exist or is set to None.")
+        else:
+            if not dependency_value.startswith("/"):
+                new_path_dependency = f"{abs_path}/{dependency_value}"
+                dic_to_mutate[dependency] = new_path_dependency
 
     # Prepare strings for sed
     sed_commands = ""
     for dependency in dic_to_mutate:
-        path_dependency = config[dependency].replace("/", "\/")
+        dependency_value = find_item_in_dict(config, dependency)
+        path_dependency = dependency_value.replace("/", "\/")
         new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")
         sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" {name_config}\n'
 

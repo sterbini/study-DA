@@ -48,8 +48,9 @@ class MadCollider:
         # Optics specific tools
         self._ost = None
 
-        # Path to disk
+        # Path to disk and compression
         self.path_collider = configuration["path_collider"]
+        self.compress = configuration["compress"]
 
     @property
     def ost(self):
@@ -156,14 +157,14 @@ class MadCollider:
         print(f"--- Now displaying Qx and Qy for line {line}---")
         print(tw.qx, tw.qy)
 
-    def write_collider_to_disk(self, collider: xt.Multiline, compress: bool = True) -> None:
+    def write_collider_to_disk(self, collider: xt.Multiline) -> None:
         # Save collider to json, creating the folder if it does not exist
         if "/" in self.path_collider:
             os.makedirs(self.path_collider, exist_ok=True)
         collider.to_json(self.path_collider)
 
         # Compress the collider file to zip to ease the load on afs
-        if compress:
+        if self.compress:
             with ZipFile(f"{self.path_collider}.zip", "w") as zipf:
                 zipf.write(self.path_collider)
 
