@@ -64,7 +64,7 @@ def _generate_run_file_htc(
     l_dependencies=[],
     name_config="config.yaml",
 ):
-    # Get local path and abs path to gen 2
+    # Get local path and abs path to current gen
     abs_path = job_folder
     local_path = abs_path.split("/")[-1]
 
