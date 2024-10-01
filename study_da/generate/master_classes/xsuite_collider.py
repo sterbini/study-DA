@@ -419,11 +419,7 @@ class XsuiteCollider:
             )
 
     def record_final_luminosity(self, collider, l_n_collisions):
-        # Get the final luminoisty in all IPs
-        twiss_b1 = collider["lhcb1"].twiss()
-        twiss_b2 = collider["lhcb2"].twiss()
-        l_lumi = []
-        l_PU = []
+        # Define IPs in which the luminosity will be computed
         l_ip = ["ip1", "ip2", "ip5", "ip8"]
 
         # Ensure that the final number of particles per bunch is defined, even
@@ -433,33 +429,53 @@ class XsuiteCollider:
                 "num_particles_per_bunch"
             ]
 
-        # Loop over each IP and record the luminosity
-        for n_col, ip in zip(l_n_collisions, l_ip):
-            L = xt.lumi.luminosity_from_twiss(  # type: ignore
-                n_colliding_bunches=n_col,
-                num_particles_per_bunch=self.config_beambeam["final_num_particles_per_bunch"],
-                ip_name=ip,
-                nemitt_x=self.config_beambeam["nemitt_x"],
-                nemitt_y=self.config_beambeam["nemitt_y"],
-                sigma_z=self.config_beambeam["sigma_z"],
-                twiss_b1=twiss_b1,
-                twiss_b2=twiss_b2,
-                crab=self.crab,
-            )
-            PU = compute_PU(
-                L,
-                n_col,
-                twiss_b1["T_rev0"],
-                cross_section=self.config_beambeam["cross_section"],
-            )
+        def twiss_and_compute_lumi(collider, l_n_collisions):
+            # Loop over each IP and record the luminosity
+            twiss_b1 = collider["lhcb1"].twiss()
+            twiss_b2 = collider["lhcb2"].twiss()
+            l_lumi = []
+            l_PU = []
+            for n_col, ip in zip(l_n_collisions, l_ip):
+                L = xt.lumi.luminosity_from_twiss(  # type: ignore
+                    n_colliding_bunches=n_col,
+                    num_particles_per_bunch=self.config_beambeam["final_num_particles_per_bunch"],
+                    ip_name=ip,
+                    nemitt_x=self.config_beambeam["nemitt_x"],
+                    nemitt_y=self.config_beambeam["nemitt_y"],
+                    sigma_z=self.config_beambeam["sigma_z"],
+                    twiss_b1=twiss_b1,
+                    twiss_b2=twiss_b2,
+                    crab=self.crab,
+                )
+                PU = compute_PU(
+                    L,
+                    n_col,
+                    twiss_b1["T_rev0"],
+                    cross_section=self.config_beambeam["cross_section"],
+                )
 
-            l_lumi.append(L)
-            l_PU.append(PU)
+                l_lumi.append(L)
+                l_PU.append(PU)
+
+            return l_lumi, l_PU
+
+        # Get the final luminosity in all IPs, without beam-beam
+        collider.vars["beambeam_scale"] = 0
+        l_lumi, l_PU = twiss_and_compute_lumi(collider, l_n_collisions)
 
         # Update configuration
         for ip, L, PU in zip(l_ip, l_lumi, l_PU):
-            self.config_beambeam[f"luminosity_{ip}_after_optimization"] = float(L)
-            self.config_beambeam[f"Pile-up_{ip}_after_optimization"] = float(PU)
+            self.config_beambeam[f"luminosity_{ip}_without_beam_beam"] = float(L)
+            self.config_beambeam[f"Pile-up_{ip}_without_beam_beam"] = float(PU)
+
+        # Get the final luminosity in all IPs, with beam-beam
+        collider.vars["beambeam_scale"] = 1
+        l_lumi, l_PU = twiss_and_compute_lumi(collider, l_n_collisions)
+
+        # Update configuration
+        for ip, L, PU in zip(l_ip, l_lumi, l_PU):
+            self.config_beambeam[f"luminosity_{ip}_with_beam_beam"] = float(L)
+            self.config_beambeam[f"Pile-up_{ip}_with_beam_beam"] = float(PU)
 
     def write_collider_to_disk(self, collider, full_configuration):
         if self.save_final_collider:
