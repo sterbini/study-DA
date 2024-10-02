@@ -28,7 +28,7 @@ class SubmitScan:
         self: Self,
         path_tree: str,
         path_python_environment: str,
-        path_python_environment_container: str | None = None,
+        path_python_environment_container: str = "",
         path_container_image: str | None = None,
     ):
         # Path to study files
@@ -66,6 +66,16 @@ class SubmitScan:
         # Python environment for the container
         self.path_python_environment_container = path_python_environment_container
 
+        # Ensure that the container image is set if the python environment is set
+        if self.path_container_image and not self.path_python_environment_container:
+            raise ValueError(
+                "The path to the python environment in the container must be set if the container image is set."
+            )
+
+        # Add /bin/activate to the path_python_environment if needed
+        if not self.path_python_environment_container.endswith("/bin/activate"):
+            self.path_python_environment_container += "/bin/activate"
+
         # Lock file to avoid concurrent access (softlock as several platforms are used)
         self.lock = SoftFileLock(f"{self.path_tree}.lock", timeout=30)
 
@@ -99,56 +109,53 @@ class SubmitScan:
 
     def generate_run_files(
         self: Self,
+        dic_tree: dict,
         l_jobs_to_submit: list[str],
         dic_additional_commands_per_gen: dict[int, str] = {},
         dic_dependencies_per_gen: dict[int, list[str]] = {},
         name_config: str = "config.yaml",
     ):
         dic_all_jobs = self.get_all_jobs()
-        # Lock since we are modifying the tree
-        with self.lock:
-            dic_tree = self.dic_tree
-            for job in l_jobs_to_submit:
-                l_keys = dic_all_jobs[job]["l_keys"]
-                job_name = job.split("/")[-1]
-                relative_job_folder = "/".join(job.split("/")[:-1])
-                absolute_job_folder = f"{self.abs_path}/{relative_job_folder}"
-                generation_number = dic_all_jobs[job]["gen"]
-                submission_type = nested_get(dic_tree, l_keys + ["submission_type"])
-                singularity = "docker" in submission_type
-                path_python_environment = (
-                    self.path_python_environment_container
-                    if singularity
-                    else self.path_python_environment
-                )
+        for job in l_jobs_to_submit:
+            l_keys = dic_all_jobs[job]["l_keys"]
+            job_name = job.split("/")[-1]
+            relative_job_folder = "/".join(job.split("/")[:-1])
+            absolute_job_folder = f"{self.abs_path}/{relative_job_folder}"
+            generation_number = dic_all_jobs[job]["gen"]
+            submission_type = nested_get(dic_tree, l_keys + ["submission_type"])
+            singularity = "docker" in submission_type
+            path_python_environment = (
+                self.path_python_environment_container
+                if singularity
+                else self.path_python_environment
+            )
 
-                # Ensure that the run file does not already exist
-                if "path_run" in nested_get(dic_tree, l_keys):
-                    logging.warning(f"Run file already exists for job {job}. Skipping.")
-                    continue
+            # Ensure that the run file does not already exist
+            if "path_run" in nested_get(dic_tree, l_keys):
+                logging.warning(f"Run file already exists for job {job}. Skipping.")
+                continue
 
-                run_str = generate_run_file(
-                    absolute_job_folder,
-                    job_name,
-                    path_python_environment,
-                    generation_number,
-                    self.abs_path_tree,
-                    l_keys,
-                    htc="htc" in submission_type,
-                    additionnal_command=dic_additional_commands_per_gen[generation_number],
-                    l_dependencies=dic_dependencies_per_gen[generation_number],
-                    name_config=name_config,
-                )
-                # Write the run file
-                path_run_job = f"{absolute_job_folder}/run.sh"
-                with open(path_run_job, "w") as f:
-                    f.write(run_str)
+            run_str = generate_run_file(
+                absolute_job_folder,
+                job_name,
+                path_python_environment,
+                generation_number,
+                self.abs_path_tree,
+                l_keys,
+                htc="htc" in submission_type,
+                additionnal_command=dic_additional_commands_per_gen[generation_number],
+                l_dependencies=dic_dependencies_per_gen[generation_number],
+                name_config=name_config,
+            )
+            # Write the run file
+            path_run_job = f"{absolute_job_folder}/run.sh"
+            with open(path_run_job, "w") as f:
+                f.write(run_str)
 
-                # Record the path to the run file in the tree
-                nested_set(dic_tree, l_keys + ["path_run"], path_run_job)
+            # Record the path to the run file in the tree
+            nested_set(dic_tree, l_keys + ["path_run"], path_run_job)
 
-            # Update the dict
-            self.dic_tree = dic_tree
+        return dic_tree
 
     def submit(
         self: Self,
@@ -187,7 +194,8 @@ class SubmitScan:
             l_jobs_to_submit = [job for dic_gen in dic_to_submit_by_gen.values() for job in dic_gen]
 
             # Generate the run files if not already done
-            self.generate_run_files(
+            dic_tree = self.generate_run_files(
+                dic_tree,
                 l_jobs_to_submit,
                 dic_additional_commands_per_gen,
                 dic_dependencies_per_gen,
@@ -197,9 +205,7 @@ class SubmitScan:
             # Write to the tree if no more jobs are to be submitted
             if not l_jobs_to_submit:
                 dic_tree["status"] = "finished"
-                self.dic_tree = dic_tree
                 print("All jobs are done.")
-                return
 
             path_submission_file = (
                 f"{self.abs_path}/{self.study_name}/submission/submission_file.sub"
