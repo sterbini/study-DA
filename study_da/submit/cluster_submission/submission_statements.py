@@ -98,8 +98,8 @@ class HTC(SubmissionStatement):
             f"initialdir = {self.path_job_folder}\n"
             + f"executable = {self.path_job_folder}/run.sh\n"
             + f"request_GPUs = {self.request_GPUs}\n"
-            + "queue\n"
-            + f"+JobFlavour  = {htc_flavor}"
+            + f"+JobFlavour  = {htc_flavor}\n"
+            + "queue"
         )
         self.tail = "# HTC"
         self.submit_command = self.get_submit_command(sub_filename)
@@ -126,8 +126,8 @@ class HTCDocker(SubmissionStatement):
             f"initialdir = {self.path_job_folder}\n"
             + f"executable = {self.path_job_folder}/run.sh\n"
             + f"request_GPUs = {self.request_GPUs}\n"
+            + f"+JobFlavour  = {htc_flavor}\n"
             + "queue"
-            + f"+JobFlavour  = {htc_flavor}"
         )
         self.tail = "# HTC Docker"
         self.submit_command = self.get_submit_command(sub_filename)

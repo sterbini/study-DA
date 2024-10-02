@@ -351,7 +351,7 @@ class ClusterSubmission:
         output = process.stdout.decode("utf-8")
         output_error = process.stderr.decode("utf-8")
         if "ERROR" in output_error:
-            raise RuntimeError(f"Error in submission: {output}")
+            raise RuntimeError(f"Error in submission: {output_error}")
         for line in output.split("\n"):
             if "htc" in submission_type:
                 if "cluster" in line:
