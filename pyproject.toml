@@ -17,7 +17,7 @@ xsuite = "^0.16.6"
 fastparquet = "^2024.5.0"
 nafflib = "^2.0.2"
 filelock = "^3.16.1"
-xmask = {path = "external_dependencies/xmask", develop = true}
+# xmask = {path = "external_dependencies/xmask", develop = true}
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"
