@@ -35,7 +35,7 @@ dic_additional_commands_per_gen = {
 }
 
 # Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
-dic_dependencies_per_gen = {1: [], 2: ["collider_file", "particle_file"]}
+dic_dependencies_per_gen = {1: ["acc-models-lhc"], 2: ["collider_file", "particle_file"]}
 name_config = "config_hllhc16.yaml"
 
 # %%

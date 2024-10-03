@@ -93,12 +93,9 @@ def _generate_run_file_htc(
         dependency_value = find_item_in_dict(config, dependency)
         if dependency_value is None:
             raise KeyError("The dependency you want to update doesn't exist or is set to None.")
-        else:
-            if not dependency_value.startswith("/"):
-                new_path_dependency = f"{abs_path}/{dependency_value}"
-                dic_to_mutate[dependency] = new_path_dependency
-
-    print("dic_to_mutate", dic_to_mutate)
+        if not dependency_value.startswith("/"):
+            new_path_dependency = f"{abs_path}/{dependency_value}"
+            dic_to_mutate[dependency] = new_path_dependency
 
     # Prepare strings for sed
     sed_commands = ""
@@ -107,8 +104,6 @@ def _generate_run_file_htc(
         path_dependency = dependency_value.replace("/", "\/")
         new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")
         sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}\n'
-
-    print("sed_commands", sed_commands)
 
     # Return final run script
     return (
