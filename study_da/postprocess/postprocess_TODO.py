@@ -7,19 +7,11 @@ import time
 
 # Third party imports
 import pandas as pd
-import tree_maker
 
 
 # ==================================================================================================
 # --- Functions to browse simulations folder and extract relevant observables
 # ==================================================================================================
-# Get a given data from a dictionary with position provided as a list
-def get_from_dict(dataDict, mapList):
-    for k in mapList:
-        dataDict = dataDict[k]
-    return dataDict
-
-
 def get_particles_data(root):
     l_df_output = []
 
@@ -61,7 +53,7 @@ def reorganize_particles_data(l_df_output, dic_parameters_of_interest):
 
         # Select simulations parameters of interest
         for name_param, l_path_param in dic_parameters_of_interest.items():
-            df_output[name_param] = get_from_dict(dic_child_collider, l_path_param)
+            df_output[name_param] = nested_get(dic_child_collider, l_path_param)
 
         # Feel free to add more parameters of interest here (e.g. from dic_child_simulation)
 

@@ -25,14 +25,7 @@ def latex_float(f):
     return r"${0} \times 10^{{{1}}}$".format(base, int(exponent))
 
 
-def load_config(config_path):
-    # Read configuration file
-    with open(config_path, "r") as fid:
-        config = yaml.safe_load(fid)
-    return config
-
-
-def get_title_from_conf(
+def get_title_from_configuration(
     conf_mad,
     conf_collider=None,
     type_crossing=None,

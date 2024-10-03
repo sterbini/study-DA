@@ -20,7 +20,7 @@ study_sub = SubmitScan(
     path_tree="example_tune_scan/tree.yaml",
     path_python_environment="/home/cdroin/study-DA/.venv",
     path_python_environment_container="/usr/local/DA_study/miniforge_docker",
-    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:74ed75ec",
+    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:ec4ae177",
 )
 
 # %%
@@ -35,8 +35,7 @@ dic_additional_commands_per_gen = {
 }
 
 # Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
-# Must be strings
-dic_dependencies_per_gen = {1: ["acc-models-lhc"], 2: ["collider_file", "particle_file"]}
+dic_dependencies_per_gen = {1: [], 2: ["collider_file", "particle_file"]}
 name_config = "config_hllhc16.yaml"
 
 # %%
