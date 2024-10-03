@@ -152,7 +152,7 @@ class MadCollider:
     def check_xsuite_lattices(self, line: xt.Line) -> None:
         tw = line.twiss(method="6d", matrix_stability_tol=100)
         print(f"--- Now displaying Twiss result at all IPS for line {line}---")
-        print(tw[:, "ip.*"])
+        print(tw.rows["ip.*"])
         # print qx and qy
         print(f"--- Now displaying Qx and Qy for line {line}---")
         print(tw.qx, tw.qy)
