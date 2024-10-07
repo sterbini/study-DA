@@ -60,6 +60,26 @@ class MadCollider:
     """
 
     def __init__(self, configuration: dict):
+        """
+        Initializes the MadCollider class with the given configuration.
+
+        Args:
+            configuration (dict): A dictionary containing the following keys:
+                - sanity_checks (bool): Flag to enable or disable sanity checks.
+                - links (str): Path to the links configuration.
+                - beam_config (dict): Configuration for the beam.
+                - optics_file (str): Path to the optics file.
+                - enable_imperfections (bool): Flag to enable or disable imperfections.
+                - enable_knob_synthesis (bool): Flag to enable or disable knob synthesis.
+                - rename_coupling_knobs (bool): Flag to enable or disable renaming of coupling knobs.
+                - pars_for_imperfections (dict): Parameters for imperfections.
+                - ver_lhc_run (float | None): Version of the LHC run, if applicable.
+                - ver_hllhc_optics (float | None): Version of the HL-LHC optics, if applicable.
+                - ions (bool): Flag to indicate if ions are used.
+                - phasing (dict): Configuration for phasing.
+                - path_collider (str): Path to the collider.
+                - compress (bool): Flag to enable or disable compression.
+        """
         # Configuration variables
         self.sanity_checks: bool = configuration["sanity_checks"]
         self.links: str = configuration["links"]
