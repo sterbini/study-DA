@@ -65,7 +65,7 @@ def write_dic_to_path(dic: dict, path: str, ryaml: ruamel.yaml.YAML | None = Non
         ryaml.dump(dic, fid)
 
 
-def nested_get(dic, keys):
+def nested_get(dic: dict, keys: list) -> Any:
     # Adapted from https://stackoverflow.com/questions/14692690/access-nested-dictionary-items-via-a-list-of-keys
     """Get the value from a nested dictionary using a list of keys.
 
@@ -82,7 +82,7 @@ def nested_get(dic, keys):
     return dic
 
 
-def nested_set(dic, keys, value):
+def nested_set(dic: dict, keys: list, value: Any) -> None:
     """Set a value in a nested dictionary using a list of keys.
 
     Args:
@@ -119,7 +119,7 @@ def find_item_in_dict(obj: dict, key: str) -> Any:
                 return item
 
 
-def set_item_in_dict(obj: dict, key: str, value: Any, found: bool = False):
+def set_item_in_dict(obj: dict, key: str, value: Any, found: bool = False) -> None:
     """Set an item in a nested dictionary.
 
     Args:

@@ -59,19 +59,19 @@ class XsuiteTracking:
             nemitt_y (float): Normalized emittance in the y-plane.
         """
         # Context parameters
-        self.context_str = configuration["context"]
-        self.device_number = configuration["device_number"]
+        self.context_str: str = configuration["context"]
+        self.device_number: int = configuration["device_number"]
         self._context = None
 
         # Simulation parameters
-        self.beam = configuration["beam"]
-        self.particle_file = configuration["particle_file"]
-        self.delta_max = configuration["delta_max"]
-        self.n_turns = configuration["n_turns"]
+        self.beam: str = configuration["beam"]
+        self.particle_file: str = configuration["particle_file"]
+        self.delta_max: float = configuration["delta_max"]
+        self.n_turns: int = configuration["n_turns"]
 
         # Beambeam parameters
-        self.nemitt_x = nemitt_x
-        self.nemitt_y = nemitt_y
+        self.nemitt_x: float = nemitt_x
+        self.nemitt_y: float = nemitt_y
 
     @property
     def context(self) -> Any:
