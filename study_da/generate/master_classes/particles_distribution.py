@@ -150,14 +150,15 @@ class ParticlesDistribution:
 
         return [l_particles]
 
-    def write_particle_distribution_to_disk(self, ll_particles) -> list[str]:
+    def write_particle_distribution_to_disk(
+        self, ll_particles: list[list[np.ndarray]]
+    ) -> list[str]:
         """
         Writes a list of particle distributions to disk in Parquet format.
 
         Args:
-            ll_particles (list[list[dict]]): A list of particle distributions,
-            where each distribution is a list of dictionaries containing
-            particle data.
+            ll_particles (list[list[np.ndarray]]): A list of particle distributions,
+            where each distribution is a list containing particle data.
 
         Returns:
             list[str]: A list of file paths where the particle distributions
