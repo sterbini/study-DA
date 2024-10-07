@@ -7,11 +7,14 @@
 # Import standard library modules
 import logging
 import time
+from typing import Any
 
 # Import third-party modules
 import numpy as np
 import pandas as pd
 import xobjects as xo
+import xpart as xp
+import xtrack as xt
 
 # ==================================================================================================
 # --- Class definition
@@ -19,7 +22,42 @@ import xobjects as xo
 
 
 class XsuiteTracking:
-    def __init__(self, configuration: dict, nemitt_x, nemitt_y):
+    """
+    XsuiteTracking class for managing particle tracking simulations.
+
+    Attributes:
+        context_str (str): The context for the simulation (e.g., "cupy", "opencl", "cpu").
+        device_number (int): The device number for GPU contexts.
+        _context (xo.Context): The context object for the simulation.
+        beam (str): The beam configuration.
+        particle_file (str): The file path to the particle data.
+        delta_max (float): The maximum delta value for particles.
+        n_turns (int): The number of turns for the simulation.
+        nemitt_x (float): The normalized emittance in the x direction.
+        nemitt_y (float): The normalized emittance in the y direction.
+
+    Methods:
+        context: Get the context object for the simulation.
+        prepare_particle_distribution_for_tracking: Prepare the particle distribution for tracking.
+        track: Track the particles in the collider.
+    """
+
+    def __init__(self, configuration: dict, nemitt_x: float, nemitt_y: float) -> None:
+        """
+        Initialize the tracking configuration.
+
+        Args:
+            configuration (dict): A dictionary containing the configuration parameters.
+                Expected keys:
+                - "context": str, context string for the simulation.
+                - "device_number": int, device number for the simulation.
+                - "beam": str, beam type for the simulation.
+                - "particle_file": str, path to the particle file.
+                - "delta_max": float, maximum delta value for the simulation.
+                - "n_turns": int, number of turns for the simulation.
+            nemitt_x (float): Normalized emittance in the x-plane.
+            nemitt_y (float): Normalized emittance in the y-plane.
+        """
         # Context parameters
         self.context_str = configuration["context"]
         self.device_number = configuration["device_number"]
@@ -36,7 +74,24 @@ class XsuiteTracking:
         self.nemitt_y = nemitt_y
 
     @property
-    def context(self):
+    def context(self) -> Any:
+        """
+        Returns the context for the current instance. If the context is not already set,
+        it initializes the context based on the `context_str` attribute. The context can
+        be one of the following:
+
+        - "cupy": Uses `xo.ContextCupy`. If `device_number` is specified, it initializes
+            the context with the given device number.
+        - "opencl": Uses `xo.ContextPyopencl`.
+        - "cpu": Uses `xo.ContextCpu`.
+        - Any other value: Logs a warning and defaults to `xo.ContextCpu`.
+
+        If `device_number` is specified but the context is not "cupy", a warning is logged
+        indicating that the device number will be ignored.
+
+        Returns:
+            Any: The initialized context.
+        """
         if self._context is None:
             if self.device_number is not None and self.context_str not in ["cupy"]:
                 logging.warning("Device number will be ignored since context is not cupy")
@@ -55,7 +110,28 @@ class XsuiteTracking:
                     self._context = xo.ContextCpu()
         return self._context
 
-    def prepare_particle_distribution_for_tracking(self, collider):
+    def prepare_particle_distribution_for_tracking(
+        self, collider: xt.Multiline
+    ) -> tuple[xp.particles.particles.Particles, np.ndarray, np.ndarray]:
+        """
+        Prepare a particle distribution for tracking in the collider.
+
+        This method reads particle data from a parquet file, processes the data to
+        generate normalized amplitudes and angles, and then builds particles for
+        tracking in the collider. If the context is set to use GPU, the collider
+        trackers are reset and rebuilt accordingly.
+
+        Args:
+            collider (xt.Multiline): The collider object containing the beam and
+                tracking information.
+
+        Returns:
+            tuple: A tuple containing:
+                - xp.particles.particles.Particles: The particles ready for tracking.
+                - np.ndarray: Array of particle IDs.
+                - np.ndarray: Array of normalized amplitudes in the xy-plane.
+                - np.ndarray: Array of angles in the xy-plane in radians.
+        """
         # Reset the tracker to go to GPU if needed
         if self.context_str in ["cupy", "opencl"]:
             collider.discard_trackers()
@@ -83,7 +159,17 @@ class XsuiteTracking:
         particle_id = particle_df.particle_id.values
         return particles, particle_id, r_vect, theta_vect
 
-    def track(self, collider, particles):
+    def track(self, collider: xt.Multiline, particles: xp.particles.particles.Particles) -> dict:
+        """
+        Tracks particles through a collider for a specified number of turns and logs the elapsed time.
+
+        Args:
+            collider (xt.Multiline): The collider object containing the beamline to be tracked.
+            particles (xp.particles.particles.Particles): The particles to be tracked.
+
+        Returns:
+            dict: A dictionary representation of the tracked particles.
+        """
         # Optimize line for tracking
         collider[self.beam].optimize_for_tracking()
 
