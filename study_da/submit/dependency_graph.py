@@ -1,4 +1,4 @@
-""" " Dependency graph class to manage the dependencies between jobs"""
+"""Dependency graph class to manage the dependencies between jobs"""
 
 # ==================================================================================================
 # --- Imports
@@ -13,16 +13,39 @@ from study_da.utils import nested_get
 # --- Class
 # ==================================================================================================
 class DependencyGraph:
-    def __init__(
-        self,
-        dic_tree: dict,
-        dic_all_jobs: dict,
-    ):
+    """
+    A class to manage the dependencies between jobs.
+
+    Attributes:
+        dic_tree (dict): The dictionary representing the job tree.
+        dic_all_jobs (dict): The dictionary containing all jobs and their details.
+        dependency_graph (dict): The dictionary representing the dependency graph.
+
+    Methods:
+        __init__(dic_tree, dic_all_jobs): Initializes the DependencyGraph class.
+        build_full_dependency_graph(): Builds the full dependency graph.
+        get_unfinished_dependency(job): Gets the list of unfinished dependencies for a given job.
+    """
+
+    def __init__(self, dic_tree: dict, dic_all_jobs: dict):
+        """
+        Initializes the DependencyGraph class.
+
+        Args:
+            dic_tree (dict): The dictionary representing the job tree.
+            dic_all_jobs (dict): The dictionary containing all jobs and their details.
+        """
         self.dic_tree = dic_tree
         self.dic_all_jobs = dic_all_jobs
         self.dependency_graph = {}
 
     def build_full_dependency_graph(self) -> dict:
+        """
+        Builds the full dependency graph.
+
+        Returns:
+            dict: The full dependency graph.
+        """
         self.set_l_keys = {
             tuple(self.dic_all_jobs[job]["l_keys"][:-1]) for job in self.dic_all_jobs
         }
@@ -41,6 +64,15 @@ class DependencyGraph:
         return self.dependency_graph
 
     def get_unfinished_dependency(self, job: str) -> list:
+        """
+        Gets the list of unfinished dependencies for a given job.
+
+        Args:
+            job (str): The name of the job.
+
+        Returns:
+            list: The list of unfinished dependencies.
+        """
         # Ensure the dependency graph is built
         if self.dependency_graph == {}:
             self.build_full_dependency_graph()
