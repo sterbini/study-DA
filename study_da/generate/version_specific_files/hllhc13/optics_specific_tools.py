@@ -47,7 +47,7 @@ def build_sequence(
         mylhcbeam (int): The beam number (1, 2 or 4).
         beam_config (dict[str, Any]): The configuration of the beam from the configuration file.
         ignore_cycling (bool, optional): Whether to ignore cycling to have IP3 at position s=0.
-          Defaults to False.
+            Defaults to False.
         slice_factor (int | None, optional): The slice factor if optic is not thin. Defaults to None.
         BFPP (bool, optional): Whether to use the BFPP knob. Defaults to False.
 

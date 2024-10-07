@@ -1,7 +1,27 @@
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+# Import standard library modules
+from typing import Any
+
+# Import third-party modules
 import numpy as np
+from cpymad.madx import Madx
+
+# ==================================================================================================
+# --- Functions specific to each (HL-)LHC version
+# ==================================================================================================
 
 
-def check_madx_lattices(mad):
+def check_madx_lattices(mad: Madx) -> None:
+    """Check the consistency of the MAD-X lattice for the (HL-)LHC.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+
+    Returns:
+        None
+    """
     assert mad.globals["qxb1"] == mad.globals["qxb2"]
     assert mad.globals["qyb1"] == mad.globals["qyb2"]
     assert mad.globals["qpxb1"] == mad.globals["qpxb2"]
@@ -26,14 +46,27 @@ def check_madx_lattices(mad):
 
 
 def build_sequence(
-    mad,
-    mylhcbeam,
-    beam_config,  # Not used but important for consistency with other optics
-    ignore_cycling=False,
-    slice_factor=4,
-    BFPP=False, # Not used but important for consistency with other optics
-):
-    # Select beam
+    mad: Madx,
+    mylhcbeam: int,
+    beam_config: dict[str, Any],
+    ignore_cycling: bool = False,
+    slice_factor: int | None = 4,
+    BFPP: bool = False,
+) -> None:
+    """Build the sequence for the (HL-)LHC, for a given beam.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+        mylhcbeam (int): The beam number (1, 2 or 4).
+        beam_config (dict[str, Any]): The configuration of the beam from the configuration file.
+        ignore_cycling (bool, optional): Whether to ignore cycling to have IP3 at position s=0.
+            Defaults to False.
+        slice_factor (int | None, optional): The slice factor if optic is not thin. Defaults to 4.
+        BFPP (bool, optional): Whether to use the BFPP knob. Defaults to False.
+
+    Returns:
+        None
+    """  # Select beam
     mad.input(f"mylhcbeam = {mylhcbeam}")
 
     mad.input("""
@@ -54,7 +87,8 @@ def build_sequence(
       """)
 
     # Redefine macro for myslice
-    my_slice(mad, slice_factor=slice_factor)
+    if slice_factor is not None:
+        my_slice(mad, slice_factor=slice_factor)
 
     # Slice nominal sequence
     mad.input("exec, myslice;")
@@ -80,14 +114,32 @@ def build_sequence(
         """)
 
 
-def apply_optics(mad, optics_file):
+def apply_optics(mad: Madx, optics_file: str) -> None:
+    """Apply the optics to the MAD-X model.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+        optics_file (str): The path to the optics file to apply.
+
+    Returns:
+        None
+    """
     mad.call(optics_file)
     # A knob redefinition
     mad.input("on_alice := on_alice_normalized * 7000./nrj;")
     mad.input("on_lhcb := on_lhcb_normalized * 7000./nrj;")
 
 
-def my_slice(mad, slice_factor=2):
+def my_slice(mad: Madx, slice_factor: int = 2):
+    """Redefine the macro myslice for the LHC, to make a sequence thin.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+        slice_factor (int, optional): The slice factor. Defaults to 2.
+
+    Returns:
+        None
+    """
     mad.input(f"slicefactor = {slice_factor};")
     mad.input("""
         myslice: macro = {

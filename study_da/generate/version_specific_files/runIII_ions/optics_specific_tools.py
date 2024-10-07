@@ -1,8 +1,28 @@
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+# Import standard library modules
+from typing import Any
+
+# Import third-party modules
 import numpy as np
 import xmask as xm
+from cpymad.madx import Madx
+
+# ==================================================================================================
+# --- Functions specific to each (HL-)LHC version
+# ==================================================================================================
 
 
-def check_madx_lattices(mad):
+def check_madx_lattices(mad: Madx) -> None:
+    """Check the consistency of the MAD-X lattice for the (HL-)LHC.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+
+    Returns:
+        None
+    """
     assert mad.globals["qxb1"] == mad.globals["qxb2"]
     assert mad.globals["qyb1"] == mad.globals["qyb2"]
     assert mad.globals["qpxb1"] == mad.globals["qpxb2"]
@@ -34,13 +54,27 @@ def check_madx_lattices(mad):
 
 
 def build_sequence(
-    mad,
-    mylhcbeam,
-    beam_config,  # Not used but important for consistency with other optics
-    ignore_cycling=False,
-    slice_factor=8,
-    BFPP=True,
-):
+    mad: Madx,
+    mylhcbeam: int,
+    beam_config: dict[str, Any],
+    ignore_cycling: bool = False,
+    slice_factor: int | None = 8,
+    BFPP: bool = True,
+) -> None:
+    """Build the sequence for the (HL-)LHC, for a given beam.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+        mylhcbeam (int): The beam number (1, 2 or 4).
+        beam_config (dict[str, Any]): The configuration of the beam from the configuration file.
+        ignore_cycling (bool, optional): Whether to ignore cycling to have IP3 at position s=0.
+            Defaults to False.
+        slice_factor (int | None, optional): The slice factor if optic is not thin. Defaults to 8.
+        BFPP (bool, optional): Whether to use the BFPP knob. Defaults to True.
+
+    Returns:
+        None
+    """
     # Select beam
     mad.input(f"mylhcbeam = {mylhcbeam}")
     mad.input("option, -echo,warn, -info;")
@@ -48,9 +82,9 @@ def build_sequence(
     # optics dependent macros (for splitting)
     mad.call("acc-models-lhc/runII/2018/toolkit/macro.madx")
 
-    assert mylhcbeam in [1, 2, 4], "Invalid mylhcbeam (it should be in [1, 2, 4])"
+    assert mylhcbeam in {1, 2, 4}, "Invalid mylhcbeam (it should be in [1, 2, 4])"
 
-    if mylhcbeam in [1, 2]:
+    if mylhcbeam in {1, 2}:
         mad.call("acc-models-lhc/runII/2018/lhc_as-built.seq")
     else:
         mad.call("acc-models-lhc/runII/2018/lhcb4_as-built.seq")
@@ -59,7 +93,7 @@ def build_sequence(
     mad.call("acc-models-lhc/runIII/RunIII_dev/IR7-Run3seqedit.madx")
 
     # Makethin part
-    if slice_factor > 0:
+    if slice_factor is not None and slice_factor > 0:
         # the variable in the macro is slice_factor
         mad.input(f"slicefactor={slice_factor};")
         mad.call("acc-models-lhc/runII/2018/toolkit/myslice.madx")
@@ -94,14 +128,31 @@ def build_sequence(
         apply_BFPP(mad)
 
 
-def apply_optics(mad, optics_file):
+def apply_optics(mad: Madx, optics_file: str) -> None:
+    """Apply the optics to the MAD-X model.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+        optics_file (str): The path to the optics file to apply.
+
+    Returns:
+        None
+    """
     mad.call(optics_file)
     apply_ir7_strengths(mad)
     mad.input("on_alice := on_alice_normalized * 7000. / nrj;")
     mad.input("on_lhcb := on_lhcb_normalized * 7000. / nrj;")
 
 
-def apply_ir7_strengths(mad):
+def apply_ir7_strengths(mad: Madx) -> None:
+    """Apply the IR7 strengths fix to the MAD-X model.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+
+    Returns:
+        None
+    """
     mad.input("""!***IR7 Optics***
             KQ4.LR7     :=    0.131382724100E-02 ;
             KQT4.L7     :=    0.331689344000E-03 ;
@@ -147,7 +198,15 @@ def apply_ir7_strengths(mad):
             KQT13.R7B2  :=   -0.585571959400E-03 ;""")
 
 
-def apply_BFPP(mad):
+def apply_BFPP(mad: Madx) -> None:
+    """Apply the BFPP knob to the MAD-X model.
+
+    Args:
+        mad (Madx): The MAD-X object used to build the sequence.
+
+    Returns:
+        None
+    """
     mad.input("""acbch8.r2b1        :=   6.336517325e-05 * ON_BFPP.R2 / 7.8;
                 acbch10.r2b1       :=   2.102863759e-05 * ON_BFPP.R2 / 7.8;
                 acbh12.r2b1        :=   4.404997133e-05 * ON_BFPP.R2 / 7.8;
