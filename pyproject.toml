@@ -17,6 +17,7 @@ xsuite = "^0.18.6"
 fastparquet = "^2024.5.0"
 nafflib = "^2.0.2"
 filelock = "^3.16.1"
+# Xmask commented out as external_dependencies are not supported by pypi
 # xmask = {path = "external_dependencies/xmask", develop = true}
 
 [tool.poetry.group.test.dependencies]

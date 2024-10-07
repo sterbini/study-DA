@@ -18,7 +18,14 @@ import ruamel.yaml as yaml
 from jinja2 import Environment, FileSystemLoader
 
 # Import user-defined modules
-from study_da.utils import find_item_in_dict, load_dic_from_path, nested_set
+from study_da.utils import load_dic_from_path, nested_set
+
+from .parameter_space import (
+    linspace,
+    list_values_path,
+    logspace,
+    test_convert_for_subvariables,
+)
 
 
 # ==================================================================================================
@@ -143,63 +150,24 @@ class GenerateScan:
         if generation == "base":
             raise ValueError("Generation 'base' should not have scans.")
 
-        def test_convert_for_subvariables(parameter_dict: dict, parameter_list: list) -> list:
-            if "subvariables" in parameter_dict:
-                subvariables = self.config["structure"][generation]["scans"][parameter][
-                    "subvariables"
-                ]
-                parameter_list = [
-                    {subvar: value for subvar in subvariables} for value in parameter_list
-                ]
-            return parameter_list
-
         dic_parameter_lists = {}
         dic_parameter_lists_for_naming = {}
         for parameter in self.config["structure"][generation]["scans"]:
-            if "linspace" in self.config["structure"][generation]["scans"][parameter]:
-                l_values_linspace = self.config["structure"][generation]["scans"][parameter][
-                    "linspace"
-                ]
-                parameter_list = np.round(
-                    np.linspace(
-                        l_values_linspace[0],
-                        l_values_linspace[1],
-                        l_values_linspace[2],
-                        endpoint=True,
-                    ),
-                    5,
-                )
+            dic_curr_parameter = self.config["structure"][generation]["scans"][parameter]
+            if "linspace" in dic_curr_parameter:
+                parameter_list = linspace(dic_curr_parameter["linspace"])
                 dic_parameter_lists_for_naming[parameter] = parameter_list
-            elif "logspace" in self.config["structure"][generation]["scans"][parameter]:
-                l_values_logspace = self.config["structure"][generation]["scans"][parameter][
-                    "logspace"
-                ]
-                parameter_list = np.round(
-                    np.logspace(
-                        l_values_logspace[0],
-                        l_values_logspace[1],
-                        l_values_logspace[2],
-                        endpoint=True,
-                    ),
-                    5,
-                )
+            elif "logspace" in dic_curr_parameter:
+                parameter_list = logspace(dic_curr_parameter["logspace"])
                 dic_parameter_lists_for_naming[parameter] = parameter_list
-            elif "path_list" in self.config["structure"][generation]["scans"][parameter]:
-                l_values_path_list = self.config["structure"][generation]["scans"][parameter][
-                    "path_list"
+            elif "path_list" in dic_curr_parameter:
+                l_values_path_list = dic_curr_parameter["path_list"]
+                parameter_list = list_values_path(l_values_path_list, self.dic_common_parameters)
+                dic_parameter_lists_for_naming[parameter] = [
+                    f"{n:02d}" for n, path in enumerate(parameter_list)
                 ]
-                n_path_arg = l_values_path_list[1]
-                n_path = find_item_in_dict(self.dic_common_parameters, n_path_arg)
-                if n_path is None:
-                    raise ValueError(
-                        f"Parameter {n_path_arg} is not defined in the scan configuration."
-                    )
-                parameter_list = [
-                    l_values_path_list[0].replace("____", f"{n:02d}") for n in range(n_path)
-                ]
-                dic_parameter_lists_for_naming[parameter] = [f"{n:02d}" for n in range(n_path)]
-            elif "list" in self.config["structure"][generation]["scans"][parameter]:
-                parameter_list = self.config["structure"][generation]["scans"][parameter]["list"]
+            elif "list" in dic_curr_parameter:
+                parameter_list = dic_curr_parameter["list"]
                 dic_parameter_lists_for_naming[parameter] = parameter_list
             else:
                 raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")

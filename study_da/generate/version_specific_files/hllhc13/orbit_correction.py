@@ -1,4 +1,8 @@
+# ==================================================================================================
+# --- Functions
+# ==================================================================================================
 def generate_orbit_correction_setup() -> dict:
+    """Return a dictionary with the setup for the orbit correction."""
     return {
         "lhcb1": {
             "IR1 left": dict(
