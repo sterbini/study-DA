@@ -7,7 +7,7 @@ from study_da.utils.configuration import load_dic_from_path, write_dic_to_path
 # Load the configuration from hllhc16
 config, ryaml = load_dic_from_path("example_tune_scan/config_hllhc16.yaml")
 
-# Adapt the number of turns
+# Update the location of acc-models
 config["config_mad"]["links"]["acc-models-lhc"] = (
     "../../../../../external_dependencies/acc-models-lhc"
 )

@@ -77,7 +77,7 @@ class XsuiteCollider:
         configure_beam_beam: Configures the beam-beam interactions.
         record_final_luminosity: Records the final luminosity of the collider.
         write_collider_to_disk: Writes the collider configuration to disk.
-        update_knob: Updates a specific knob in the collider.
+        update_configuration_knob: Updates a specific knob in the collider.
         return_fingerprint: Returns a fingerprint of the collider's configuration.
     """
 
@@ -428,10 +428,17 @@ class XsuiteCollider:
             None
         """
         # Update the number of bunches in the configuration file
-        self.config_lumi_leveling["ip1"]["num_colliding_bunches"] = n_collisions_ip1_and_5
-        self.config_lumi_leveling["ip5"]["num_colliding_bunches"] = n_collisions_ip1_and_5
-        self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = n_collisions_ip2
-        self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
+        l_n_collisions = [
+            n_collisions_ip1_and_5,
+            n_collisions_ip2,
+            n_collisions_ip1_and_5,
+            n_collisions_ip8,
+        ]
+        for ip, n_collisions in zip(["ip1", "ip2", "ip5", "ip8"], l_n_collisions):
+            if ip in self.config_lumi_leveling:
+                self.config_lumi_leveling[ip]["num_colliding_bunches"] = n_collisions
+            else:
+                logging.warning(f"IP {ip} is not in the configuration")
 
         # ! Crabs are not handled in the following function
         xm.lhc.luminosity_leveling(
@@ -441,14 +448,18 @@ class XsuiteCollider:
         )
 
         # Update configuration
-        self.update_knob(collider, self.config_lumi_leveling["ip1"], "on_sep1")
-        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2")
-        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2h")
-        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2v")
-        self.update_knob(collider, self.config_lumi_leveling["ip5"], "on_sep5")
-        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8")
-        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8h")
-        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8v")
+        if "ip1" in self.config_lumi_leveling:
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip1"], "on_sep1")
+        if "ip2" in self.config_lumi_leveling:
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2h")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2v")
+        if "ip5" in self.config_lumi_leveling:
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip5"], "on_sep5")
+        if "ip8" in self.config_lumi_leveling:
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8h")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8v")
 
     def level_ip1_5_by_bunch_intensity(
         self,
@@ -513,8 +524,10 @@ class XsuiteCollider:
             None
         """
         # Update the number of bunches in the configuration file
-        self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = n_collisions_ip2
-        self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
+        if "ip2" in self.config_lumi_leveling:
+            self.config_lumi_leveling["ip2"]["num_colliding_bunches"] = n_collisions_ip2
+        if "ip8" in self.config_lumi_leveling:
+            self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
 
         # Do levelling in IP2 and IP8
         xm.lhc.luminosity_leveling(
@@ -524,12 +537,14 @@ class XsuiteCollider:
         )
 
         # Update configuration
-        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2")
-        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2h")
-        self.update_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2v")
-        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8")
-        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8h")
-        self.update_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8v")
+        if "ip2" in self.config_lumi_leveling:
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2h")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip2"], "on_sep2v")
+        if "ip8" in self.config_lumi_leveling:
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8h")
+            self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8v")
 
     def add_linear_coupling(self, collider: xt.Multiline) -> None:
         """
@@ -550,7 +565,7 @@ class XsuiteCollider:
         Notes:
             - For LHC Run 3.0, the `cmrs.b1_sq` and `cmrs.b2_sq` variables are adjusted.
             - For HL-LHC optics versions 1.6, 1.5, 1.4, and 1.3, the `c_minus_re_b1` and
-              `c_minus_re_b2` variables are adjusted.
+            `c_minus_re_b2` variables are adjusted.
         """
         # Add linear coupling as the target in the tuning of the base collider was 0
         # (not possible to set it the target to 0.001 for now)
@@ -766,7 +781,9 @@ class XsuiteCollider:
             collider.to_json(self.path_final_collider)
 
     @staticmethod
-    def update_knob(collider: xt.Multiline, dictionnary: dict, knob_name: str) -> None:
+    def update_configuration_knob(
+        collider: xt.Multiline, dictionnary: dict, knob_name: str
+    ) -> None:
         """
         Updates the given dictionary with the final value of a specified knob from the collider.
 

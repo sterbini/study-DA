@@ -1,9 +1,9 @@
+""" " Dependency graph class to manage the dependencies between jobs"""
+
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
 # Standard library imports
-from typing import Self
-
 # Third party imports
 # Local imports
 from study_da.utils import nested_get
@@ -14,7 +14,7 @@ from study_da.utils import nested_get
 # ==================================================================================================
 class DependencyGraph:
     def __init__(
-        self: Self,
+        self,
         dic_tree: dict,
         dic_all_jobs: dict,
     ):
@@ -22,7 +22,7 @@ class DependencyGraph:
         self.dic_all_jobs = dic_all_jobs
         self.dependency_graph = {}
 
-    def build_full_dependency_graph(self: Self):
+    def build_full_dependency_graph(self) -> dict:
         self.set_l_keys = {
             tuple(self.dic_all_jobs[job]["l_keys"][:-1]) for job in self.dic_all_jobs
         }
@@ -40,7 +40,7 @@ class DependencyGraph:
                             self.dependency_graph[job].add(sub_dict["file"])
         return self.dependency_graph
 
-    def get_unfinished_dependency(self, job: str):
+    def get_unfinished_dependency(self, job: str) -> list:
         # Ensure the dependency graph is built
         if self.dependency_graph == {}:
             self.build_full_dependency_graph()

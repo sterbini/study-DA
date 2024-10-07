@@ -1,3 +1,5 @@
+"""Module for submitting jobs on a cluster (or locally)."""
+
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
@@ -21,7 +23,7 @@ from .submission_statements import HTC, HTCDocker, LocalPC, Slurm, SlurmDocker
 # ==================================================================================================
 class ClusterSubmission:
     def __init__(
-        self: Self,
+        self,
         study_name: str,
         l_jobs_to_submit: list[str],
         dic_all_jobs: dict,

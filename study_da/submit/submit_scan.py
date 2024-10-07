@@ -1,3 +1,6 @@
+"""This module contains the SubmitScan class, which is used to submit jobs either locally or
+on a cluster."""
+
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
@@ -5,7 +8,6 @@
 import logging
 import os
 import time
-from typing import Self
 
 # Third party imports
 from filelock import SoftFileLock
@@ -25,7 +27,7 @@ from .generate_run import generate_run_file
 # ==================================================================================================
 class SubmitScan:
     def __init__(
-        self: Self,
+        self,
         path_tree: str,
         path_python_environment: str,
         path_python_environment_container: str = "",
@@ -81,16 +83,16 @@ class SubmitScan:
 
     # dic_tree as a property so that it is reloaded every time it is accessed
     @property
-    def dic_tree(self: Self):
+    def dic_tree(self):
         return load_dic_from_path(self.path_tree)[0]
 
     # Setter for the dic_tree property
     @dic_tree.setter
-    def dic_tree(self: Self, value: dict):
+    def dic_tree(self, value: dict):
         write_dic_to_path(value, self.path_tree)
 
     # Property for the same reason
-    def configure_jobs(self: Self):
+    def configure_jobs(self) -> None:
         # Lock since we are modifying the tree
         with self.lock:
             dic_tree = ConfigJobs(self.dic_tree).find_and_configure_jobs()
@@ -104,17 +106,17 @@ class SubmitScan:
             # Explicitly set the dic_tree property to force rewrite
             self.dic_tree = dic_tree
 
-    def get_all_jobs(self: Self):
+    def get_all_jobs(self) -> dict:
         return ConfigJobs(self.dic_tree).find_all_jobs()
 
     def generate_run_files(
-        self: Self,
+        self,
         dic_tree: dict,
         l_jobs_to_submit: list[str],
         dic_additional_commands_per_gen: dict[int, str] = {},
         dic_dependencies_per_gen: dict[int, list[str]] = {},
         name_config: str = "config.yaml",
-    ):
+    ) -> dict:
         dic_all_jobs = self.get_all_jobs()
         for job in l_jobs_to_submit:
             l_keys = dic_all_jobs[job]["l_keys"]
@@ -158,12 +160,12 @@ class SubmitScan:
         return dic_tree
 
     def submit(
-        self: Self,
+        self,
         one_generation_at_a_time: bool = False,
         dic_additional_commands_per_gen: dict[int, str] = {},
         dic_dependencies_per_gen: dict[int, list[str]] = {},
         name_config: str = "config.yaml",
-    ):
+    ) -> None:
         dic_all_jobs = self.get_all_jobs()
 
         with self.lock:
@@ -231,8 +233,8 @@ class SubmitScan:
             self.dic_tree = cluster_submission.dic_tree
 
     def keep_submit_until_done(
-        self: Self, one_generation_at_a_time: bool = False, wait_time: float = 30
-    ):
+        self, one_generation_at_a_time: bool = False, wait_time: float = 30
+    ) -> None:
         if wait_time < 1 / 20:
             logging.warning("Wait time should be at least 10 seconds to prevent locking errors.")
             logging.warning("Setting wait time to 10 seconds.")

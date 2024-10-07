@@ -9,7 +9,7 @@ config_particles:
 config_mad:
   # Links to be made for tools and scripts
   links:
-    acc-models-lhc: ../../../../external_dependencies/acc-models-lhc-v13
+    acc-models-lhc: ../../../../../external_dependencies/acc-models-lhc-v13
 
   # Optics file
   optics_file: acc-models-lhc/opt_500_500_500_500_thin.madx
@@ -68,6 +68,7 @@ config_mad:
 
   # Path of the collider file to be saved
   path_collider: collider.json
+  compress: true # will compress the collider file, filename will end with .zip
 
 # Configuration for tuning of the collider
 config_collider:
@@ -157,6 +158,8 @@ config_collider:
     nemitt_x: 2.5e-6
     nemitt_y: 2.5e-6
     mask_with_filling_pattern:
+      # If not already existing in the study-da package, pattern must have an absolute path or be
+      # added as a dependency for the run file
       pattern_fname: 8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
       i_bunch_b1:      # If not specified, the bunch with the worst schedule is chosen
       i_bunch_b2:      # Same. A value for i_bunch_b1 and i_bunch_b2 must be specified if pattern_fname is specified

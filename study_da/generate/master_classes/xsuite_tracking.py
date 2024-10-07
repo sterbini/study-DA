@@ -112,7 +112,7 @@ class XsuiteTracking:
 
     def prepare_particle_distribution_for_tracking(
         self, collider: xt.Multiline
-    ) -> tuple[xp.particles.particles.Particles, np.ndarray, np.ndarray]:
+    ) -> tuple[xp.Particles, np.ndarray, np.ndarray, np.ndarray]:
         """
         Prepare a particle distribution for tracking in the collider.
 
@@ -127,7 +127,7 @@ class XsuiteTracking:
 
         Returns:
             tuple: A tuple containing:
-                - xp.particles.particles.Particles: The particles ready for tracking.
+                - xp.Particles: The particles ready for tracking.
                 - np.ndarray: Array of particle IDs.
                 - np.ndarray: Array of normalized amplitudes in the xy-plane.
                 - np.ndarray: Array of angles in the xy-plane in radians.
@@ -159,13 +159,13 @@ class XsuiteTracking:
         particle_id = particle_df.particle_id.values
         return particles, particle_id, r_vect, theta_vect
 
-    def track(self, collider: xt.Multiline, particles: xp.particles.particles.Particles) -> dict:
+    def track(self, collider: xt.Multiline, particles: xp.Particles) -> dict:
         """
         Tracks particles through a collider for a specified number of turns and logs the elapsed time.
 
         Args:
             collider (xt.Multiline): The collider object containing the beamline to be tracked.
-            particles (xp.particles.particles.Particles): The particles to be tracked.
+            particles (xp.Particles): The particles to be tracked.
 
         Returns:
             dict: A dictionary representation of the tracked particles.

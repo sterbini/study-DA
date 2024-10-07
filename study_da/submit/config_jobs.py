@@ -1,9 +1,11 @@
+""" " This module contains the ConfigJobs class that allows to configure jobs in the tree file."""
+
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
 # Standard library imports
 import copy
-from typing import Any, Self
+from typing import Any
 
 
 # ==================================================================================================
@@ -116,7 +118,7 @@ class ConfigJobs:
         self.dic_tree = dic_tree
 
     def _find_and_configure_jobs_recursion(
-        self: Self,
+        self,
         dic_gen: dict[str, Any],
         depth: int = 0,
         l_keys: list[str] | None = None,
@@ -194,7 +196,7 @@ class ConfigJobs:
                     # Merge the configuration of the job with the existing one
                     dic_gen |= self.dic_config_jobs[job_name]
 
-    def find_and_configure_jobs(self: Self):
+    def find_and_configure_jobs(self):
         # Variables to store the jobs and their configuration
         self.dic_config_jobs = {}
         self.dic_all_jobs = {}
@@ -204,7 +206,7 @@ class ConfigJobs:
 
         return self.dic_tree
 
-    def find_all_jobs(self: Self):
+    def find_all_jobs(self):
         # Variables to store the jobs and their configuration
         self.dic_all_jobs = {}
 
