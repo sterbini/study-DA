@@ -27,6 +27,13 @@ def reformat_filling_scheme_from_lpc(
     xtrack library. The filling scheme from the LPC is a list of bunches for each beam, where each
     bunch is represented by a 1 in the list. The function converts this list to a list of indices
     of the filled bunches. The function also returns the indices of the filled bunches for each beam.
+
+    Args:
+        filling_scheme_path (str): Path to the filling scheme file.
+        filling_scheme_path_converted (str): Path to the converted filling scheme file.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: Indices of the filled bunches for each beam.
     """
 
     # Load the filling scheme directly if json
@@ -73,7 +80,14 @@ def reformat_filling_scheme_from_lpc(
 
 def load_and_check_filling_scheme(filling_scheme_path: str) -> str:
     """Load and check the filling scheme from a JSON file. Convert the filling scheme to the correct
-    format if needed."""
+    format if needed.
+
+    Args:
+        filling_scheme_path (str): Path to the filling scheme file.
+
+    Returns:
+        str: Path to the converted filling scheme file.
+    """
     if not filling_scheme_path.endswith(".json"):
         raise ValueError("Filling scheme must be in json format")
 
@@ -115,7 +129,7 @@ def _compute_LR_per_bunch(
     _array_b2: np.ndarray,
     _B1_bunches_index: np.ndarray,
     _B2_bunches_index: np.ndarray,
-    numberOfLRToConsider: int | list[int],
+    number_of_LR_to_consider: int | list[int],
     beam: str = "beam_1",
 ) -> list[int]:
     # Reverse beam order if needed
@@ -131,8 +145,12 @@ def _compute_LR_per_bunch(
     B2_bunches = np.array(_array_b2) == 1.0
 
     # Define number of LR to consider
-    if isinstance(numberOfLRToConsider, int):
-        numberOfLRToConsider = [numberOfLRToConsider, numberOfLRToConsider, numberOfLRToConsider]
+    if isinstance(number_of_LR_to_consider, int):
+        number_of_LR_to_consider = [
+            number_of_LR_to_consider,
+            number_of_LR_to_consider,
+            number_of_LR_to_consider,
+        ]
 
     l_long_range_per_bunch = []
     number_of_bunches = 3564
@@ -165,14 +183,14 @@ def _compute_LR_per_bunch(
             # if this bunch is true, then there is head on collision
             l_HO[i] = B2_bunches[m]
 
-            ## Check if beam 2 has bunches in range  m - numberOfLRToConsider to m + numberOfLRToConsider
+            ## Check if beam 2 has bunches in range  m - number_of_LR_to_consider to m + number_of_LR_to_consider
             ## Also have to check if bunches wrap around from 3563 to 0 or vice versa
 
             bunches_ineraction_temp = np.array([])
             positions = np.array([])
 
-            first_to_consider = m - numberOfLRToConsider[i]
-            last_to_consider = m + numberOfLRToConsider[i] + 1
+            first_to_consider = m - number_of_LR_to_consider[i]
+            last_to_consider = m + number_of_LR_to_consider[i] + 1
 
             if first_to_consider < 0:
                 bunches_ineraction_partial = np.flatnonzero(
@@ -218,12 +236,23 @@ def _compute_LR_per_bunch(
     return l_long_range_per_bunch
 
 
-def get_worst_bunch(filling_scheme_path: str, numberOfLRToConsider: int = 26, beam="beam_1") -> int:
+def get_worst_bunch(
+    filling_scheme_path: str, number_of_LR_to_consider: int = 26, beam="beam_1"
+) -> int:
     """
     # Adapted from https://github.com/PyCOMPLETE/FillingPatterns/blob/5f28d1a99e9a2ef7cc5c171d0cab6679946309e8/fillingpatterns/bbFunctions.py#L233
     Given a filling scheme, containing two arrays of booleans representing the trains of bunches for
     the two beams, this function returns the worst bunch for each beam, according to their collision
     schedule.
+
+    Args:
+        filling_scheme_path (str): Path to the filling scheme file.
+        number_of_LR_to_consider (int): Number of long range collisions to consider. Defaults to 26.
+        beam (str): Beam for which to compute the worst bunch. Defaults to "beam_1".
+
+    Returns:
+        int: The worst bunch for the specified beam.
+
     """
 
     if not filling_scheme_path.endswith(".json"):
@@ -241,7 +270,7 @@ def get_worst_bunch(filling_scheme_path: str, numberOfLRToConsider: int = 26, be
 
     # Compute the number of long range collisions per bunch
     l_long_range_per_bunch = _compute_LR_per_bunch(
-        array_b1, array_b2, B1_bunches_index, B2_bunches_index, numberOfLRToConsider, beam=beam
+        array_b1, array_b2, B1_bunches_index, B2_bunches_index, number_of_LR_to_consider, beam=beam
     )
 
     # Get the worst bunch for both beams

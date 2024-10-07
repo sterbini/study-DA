@@ -180,7 +180,7 @@ class XsuiteCollider:
         if self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] is None:
             # Case the bunch number has not been provided
             worst_bunch_b1 = get_worst_bunch(
-                filling_scheme_path, numberOfLRToConsider=n_LR, beam="beam_1"
+                filling_scheme_path, number_of_LR_to_consider=n_LR, beam="beam_1"
             )
             if ask_worst_bunch:
                 while self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] is None:
@@ -203,7 +203,7 @@ class XsuiteCollider:
 
         if self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b2"] is None:
             worst_bunch_b2 = get_worst_bunch(
-                filling_scheme_path, numberOfLRToConsider=n_LR, beam="beam_2"
+                filling_scheme_path, number_of_LR_to_consider=n_LR, beam="beam_2"
             )
             # For beam 2, just select the worst bunch by default
             self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b2"] = worst_bunch_b2
