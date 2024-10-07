@@ -1,4 +1,6 @@
-""" " This module contains the ConfigJobs class that allows to configure jobs in the tree file."""
+"""
+This module contains the ConfigJobs class that allows to configure jobs in the tree file.
+"""
 
 # ==================================================================================================
 # --- Imports
@@ -11,7 +13,13 @@ from typing import Any
 # ==================================================================================================
 # --- Functions
 # ==================================================================================================
-def ask_and_set_context(dic_gen: dict[str, Any]):
+def ask_and_set_context(dic_gen: dict[str, Any]) -> None:
+    """
+    Prompts the user to select a context for the job and sets it in the provided dictionary.
+
+    Args:
+        dic_gen (dict[str, Any]): The dictionary containing job configuration.
+    """
     while True:
         try:
             context = input(
@@ -34,12 +42,19 @@ def ask_and_set_context(dic_gen: dict[str, Any]):
     dic_gen["context"] = dict_context[context]
 
 
-def ask_and_set_htc_flavour(dic_gen: dict[str, Any]):
+def ask_and_set_htc_flavour(dic_gen: dict[str, Any]) -> None:
+    """
+    Prompts the user to select an HTCondor job flavor and sets it in the provided dictionary.
+
+    Args:
+        dic_gen (dict[str, Any]): The dictionary containing job configuration.
+    """
     while True:
         try:
             submission_type = input(
                 f"What type of htc job flavour do you want to use for job {dic_gen['file']}?"
-                " 1: espresso, 2: microcentury, 3: longlunch, 4: workday, 5: tomorrow, 6: testmatch, 7: nextweek. Default is espresso."
+                f" 1: espresso, 2: microcentury, 3: longlunch, 4: workday, 5: tomorrow,"
+                f" 6: testmatch, 7: nextweek. Default is espresso."
             )
             submission_type = 1 if submission_type == "" else int(submission_type)
             if submission_type in range(1, 8):
@@ -61,7 +76,13 @@ def ask_and_set_htc_flavour(dic_gen: dict[str, Any]):
     dic_gen["htc_flavor"] = dict_flavour_type[submission_type]
 
 
-def ask_and_set_run_on(dic_gen: dict[str, Any]):
+def ask_and_set_run_on(dic_gen: dict[str, Any]) -> None:
+    """
+    Prompts the user to select a submission type and sets it in the provided dictionary.
+
+    Args:
+        dic_gen (dict[str, Any]): The dictionary containing job configuration.
+    """
     while True:
         try:
             submission_type = input(
@@ -87,6 +108,12 @@ def ask_and_set_run_on(dic_gen: dict[str, Any]):
 
 
 def ask_keep_setting() -> bool:
+    """
+    Prompts the user to decide whether to keep the same settings for identical jobs.
+
+    Returns:
+        bool: True if the user wants to keep the same settings, False otherwise.
+    """
     keep_setting = input(
         "Do you want to keep the same setting for identical jobs? (y/n). Default is y."
     )
@@ -98,6 +125,12 @@ def ask_keep_setting() -> bool:
 
 
 def ask_skip_configured_jobs() -> bool:
+    """
+    Prompts the user to decide whether to skip already configured jobs.
+
+    Returns:
+        bool: True if the user wants to skip already configured jobs, False otherwise.
+    """
     skip_configured_jobs = input(
         "Some jobs to submit seem to be configured already. Do you want to skip them? (y/n). "
         "Default is y."
@@ -113,9 +146,27 @@ def ask_skip_configured_jobs() -> bool:
 # --- Class
 # ==================================================================================================
 class ConfigJobs:
+    """
+    A class to configure jobs in the tree file.
+
+    Attributes:
+        dic_tree (dict): The dictionary representing the job tree.
+
+    Methods:
+        _find_and_configure_jobs_recursion(dic_gen, depth=0, l_keys=None, find_only=False):
+            Recursively finds and configures jobs.
+        find_and_configure_jobs(): Finds and configures all jobs in the tree.
+        find_all_jobs(): Finds all jobs in the tree.
+    """
+
     def __init__(self, dic_tree: dict):
-        # Load the corresponding yaml as dicts
-        self.dic_tree = dic_tree
+        """
+        Initializes the ConfigJobs class.
+
+        Args:
+            dic_tree (dict): The dictionary representing the job tree.
+        """
+        self.dic_tree: dict = dic_tree
 
     def _find_and_configure_jobs_recursion(
         self,
@@ -123,7 +174,21 @@ class ConfigJobs:
         depth: int = 0,
         l_keys: list[str] | None = None,
         find_only: bool = False,
-    ):
+    ) -> None:
+        """
+        Recursively finds and configures jobs in the tree.
+
+        Args:
+            dic_gen (dict[str, Any]): The dictionary representing the current level of the job tree.
+            depth (int, optional): The current depth in the tree. Defaults to 0.
+            l_keys (list[str], optional): The list of keys representing the path in the tree.
+                Defaults to None.
+            find_only (bool, optional): If True, only finds jobs without configuring them.
+                Defaults to False.
+
+        Raises:
+            AttributeError: If required attributes are not set before calling this method.
+        """
         if l_keys is None:
             l_keys = []
 
@@ -155,7 +220,8 @@ class ConfigJobs:
                     self, "skip_configured_jobs"
                 ):
                     raise AttributeError(
-                        "dic_config_jobs and skip_configured_jobs should be set before calling this method"
+                        "dic_config_jobs and skip_configured_jobs should be set before calling"
+                        "this method"
                     )
 
                 # ! This hasn't been propertly tested
@@ -175,28 +241,49 @@ class ConfigJobs:
 
                 # If it's the first time we find the job, ask for context and run_on
                 if job_name not in self.dic_config_jobs:
-                    print(f"Found job at depth {depth}: {value}")
-                    # Set context and run_on
-                    ask_and_set_context(dic_gen)
-                    ask_and_set_run_on(dic_gen)
-                    if dic_gen["submission_type"] in ["htc", "htc_docker"]:
-                        ask_and_set_htc_flavour(dic_gen)
-                    else:
-                        dic_gen["htc_flavor"] = None
-                    dic_gen["status"] = "to_submit"
-                    if ask_keep_setting():
-                        self.dic_config_jobs[job_name] = {
-                            "context": dic_gen["context"],
-                            "submission_type": dic_gen["submission_type"],
-                            "status": dic_gen["status"],
-                            "htc_flavor": dic_gen["htc_flavor"],
-                        }
-
+                    self._get_context_and_run_on(depth, value, dic_gen, job_name)
                 else:
                     # Merge the configuration of the job with the existing one
                     dic_gen |= self.dic_config_jobs[job_name]
 
-    def find_and_configure_jobs(self):
+    def _get_context_and_run_on(self, depth: int, value: str, dic_gen: dict, job_name: str):
+        """
+        Sets the context and run-on parameters for a job, updates the job configuration,
+        and stores it in the job dictionary if the user chooses to keep the settings.
+
+        Args:
+            depth (int): The depth level of the job in the hierarchy.
+            value (str): The value associated with the job.
+            dic_gen (dict): A dictionary containing general job configuration parameters.
+            job_name (str): The name of the job to be configured.
+
+        Returns:
+            None
+        """
+        print(f"Found job at depth {depth}: {value}")
+        # Set context and run_on
+        ask_and_set_context(dic_gen)
+        ask_and_set_run_on(dic_gen)
+        if dic_gen["submission_type"] in ["htc", "htc_docker"]:
+            ask_and_set_htc_flavour(dic_gen)
+        else:
+            dic_gen["htc_flavor"] = None
+        dic_gen["status"] = "to_submit"
+        if ask_keep_setting():
+            self.dic_config_jobs[job_name] = {
+                "context": dic_gen["context"],
+                "submission_type": dic_gen["submission_type"],
+                "status": dic_gen["status"],
+                "htc_flavor": dic_gen["htc_flavor"],
+            }
+
+    def find_and_configure_jobs(self) -> dict:
+        """
+        Finds and configures all jobs in the tree.
+
+        Returns:
+            dict: The updated job tree with configurations.
+        """
         # Variables to store the jobs and their configuration
         self.dic_config_jobs = {}
         self.dic_all_jobs = {}
@@ -206,7 +293,13 @@ class ConfigJobs:
 
         return self.dic_tree
 
-    def find_all_jobs(self):
+    def find_all_jobs(self) -> dict:
+        """
+        Finds all jobs in the tree.
+
+        Returns:
+            dict: A dictionary containing all jobs and their details.
+        """
         # Variables to store the jobs and their configuration
         self.dic_all_jobs = {}
 
