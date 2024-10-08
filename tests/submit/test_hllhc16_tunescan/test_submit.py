@@ -7,7 +7,7 @@ from study_da.utils.configuration import load_dic_from_path, write_dic_to_path
 # Load the configuration from hllhc16
 config, ryaml = load_dic_from_path("example_tune_scan/config_hllhc16.yaml")
 
-# Update the location of acc-models
+# Adapt the path to the acc-models-lhc
 config["config_mad"]["links"]["acc-models-lhc"] = (
     "../../../../../external_dependencies/acc-models-lhc"
 )
@@ -20,17 +20,18 @@ study_sub = SubmitScan(
     path_tree="example_tune_scan/tree.yaml",
     path_python_environment="/home/cdroin/study-DA/.venv",
     path_python_environment_container="/usr/local/DA_study/miniforge_docker",
-    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:ec4ae177",
+    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:2f4ed20b",
 )
 
 # %%
-study_sub.configure_jobs()
+study_sub.configure_jobs(force_configure=False)
 
 # %%
 # Additional commands to be executed at the end of the run file (generation-specific)
 dic_additional_commands_per_gen = {
-    1: "rm -rf final_* modules optics_repository optics_toolkit tools tracking_tools temp"
-    " mad_collider.log __pycache__ twiss* errors fc* optics_orbit_at*",
+    1: "cp *.json *.zip $path_job \n"
+    "cp -r particles $path_job/particles \n"
+    "rm -rf final_* modules optics_repository optics_toolkit tools tracking_tools temp mad_collider.log __pycache__ twiss* errors fc* optics_orbit_at* \n",
     2: "",
 }
 
@@ -46,11 +47,3 @@ study_sub.submit(
     name_config=name_config,
 )
 # study_sub.keep_submit_until_done(wait_time = 1)
-
-# %%
-
-
-# %%
-
-
-# %%

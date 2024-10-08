@@ -60,12 +60,15 @@ def _generate_run_file(
 ):
     return (
         "#!/bin/bash\n"
-        + f"source {setup_env_script}\n"
-        + f"cd {job_folder}\n"
-        + f"python {job_name} > output_python.txt 2> error_python.txt\n"
-        + tag_str(tree_path, l_keys)
-        + additionnal_command
-        + "\n"
+        f"# Load the environment\n"
+        f"source {setup_env_script}\n\n"
+        f"# Move into the job folder and run it\n"
+        f"cd {job_folder}\n\n"
+        f"python {job_name} > output_python.txt 2> error_python.txt\n"
+        # Tag the job
+        f"{tag_str(tree_path, l_keys)}"
+        f"# Optional user defined command to run\n"
+        f"{additionnal_command}\n"
     )
 
 
@@ -105,24 +108,28 @@ def _generate_run_file_htc(
         dependency_value = find_item_in_dict(config, dependency)
         path_dependency = dependency_value.replace("/", "\/")
         new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")
-        sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}\n'
+        sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}'
 
     # Return final run script
     return (
         f"#!/bin/bash\n"
-        f"source {setup_env_script}\n"
-        # Copy config in (what will be) the level above
-        f"cp -f {abs_path}/../{name_config} .\n"
-        # Create local directory on node and cd into it
+        f"# Load the environment\n"
+        f"source {setup_env_script}\n\n"
+        f"# Copy config in (what will be) the level above\n"
+        f"cp -f {abs_path}/../{name_config} .\n\n"
+        f"# Create local directory on node and cd into it\n"
         f"mkdir {local_path}\n"
-        f"cd {local_path}\n"
-        # Mutate the paths in config to be absolute
-        f"{sed_commands}\n"
-        # Run the job
-        f"python {abs_path}/{job_name} > output_python.txt 2> error_python.txt\n"
+        f"cd {local_path}\n\n"
+        f"# Mutate the paths in config to be absolute\n"
+        f"{sed_commands}\n\n"
+        f"# Run the job\n"
+        f"python {abs_path}/{job_name} > output_python.txt 2> error_python.txt\n\n"
+        # Tag the job
         f"{tag_str(tree_path, l_keys)}"
-        # Copy back output, including the new config
-        f"cp -f *.txt *.parquet *.yaml {abs_path}\n"
-        # Optional user defined command to run
+        f"# Copy back output, including the new config\n"
+        f"cp -f *.txt *.parquet *.yaml {abs_path}\n\n"
+        f"# Store abs path as a variable in case it's needed for additional commands\n"
+        f"path_job={abs_path}\n\n"
+        f"# Optional user defined command to run\n"
         f"{additionnal_command}\n"
     )

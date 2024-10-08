@@ -92,16 +92,24 @@ class SubmitScan:
         write_dic_to_path(value, self.path_tree)
 
     # Property for the same reason
-    def configure_jobs(self) -> None:
+    def configure_jobs(self, force_configure: bool = False) -> None:
         # Lock since we are modifying the tree
         with self.lock:
-            dic_tree = ConfigJobs(self.dic_tree).find_and_configure_jobs()
+            # Get the tree
+            dic_tree = self.dic_tree
 
+            # Ensure jobs have not been configured already
+            if ("configured" in dic_tree and dic_tree["configured"]) and not force_configure:
+                logging.warning("Jobs have already been configured. Skipping.")
+                return
+
+            dic_tree = ConfigJobs(dic_tree).find_and_configure_jobs()
             # Add the python environment, container image and absolute path of the study to the tree
             dic_tree["python_environment"] = self.path_python_environment
             dic_tree["container_image"] = self.path_container_image
             dic_tree["absolute_path"] = self.abs_path
             dic_tree["status"] = "To finish"
+            dic_tree["configured"] = True
 
             # Explicitly set the dic_tree property to force rewrite
             self.dic_tree = dic_tree
