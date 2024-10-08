@@ -8,7 +8,7 @@
 import logging
 import os
 import shutil
-from zipfile import ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile
 
 # Import third-party modules
 import xmask as xm
@@ -299,7 +299,7 @@ class MadCollider:
 
         # Compress the collider file to zip to ease the load on afs
         if self.compress:
-            with ZipFile(f"{self.path_collider}.zip", "w") as zipf:
+            with ZipFile(f"{self.path_collider}.zip", "w", ZIP_DEFLATED, compresslevel=9) as zipf:
                 zipf.write(self.path_collider)
 
     @staticmethod
