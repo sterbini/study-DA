@@ -137,7 +137,7 @@ class GenerateScan:
         self.write(study_str, file_path_gen)
         return [directory_path_gen]
 
-    def get_dic_parametric_scans(self, generation) -> tuple[dict[str, Any], dict[str, Any]]:
+    def get_dic_parametric_scans(self, generation: str) -> tuple[dict[str, Any], dict[str, Any]]:
         """
         Retrieves dictionaries of parametric scan values.
 
@@ -151,37 +151,6 @@ class GenerateScan:
         if generation == "base":
             raise ValueError("Generation 'base' should not have scans.")
 
-        dic_parameter_lists = {}
-        dic_parameter_lists_for_naming = {}
-        for parameter in self.config["structure"][generation]["scans"]:
-            dic_curr_parameter = self.config["structure"][generation]["scans"][parameter]
-            if "linspace" in dic_curr_parameter:
-                parameter_list = linspace(dic_curr_parameter["linspace"])
-                dic_parameter_lists_for_naming[parameter] = parameter_list
-            elif "logspace" in dic_curr_parameter:
-                parameter_list = logspace(dic_curr_parameter["logspace"])
-                dic_parameter_lists_for_naming[parameter] = parameter_list
-            elif "path_list" in dic_curr_parameter:
-                l_values_path_list = dic_curr_parameter["path_list"]
-                parameter_list = list_values_path(l_values_path_list, self.dic_common_parameters)
-                dic_parameter_lists_for_naming[parameter] = [
-                    f"{n:02d}" for n, path in enumerate(parameter_list)
-                ]
-            elif "list" in dic_curr_parameter:
-                parameter_list = dic_curr_parameter["list"]
-                dic_parameter_lists_for_naming[parameter] = parameter_list
-            else:
-                raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
-
-            # Ensure that all values are not numpy types (to avoid serialization issues)
-            parameter_list = [x.item() if isinstance(x, np.generic) else x for x in parameter_list]
-
-            # Handle nested parameters
-            parameter_list_updated = test_convert_for_subvariables(
-                self.config["structure"][generation]["scans"][parameter], parameter_list
-            )
-            dic_parameter_lists[parameter] = parameter_list_updated
-
         # Remember common parameters as they might be used across generations
         if "common_parameters" in self.config["structure"][generation]:
             self.dic_common_parameters[generation] = {}
@@ -189,6 +158,51 @@ class GenerateScan:
                 self.dic_common_parameters[generation][parameter] = self.config["structure"][
                     generation
                 ]["common_parameters"][parameter]
+
+        # Get dictionnary of parametric values being scanned
+        dic_parameter_lists = {}
+        dic_parameter_lists_for_naming = {}
+        if (
+            "scans" not in self.config["structure"][generation]
+            or self.config["structure"][generation]["scans"] is None
+        ):
+            dic_parameter_lists[""] = [generation]
+            dic_parameter_lists_for_naming[""] = [generation]
+        else:
+            for parameter in self.config["structure"][generation]["scans"]:
+                dic_curr_parameter = self.config["structure"][generation]["scans"][parameter]
+                if "linspace" in dic_curr_parameter:
+                    parameter_list = linspace(dic_curr_parameter["linspace"])
+                    dic_parameter_lists_for_naming[parameter] = parameter_list
+                elif "logspace" in dic_curr_parameter:
+                    parameter_list = logspace(dic_curr_parameter["logspace"])
+                    dic_parameter_lists_for_naming[parameter] = parameter_list
+                elif "path_list" in dic_curr_parameter:
+                    l_values_path_list = dic_curr_parameter["path_list"]
+                    parameter_list = list_values_path(
+                        l_values_path_list, self.dic_common_parameters
+                    )
+                    dic_parameter_lists_for_naming[parameter] = [
+                        f"{n:02d}" for n, path in enumerate(parameter_list)
+                    ]
+                elif "list" in dic_curr_parameter:
+                    parameter_list = dic_curr_parameter["list"]
+                    dic_parameter_lists_for_naming[parameter] = parameter_list
+                else:
+                    raise ValueError(
+                        f"Scanning method for parameter {parameter} is not recognized."
+                    )
+
+                # Ensure that all values are not numpy types (to avoid serialization issues)
+                parameter_list = [
+                    x.item() if isinstance(x, np.generic) else x for x in parameter_list
+                ]
+
+                # Handle nested parameters
+                parameter_list_updated = test_convert_for_subvariables(
+                    self.config["structure"][generation]["scans"][parameter], parameter_list
+                )
+                dic_parameter_lists[parameter] = parameter_list_updated
 
         return dic_parameter_lists, dic_parameter_lists_for_naming
 
@@ -225,20 +239,26 @@ class GenerateScan:
             dic_mutated_parameters_for_naming = dict(
                 zip(dic_parameter_lists.keys(), l_values_for_naming)
             )
-            path = (
-                generation_path
-                + "_".join(
-                    [
-                        f"{parameter}_{value}"
-                        for parameter, value in dic_mutated_parameters_for_naming.items()
-                    ]
-                )
-                + "/"
+            suffix_path = "_".join(
+                [
+                    f"{parameter}_{value}"
+                    for parameter, value in dic_mutated_parameters_for_naming.items()
+                ]
             )
+
+            # Remove '_' at the beginning of the suffix path if needed (e.g. for generation)
+            suffix_path = suffix_path.removeprefix("_")
+            # Create final path
+            path = generation_path + suffix_path + "/"
 
             # Add common parameters
             if generation in self.dic_common_parameters:
                 dic_mutated_parameters |= self.dic_common_parameters[generation]
+
+            # Remove "" from mutated parameters, if it's in the dictionary
+            # as it's only used when no scan is done
+            if "" in dic_mutated_parameters:
+                dic_mutated_parameters.pop("")
 
             # Generate the study for current generation
             self.generate_render_write(
@@ -308,16 +328,7 @@ class GenerateScan:
         else:
             raise ValueError("Executables that are not templates are not implemented yet.")
 
-        return (
-            self.create_scans(generation, study_path, executable_name, executable_path)
-            if "scans" in self.config["structure"][generation]
-            else self.generate_render_write(
-                self.config["structure"][generation],
-                study_path,
-                executable_name,
-                executable_path,
-            )
-        )
+        return self.create_scans(generation, study_path, executable_name, executable_path)
 
     def create_study(
         self,

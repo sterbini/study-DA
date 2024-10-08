@@ -119,6 +119,8 @@ def _generate_run_file(
         f"python {job_name} > output_python.txt 2> error_python.txt\n"
         # Tag the job
         f"{tag_str(tree_path, l_keys)}"
+        f"# Store abs path as a variable in case it's needed for additional commands\n"
+        f"path_job=$(pwd)\n"
         f"# Optional user defined command to run\n"
         f"{additionnal_command}\n"
     )
@@ -180,7 +182,7 @@ def _generate_run_file_htc(
         dependency_value = find_item_in_dict(config, dependency)
         path_dependency = dependency_value.replace("/", "\/")
         new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")
-        sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}'
+        sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}\n'
 
     # Return final run script
     return (
@@ -193,7 +195,7 @@ def _generate_run_file_htc(
         f"mkdir {local_path}\n"
         f"cd {local_path}\n\n"
         f"# Mutate the paths in config to be absolute\n"
-        f"{sed_commands}\n\n"
+        f"{sed_commands}\n"
         f"# Run the job\n"
         f"python {abs_path}/{job_name} > output_python.txt 2> error_python.txt\n\n"
         # Tag the job

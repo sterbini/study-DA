@@ -27,13 +27,21 @@ study_sub = SubmitScan(
 study_sub.configure_jobs(force_configure=False)
 
 # %%
-# Additional commands to be executed at the end of the run file (generation-specific)
+### Additional commands to be executed at the end of the run file (generation-specific)
+
+# In case gen_1 is submitted to htc
+# dic_additional_commands_per_gen = {
+#     1: "cp *.json *.zip $path_job \n"
+#     "cp -r particles $path_job/particles \n",
+#     2: "",
+# }
+
+# In case gen_1 is submitted locally
 dic_additional_commands_per_gen = {
-    1: "cp *.json *.zip $path_job \n"
-    "cp -r particles $path_job/particles \n"
-    "rm -rf final_* modules optics_repository optics_toolkit tools tracking_tools temp mad_collider.log __pycache__ twiss* errors fc* optics_orbit_at* \n",
+    1: "rm -rf final_* modules optics_repository optics_toolkit tools tracking_tools temp mad_collider.log __pycache__ twiss* errors fc* optics_orbit_at* \n",
     2: "",
 }
+
 
 # Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
 dic_dependencies_per_gen = {1: ["acc-models-lhc"], 2: ["collider_file", "particle_file"]}
