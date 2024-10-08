@@ -97,7 +97,8 @@ class GenerateScan:
             study_path (str): The path to the study folder.
             template_name (str): The name of the template file.
             template_path (str): The path to the template folder.
-            dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters. Defaults to {}.
+            dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters.
+                Defaults to {}.
 
         Returns:
             tuple[str, list[str]]: The study file string and the list of study paths.
@@ -329,8 +330,10 @@ class GenerateScan:
         Creates study files for the entire study.
 
         Args:
-            tree_file (bool, optional): Whether to write the study tree structure to a YAML file. Defaults to True.
-            force_overwrite (bool, optional): Whether to overwrite existing study files. Defaults to False.
+            tree_file (bool, optional): Whether to write the study tree structure to a YAML file. 
+                Defaults to True.
+            force_overwrite (bool, optional): Whether to overwrite existing study files. 
+                Defaults to False.
 
         Returns:
             list[str]: The list of study file strings.

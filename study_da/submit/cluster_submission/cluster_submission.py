@@ -69,7 +69,8 @@ class ClusterSubmission:
             Writes submission files for all jobs to be submitted and returns a dictionary of
             submission files.
         _update_job_status_from_hpc_output(submit_command: str, submission_type: str,
-            dic_id_to_path_job_temp: dict, list_of_jobs: list[str], idx_submission: int = 0) -> tuple[dict, int]:
+            dic_id_to_path_job_temp: dict, list_of_jobs: list[str], idx_submission: int = 0)
+                -> tuple[dict, int]:
             Updates the job status from the HPC output.
         submit(list_of_jobs: list[str], l_submission_filenames: list[str], submission_type: str)
             -> None:
@@ -342,9 +343,9 @@ class ClusterSubmission:
         """
         Generates SLURM submission files for Docker jobs and writes them to disk.
 
-        This method iterates over a list of jobs, checks their status (running, queuing, or completed),
-        and writes the corresponding SLURM submission files for Docker jobs. The submission files are
-        written to disk with a specific naming convention.
+        This method iterates over a list of jobs, checks their status (running, queuing, or
+        completed), and writes the corresponding SLURM submission files for Docker jobs. The
+        submission files are written to disk with a specific naming convention.
 
         Args:
             sub_filename (str): The base name for the submission files.
@@ -627,7 +628,8 @@ class ClusterSubmission:
             idx_submission (int, optional): The index of the current submission. Defaults to 0.
 
         Returns:
-            tuple[dict, int]: A tuple containing the updated dictionary and the updated index of submission.
+            tuple[dict, int]: A tuple containing the updated dictionary and the updated index of
+                submission.
 
         Raises:
             RuntimeError: If there is an error in the submission process.
@@ -672,7 +674,8 @@ class ClusterSubmission:
                 "htc", "slurm", "htc_docker", and "slurm_docker".
 
         Raises:
-            ValueError: If multiple submission files are provided for a non-"slurm_docker" submission type.
+            ValueError: If multiple submission files are provided for a non-"slurm_docker"
+                submission type.
             ValueError: If the submission type is not valid.
 
         Returns:
@@ -842,9 +845,10 @@ class ClusterSubmission:
         optionally query each job individually for its details.
 
         Args:
-            status (str): The status of the jobs to retrieve. Expected values are "running" or "queuing".
-            force_query_individually (bool, optional): If True, query each job individually for its details
-                when the job ID is not found in the internal dictionary. Defaults to False.
+            status (str): The status of the jobs to retrieve. Expected values are "running" or
+                "queuing".
+            force_query_individually (bool, optional): If True, query each job individually for its
+                details when the job ID is not found in the internal dictionary. Defaults to False.
 
         Returns:
             list[str]: A list of job paths corresponding to the specified status.
