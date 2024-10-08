@@ -249,7 +249,8 @@ config_simulation:
   collider_file: ../collider.json.zip
 
   # Distribution in the normalized xy space
-  particle_file: ../particles/00.parquet
+  particle_folder: ../particles
+  particle_file: 00.parquet
 
   # Output particle file
   path_output_particles: output_particles.parquet

@@ -25,10 +25,12 @@ from study_da.utils import (
 # ==================================================================================================
 def update_particles_distribution(full_configuration):
     # Get configuration
+    folder_particles = full_configuration["config_simulation"]["particle_folder"]
     file_particles = full_configuration["config_simulation"]["particle_file"]
+    path_particles = f"{folder_particles}/{file_particles}"
 
     # Load particle distribution
-    particle_df = pd.read_parquet(file_particles)
+    particle_df = pd.read_parquet(path_particles)
 
     r_vect = particle_df["normalized amplitude in xy-plane"].values
     theta_vect = particle_df["angle in xy-plane [deg]"].values * np.pi / 180

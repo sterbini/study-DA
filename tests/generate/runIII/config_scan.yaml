@@ -31,7 +31,7 @@ structure:
     scans:
       particle_file:
         # Number of paths is set by n_split in the main config
-        path_list: ["../particles/____.parquet", n_split]
+        path_list: ["____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
         linspace: [62.31, 62.32, 2]

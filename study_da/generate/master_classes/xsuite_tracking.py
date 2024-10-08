@@ -66,6 +66,8 @@ class XsuiteTracking:
         # Simulation parameters
         self.beam: str = configuration["beam"]
         self.particle_file: str = configuration["particle_file"]
+        self.particle_folder: str = configuration["particle_folder"]
+        self.particle_path: str = f"{self.particle_folder}/{self.particle_file}"
         self.delta_max: float = configuration["delta_max"]
         self.n_turns: int = configuration["n_turns"]
 
@@ -137,7 +139,7 @@ class XsuiteTracking:
             collider.discard_trackers()
             collider.build_trackers(_context=self.context)
 
-        particle_df = pd.read_parquet(self.particle_file)
+        particle_df = pd.read_parquet(self.particle_path)
 
         r_vect = particle_df["normalized amplitude in xy-plane"].values
         theta_vect = particle_df["angle in xy-plane [deg]"].values * np.pi / 180  # type: ignore # [rad]

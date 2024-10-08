@@ -21,7 +21,7 @@ structure:
     common_parameters:
       # Needs to be redeclared as it's used for parallelization
       # And re-used ine the second generation
-      n_split: 1
+      n_split: 2
 
   # Second generation depends on the config from the first generation
   generation_2:
@@ -31,10 +31,10 @@ structure:
     scans:
       particle_file:
         # Number of paths is set by n_split in the main config
-        path_list: ["../particles/____.parquet", n_split]
+        path_list: ["____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
         linspace: [62.31, 62.32, 1]
       qy:
         subvariables: [lhcb1, lhcb2]
-        list: [60.32, 60.33]
+        list: [60.32]
