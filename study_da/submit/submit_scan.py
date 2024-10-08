@@ -8,6 +8,7 @@ on a cluster."""
 import logging
 import os
 import time
+from typing import Optional
 
 # Third party imports
 from filelock import SoftFileLock
@@ -31,8 +32,19 @@ class SubmitScan:
         path_tree: str,
         path_python_environment: str,
         path_python_environment_container: str = "",
-        path_container_image: str | None = None,
-    ):
+        path_container_image: Optional[str] = None,
+    ) -> None:
+        """
+        Initializes the SubmitScan class.
+
+        Args:
+            path_tree (str): The path to the tree structure.
+            path_python_environment (str): The path to the Python environment.
+            path_python_environment_container (str, optional): The path to the Python environment
+                in the container. Defaults to "".
+            path_container_image (Optional[str], optional): The path to the container image.
+                Defaults to None.
+        """
         # Path to study files
         self.path_tree = path_tree
 
@@ -46,7 +58,7 @@ class SubmitScan:
         self.abs_path = os.path.abspath(self.study_name).split(f"/{self.study_name}")[0]
 
         # Path to the python environment, activate with `source path_python_environment`
-        # Turn to abolute path if it is not already
+        # Turn to absolute path if it is not already
         if not os.path.isabs(path_python_environment):
             self.path_python_environment = os.path.abspath(path_python_environment)
         else:
@@ -57,7 +69,7 @@ class SubmitScan:
             self.path_python_environment += "/bin/activate"
 
         # Container image (Docker or Singularity, if any)
-        # Turn to abolute path if it is not already
+        # Turn to absolute path if it is not already
         if path_container_image is None:
             self.path_container_image = None
         elif not os.path.isabs(path_container_image):
@@ -71,7 +83,8 @@ class SubmitScan:
         # Ensure that the container image is set if the python environment is set
         if self.path_container_image and not self.path_python_environment_container:
             raise ValueError(
-                "The path to the python environment in the container must be set if the container image is set."
+                "The path to the python environment in the container must be set if the container"
+                "image is set."
             )
 
         # Add /bin/activate to the path_python_environment if needed
@@ -83,16 +96,33 @@ class SubmitScan:
 
     # dic_tree as a property so that it is reloaded every time it is accessed
     @property
-    def dic_tree(self):
+    def dic_tree(self) -> dict:
+        """
+        Loads the dictionary tree from the path.
+
+        Returns:
+            dict: The loaded dictionary tree.
+        """
         return load_dic_from_path(self.path_tree)[0]
 
     # Setter for the dic_tree property
     @dic_tree.setter
-    def dic_tree(self, value: dict):
+    def dic_tree(self, value: dict) -> None:
+        """
+        Writes the dictionary tree to the path.
+
+        Args:
+            value (dict): The dictionary tree to write.
+        """
         write_dic_to_path(value, self.path_tree)
 
-    # Property for the same reason
     def configure_jobs(self, force_configure: bool = False) -> None:
+        """
+        Configures the jobs by modifying the tree structure.
+
+        Args:
+            force_configure (bool, optional): Whether to force reconfiguration. Defaults to False.
+        """
         # Lock since we are modifying the tree
         with self.lock:
             # Get the tree
@@ -115,16 +145,45 @@ class SubmitScan:
             self.dic_tree = dic_tree
 
     def get_all_jobs(self) -> dict:
+        """
+        Retrieves all jobs from the configuration.
+
+        Returns:
+            dict: A dictionary containing all jobs.
+        """
         return ConfigJobs(self.dic_tree).find_all_jobs()
 
     def generate_run_files(
         self,
         dic_tree: dict,
         l_jobs_to_submit: list[str],
-        dic_additional_commands_per_gen: dict[int, str] = {},
-        dic_dependencies_per_gen: dict[int, list[str]] = {},
+        dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
+        dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
         name_config: str = "config.yaml",
     ) -> dict:
+        """
+        Generates run files for the specified jobs.
+
+        Args:
+            dic_tree (dict): The dictionary tree structure.
+            l_jobs_to_submit (list[str]): List of jobs to submit.
+            dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
+                generation. Defaults to {}.
+            dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
+                Defaults to {}.
+            name_config (str, optional): The name of the configuration file.
+                Defaults to "config.yaml".
+
+        Returns:
+            dict: The updated dictionary tree structure.
+        """
+        # Handle the mutable default arguments
+        if dic_additional_commands_per_gen is None:
+            dic_additional_commands_per_gen = {}
+        if dic_dependencies_per_gen is None:
+            dic_dependencies_per_gen = {}
+
+        # Generate the run files for the jobs to submit
         dic_all_jobs = self.get_all_jobs()
         for job in l_jobs_to_submit:
             l_keys = dic_all_jobs[job]["l_keys"]
@@ -153,8 +212,8 @@ class SubmitScan:
                 self.abs_path_tree,
                 l_keys,
                 htc="htc" in submission_type,
-                additionnal_command=dic_additional_commands_per_gen[generation_number],
-                l_dependencies=dic_dependencies_per_gen[generation_number],
+                additionnal_command=dic_additional_commands_per_gen.get(generation_number, ""),
+                l_dependencies=dic_dependencies_per_gen.get(generation_number, []),
                 name_config=name_config,
             )
             # Write the run file
@@ -170,10 +229,29 @@ class SubmitScan:
     def submit(
         self,
         one_generation_at_a_time: bool = False,
-        dic_additional_commands_per_gen: dict[int, str] = {},
-        dic_dependencies_per_gen: dict[int, list[str]] = {},
+        dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
+        dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
         name_config: str = "config.yaml",
     ) -> None:
+        """
+        Submits the jobs to the cluster.
+
+        Args:
+            one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
+                time. Defaults to False.
+            dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
+                generation. Defaults to {}.
+            dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
+                Defaults to {}.
+            name_config (str, optional): The name of the configuration file.
+                Defaults to "config.yaml".
+        """
+
+        # Handle the mutable default arguments
+        if dic_additional_commands_per_gen is None:
+            dic_additional_commands_per_gen = {}
+        if dic_dependencies_per_gen is None:
+            dic_dependencies_per_gen = {}
         dic_all_jobs = self.get_all_jobs()
 
         with self.lock:
@@ -243,6 +321,15 @@ class SubmitScan:
     def keep_submit_until_done(
         self, one_generation_at_a_time: bool = False, wait_time: float = 30
     ) -> None:
+        """
+        Keeps submitting jobs until all jobs are finished.
+
+        Args:
+            one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
+                time. Defaults to False.
+            wait_time (float, optional): The wait time between submissions in minutes.
+                Defaults to 30.
+        """
         if wait_time < 1 / 20:
             logging.warning("Wait time should be at least 10 seconds to prevent locking errors.")
             logging.warning("Setting wait time to 10 seconds.")

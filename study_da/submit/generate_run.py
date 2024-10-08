@@ -13,7 +13,15 @@ from study_da.utils import find_item_in_dict
 # ==================================================================================================
 # --- Functions
 # ==================================================================================================
-def tag_str(tree_path, l_keys):
+def tag_str(tree_path: str, l_keys: list[str]) -> str:
+    """ "
+    Generates a shell script snippet to tag a job as finished if it was successful.
+    Args:
+        tree_path (str): The path to the tree structure where the job is logged.
+        l_keys (list[str]): A list of keys to be included in the log.
+    Returns:
+        str: A formatted string containing the shell script snippet.
+    """
     # Tag the job as finished with all keys from l_keys
     return f"""
 # Ensure job run was successful and tag as finished
@@ -24,19 +32,40 @@ fi\n
 
 
 def generate_run_file(
-    job_folder,
-    job_name,
-    setup_env_script,
-    generation_number,
-    tree_path,
-    l_keys,
-    htc=False,
-    additionnal_command="",
-    l_dependencies=[],
-    name_config="config.yaml",
-):
+    job_folder: str,
+    job_name: str,
+    setup_env_script: str,
+    generation_number: int,
+    tree_path: str,
+    l_keys: list[str],
+    htc: bool = False,
+    additionnal_command: str = "",
+    l_dependencies: list[str] | None = None,
+    name_config: str = "config.yaml",
+) -> str:
+    """
+    Generates a run file for a job, either for local/Slurm or HTC environments.
+
+    Args:
+        job_folder (str): The folder where the job is located.
+        job_name (str): The name of the job script.
+        setup_env_script (str): The script to set up the environment.
+        generation_number (int): The generation number.
+        tree_path (str): The path to the tree structure.
+        l_keys (list[str]): A list of keys to access the job in the tree.
+        htc (bool, optional): Whether the job shoud be run on HTCondor. Defaults to False.
+        additionnal_command (str, optional): Additional command to run. Defaults to "".
+        l_dependencies (list[str] | None, optional): List of dependencies (only for HTC jobs).
+            Defaults to None.
+        name_config (str, optional): The name of the configuration file. Defaults to "config.yaml".
+
+    Returns:
+        str: The generated run file content.
+    """
     if htc:
-        file_str = _generate_run_file_htc(
+        if l_dependencies is None:
+            l_dependencies = []
+        return _generate_run_file_htc(
             job_folder,
             job_name,
             setup_env_script,
@@ -47,17 +76,40 @@ def generate_run_file(
             l_dependencies,
             name_config,
         )
+    # Local, or Slurm
     else:
-        file_str = _generate_run_file(
-            job_folder, job_name, setup_env_script, tree_path, l_keys, additionnal_command
+        return _generate_run_file(
+            job_folder,
+            job_name,
+            setup_env_script,
+            tree_path,
+            l_keys,
+            additionnal_command,
         )
-
-    return file_str
 
 
 def _generate_run_file(
-    job_folder, job_name, setup_env_script, tree_path, l_keys, additionnal_command=""
-):
+    job_folder: str,
+    job_name: str,
+    setup_env_script: str,
+    tree_path: str,
+    l_keys: list[str],
+    additionnal_command: str = "",
+) -> str:
+    """
+    Generates a run file for local or Slurm environments.
+
+    Args:
+        job_folder (str): The folder where the job is located.
+        job_name (str): The name of the job script.
+        setup_env_script (str): The script to set up the environment.
+        tree_path (str): The path to the tree structure.
+        l_keys (list[str]): A list of keys to access the job in the tree.
+        additionnal_command (str, optional): Additional command to run. Defaults to "".
+
+    Returns:
+        str: The generated run file content.
+    """
     return (
         "#!/bin/bash\n"
         f"# Load the environment\n"
@@ -73,16 +125,36 @@ def _generate_run_file(
 
 
 def _generate_run_file_htc(
-    job_folder,
-    job_name,
-    setup_env_script,
-    generation_number,
-    tree_path,
-    l_keys,
-    additionnal_command="",
-    l_dependencies=[],
-    name_config="config.yaml",
-):
+    job_folder: str,
+    job_name: str,
+    setup_env_script: str,
+    generation_number: int,
+    tree_path: str,
+    l_keys: list[str],
+    additionnal_command: str = "",
+    l_dependencies: list[str] | None = None,
+    name_config: str = "config.yaml",
+) -> str:
+    """
+    Generates a run file for HTC environments.
+
+    Args:
+        job_folder (str): The folder where the job is located.
+        job_name (str): The name of the job script.
+        setup_env_script (str): The script to set up the environment.
+        generation_number (int): The generation number.
+        tree_path (str): The path to the tree structure.
+        l_keys (list[str]): A list of keys to access the job in the tree.
+        additionnal_command (str, optional): Additional command to run. Defaults to "".
+        l_dependencies (list[str] | None, optional): List of dependencies (only for HTC jobs).
+            Defaults to None.
+        name_config (str, optional): The name of the configuration file. Defaults to "config.yaml".
+
+    Returns:
+        str: The generated run file content.
+    """
+    if l_dependencies is None:
+        l_dependencies = []
     # Get local path and abs path to current gen
     abs_path = job_folder
     local_path = abs_path.split("/")[-1]
