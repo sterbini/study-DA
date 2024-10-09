@@ -2,6 +2,7 @@
 # --- Imports
 # ==================================================================================================
 # Standard library imports
+import logging
 from typing import Any, Optional
 
 # Local imports
@@ -30,6 +31,7 @@ def create(
     Returns:
         None
     """
+    logging.info(f"Create study from configuration file: {path_config}")
     study = GenerateScan(path_config=path_config)
     study.create_study(
         tree_file=tree_file,

@@ -110,11 +110,12 @@ class GenerateScan:
         Returns:
             tuple[str, list[str]]: The study file string and the list of study paths.
         """
+
         directory_path_gen = f"{study_path}"
         if not directory_path_gen.endswith("/"):
             directory_path_gen += "/"
         file_path_gen = f"{directory_path_gen}{gen_name}.py"
-
+        logging.info(f'Now rendering generation "{file_path_gen}"')
         # Generate the string of parameters
         str_parameters = "{"
         for key, value in dic_mutated_parameters.items():
@@ -318,6 +319,9 @@ class GenerateScan:
 
         # Generate render write for cartesian product of all parameters
         l_study_path = []
+        logging.info(
+            f"Now generation cartesian product of all parameters for generation: {generation}"
+        )
         for l_values, l_values_for_naming, l_idx in zip(
             itertools.product(*dic_parameter_lists.values()),
             itertools.product(*dic_parameter_lists_for_naming.values()),
@@ -387,6 +391,7 @@ class GenerateScan:
         Returns:
             dict: The updated dictionary representing the study tree structure.
         """
+        logging.info(f"Completing the tree structure for generation: {gen}")
         for path_next in l_study_path_next_gen:
             nested_set(
                 dictionary_tree,
@@ -403,6 +408,7 @@ class GenerateScan:
         Args:
             dictionary_tree (dict): The dictionary representing the study tree structure.
         """
+        logging.info("Writing the tree structure to a YAML file.")
         ryaml = yaml.YAML()
         with open(self.config["name"] + "/" + "tree.yaml", "w") as yaml_file:
             ryaml.indent(sequence=4, offset=2)
@@ -437,6 +443,9 @@ class GenerateScan:
         if dic_parameter_lists is not None:
             # Recursively convert all numpy types to standard types
             clean_dict(dic_parameter_lists)
+            logging.info("An external dictionary of parameters was provided.")
+        else:
+            logging.info("Creating the dictionnary of parameters from the configuration file.")
 
         return self.create_scans(
             generation,
@@ -490,6 +499,7 @@ class GenerateScan:
         l_generations = list(self.config["structure"].keys())
         for idx, generation in enumerate(l_generations):
             l_study_path_all_next_generation = []
+            logging.info(f"Taking care of generation: {generation}")
             for study_path in l_study_path:
                 if dic_parameter_all_gen is None or generation not in dic_parameter_all_gen:
                     dic_parameter_current_gen = None

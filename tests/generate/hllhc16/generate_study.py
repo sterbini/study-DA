@@ -3,16 +3,23 @@
 # ==================================================================================================
 
 # Import standard library modules
+import logging
+
 # Import third-party modules
-# Import user-defined modules
 import numpy as np
 
+# Import user-defined modules
 from study_da import create
-from study_da.utils.configuration import (
+from study_da.utils import (
     find_item_in_dict,
     load_dic_from_path,
     write_dic_to_path,
 )
+
+# Set up the logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 # ==================================================================================================
 # --- Script to generate a study
