@@ -38,3 +38,4 @@ structure:
       qy:
         subvariables: [lhcb1, lhcb2]
         list: [60.32, 60.33]
+        condition: qy < qx - 2 + 0.0039

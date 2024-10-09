@@ -18,21 +18,17 @@ from study_da.utils import find_item_in_dict
 # ==================================================================================================
 
 
-def test_convert_for_subvariables(parameter_dict: dict, parameter_list: list) -> list:
+def convert_for_subvariables(l_subvariables: list[str], parameter_list: list) -> list:
     """Convert the parameter list to a list of dictionaries with subvariables as keys.
 
     Args:
-        parameter_dict (dict): Dictionary with the parameter configuration.
+        subvariables (list[str]): List of subvariables.
         parameter_list (list): List with the parameter values.
 
     Returns:
         list: List of dictionaries with subvariables as keys.
     """
-
-    if "subvariables" in parameter_dict:
-        subvariables = parameter_dict["subvariables"]
-        parameter_list = [{subvar: value for subvar in subvariables} for value in parameter_list]
-    return parameter_list
+    return [{subvar: value for subvar in l_subvariables} for value in parameter_list]
 
 
 def linspace(l_values_linspace: list) -> np.ndarray:

@@ -8,6 +8,7 @@ and potentially a set of template files."""
 # Import standard library modules
 import inspect
 import itertools
+import logging
 import os
 import shutil
 from typing import Any
@@ -21,10 +22,10 @@ from jinja2 import Environment, FileSystemLoader
 from study_da.utils import load_dic_from_path, nested_set
 
 from .parameter_space import (
+    convert_for_subvariables,
     linspace,
     list_values_path,
     logspace,
-    test_convert_for_subvariables,
 )
 
 
@@ -137,7 +138,9 @@ class GenerateScan:
         self.write(study_str, file_path_gen)
         return [directory_path_gen]
 
-    def get_dic_parametric_scans(self, generation: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    def get_dic_parametric_scans(
+        self, generation: str
+    ) -> tuple[dict[str, Any], dict[str, Any], np.ndarray | None]:
         """
         Retrieves dictionaries of parametric scan values.
 
@@ -145,7 +148,9 @@ class GenerateScan:
             generation: The generation name.
 
         Returns:
-            tuple[dict[str, Any], dict[str, Any]]: The dictionaries of parametric scan values.
+            tuple[dict[str, Any], dict[str, Any], np.ndarray|None]: The dictionaries of parametric
+                scan values, another dictionnary with better naming for the tree creation, and an
+                array of conditions to filter out some parameter values.
         """
 
         if generation == "base":
@@ -162,6 +167,7 @@ class GenerateScan:
         # Get dictionnary of parametric values being scanned
         dic_parameter_lists = {}
         dic_parameter_lists_for_naming = {}
+        array_conditions = None
         if (
             "scans" not in self.config["structure"][generation]
             or self.config["structure"][generation]["scans"] is None
@@ -169,6 +175,8 @@ class GenerateScan:
             dic_parameter_lists[""] = [generation]
             dic_parameter_lists_for_naming[""] = [generation]
         else:
+            l_conditions = []
+            dic_subvariables = {}
             for parameter in self.config["structure"][generation]["scans"]:
                 dic_curr_parameter = self.config["structure"][generation]["scans"][parameter]
                 if "linspace" in dic_curr_parameter:
@@ -193,18 +201,44 @@ class GenerateScan:
                         f"Scanning method for parameter {parameter} is not recognized."
                     )
 
+                # Store the list of parameters (no matter the scanning method)
+                dic_parameter_lists[parameter] = parameter_list
+
+                # Store potential subvariables
+                if "subvariables" in dic_curr_parameter:
+                    dic_subvariables[parameter] = dic_curr_parameter["subvariables"]
+
+                # Save the condition if it exists
+                if "condition" in dic_curr_parameter:
+                    l_conditions.append(dic_curr_parameter["condition"])
+
+            # Generate array of conditions to filter out some of the values later
+            if l_conditions:
+                array_conditions = self.eval_conditions(l_conditions, dic_parameter_lists)
+
+            # Postprocess the parameter lists and update the dictionaries
+            for parameter in dic_parameter_lists:
+                parameter_list = dic_parameter_lists[parameter]
+                parameter_list_for_naming = dic_parameter_lists_for_naming[parameter]
+
                 # Ensure that all values are not numpy types (to avoid serialization issues)
                 parameter_list = [
                     x.item() if isinstance(x, np.generic) else x for x in parameter_list
                 ]
 
                 # Handle nested parameters
-                parameter_list_updated = test_convert_for_subvariables(
-                    self.config["structure"][generation]["scans"][parameter], parameter_list
-                )
-                dic_parameter_lists[parameter] = parameter_list_updated
+                if parameter in dic_subvariables:
+                    parameter_list_updated = convert_for_subvariables(
+                        dic_subvariables[parameter], parameter_list
+                    )
+                else:
+                    parameter_list_updated = parameter_list
 
-        return dic_parameter_lists, dic_parameter_lists_for_naming
+                # Update the dictionaries
+                dic_parameter_lists[parameter] = parameter_list_updated
+                dic_parameter_lists_for_naming[parameter] = parameter_list_for_naming
+
+        return dic_parameter_lists, dic_parameter_lists_for_naming, array_conditions
 
     def create_scans(
         self,
@@ -226,15 +260,22 @@ class GenerateScan:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
         # Get dictionnary of parametric values being scanned
-        dic_parameter_lists, dic_parameter_lists_for_naming = self.get_dic_parametric_scans(
-            generation
+        dic_parameter_lists, dic_parameter_lists_for_naming, array_conditions = (
+            self.get_dic_parametric_scans(generation)
         )
+
         # Generate render write for cartesian product of all parameters
         l_study_path = []
-        for l_values, l_values_for_naming in zip(
+        for l_values, l_values_for_naming, l_idx in zip(
             itertools.product(*dic_parameter_lists.values()),
             itertools.product(*dic_parameter_lists_for_naming.values()),
+            itertools.product(*[range(len(x)) for x in dic_parameter_lists.values()]),
         ):
+            # Check the idx to keep if conditions are present
+            if array_conditions is not None and not array_conditions[l_idx]:
+                continue
+
+            # Create the path for the study
             dic_mutated_parameters = dict(zip(dic_parameter_lists.keys(), l_values))
             dic_mutated_parameters_for_naming = dict(
                 zip(dic_parameter_lists.keys(), l_values_for_naming)
@@ -271,6 +312,12 @@ class GenerateScan:
 
             # Append the list of study paths to build the tree later on
             l_study_path.append(path)
+
+        if not l_study_path:
+            logging.warning(
+                f"No study paths were created for generation {generation}."
+                "Please check the conditions."
+            )
 
         return l_study_path
 
@@ -387,3 +434,29 @@ class GenerateScan:
 
         if tree_file:
             self.write_tree(dictionary_tree)
+
+    @staticmethod
+    def eval_conditions(l_condition: list[str], dic_parameter_lists: dict[str:Any]) -> np.ndarray:
+        """
+        Evaluates the conditions to filter out some parameter values.
+
+        Args:
+            l_condition (list[str]): The list of conditions.
+            dic_parameter_lists (dict[str: Any]): The dictionary of parameter lists.
+
+        Returns:
+            np.ndarray: The array of conditions.
+        """
+        # Initialize the array of parameters as a meshgrid of all parameters
+        l_parameters = list(dic_parameter_lists.values())
+        meshgrid = np.meshgrid(*l_parameters, indexing="ij")
+
+        # Associate the parameters to their names
+        dic_param_mesh = dict(zip(dic_parameter_lists.keys(), meshgrid))
+
+        # Evaluate the conditions and take the intersection of all conditions
+        array_conditions = np.ones_like(meshgrid[0], dtype=bool)
+        for condition in l_condition:
+            array_conditions = array_conditions & eval(condition, dic_param_mesh)
+
+        return array_conditions
