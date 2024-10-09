@@ -103,6 +103,7 @@ class SubmitScan:
         Returns:
             dict: The loaded dictionary tree.
         """
+        logging.info(f"Loading tree from {self.path_tree}")
         return load_dic_from_path(self.path_tree)[0]
 
     # Setter for the dic_tree property
@@ -114,6 +115,7 @@ class SubmitScan:
         Args:
             value (dict): The dictionary tree to write.
         """
+        logging.info(f"Writing tree to {self.path_tree}")
         write_dic_to_path(value, self.path_tree)
 
     def configure_jobs(self, force_configure: bool = False) -> None:
@@ -124,6 +126,7 @@ class SubmitScan:
             force_configure (bool, optional): Whether to force reconfiguration. Defaults to False.
         """
         # Lock since we are modifying the tree
+        logging.info("Acquiring lock to configure jobs")
         with self.lock:
             # Get the tree
             dic_tree = self.dic_tree
@@ -143,6 +146,8 @@ class SubmitScan:
 
             # Explicitly set the dic_tree property to force rewrite
             self.dic_tree = dic_tree
+
+        logging.info("Jobs have been configured. Lock released.")
 
     def get_all_jobs(self) -> dict:
         """
@@ -183,6 +188,7 @@ class SubmitScan:
         if dic_dependencies_per_gen is None:
             dic_dependencies_per_gen = {}
 
+        logging.info("Generating run files for the jobs to submit")
         # Generate the run files for the jobs to submit
         dic_all_jobs = self.get_all_jobs()
         for job in l_jobs_to_submit:
@@ -254,14 +260,17 @@ class SubmitScan:
             dic_dependencies_per_gen = {}
         dic_all_jobs = self.get_all_jobs()
 
+        logging.info("Acquiring lock to submit jobs")
         with self.lock:
             # Get dic tree once to avoid reloading it for every job
             dic_tree = self.dic_tree
 
             # Collect dict of list of unfinished jobs for every tree branch and every gen
             dic_to_submit_by_gen = {}
+            dependency_graph = DependencyGraph(dic_tree, dic_all_jobs)
             for job in dic_all_jobs:
-                l_dep = DependencyGraph(dic_tree, dic_all_jobs).get_unfinished_dependency(job)
+                logging.info(f"Checking job {job}")
+                l_dep = dependency_graph.get_unfinished_dependency(job)
                 # If job parents are finished and job is not finished, submit it
                 if (
                     len(l_dep) == 0
@@ -271,10 +280,15 @@ class SubmitScan:
                     gen = dic_all_jobs[job]["gen"]
                     if gen not in dic_to_submit_by_gen:
                         dic_to_submit_by_gen[gen] = []
+                    logging.info(f"Job {job} is added for submission.")
                     dic_to_submit_by_gen[gen].append(job)
 
             # Only keep the topmost generation if one_generation_at_a_time is True
             if one_generation_at_a_time:
+                logging.info(
+                    "Cropping list of jobs to submit to ensure only one generation is submitted at "
+                    "a time."
+                )
                 max_gen = max(dic_to_submit_by_gen.keys())
                 dic_to_submit_by_gen = {max_gen: dic_to_submit_by_gen[max_gen]}
 
@@ -308,6 +322,7 @@ class SubmitScan:
             )
 
             # Write and submit the submission files
+            logging.info("Writing and submitting submission files")
             dic_submission_files = cluster_submission.write_sub_files()
             for submission_type, (
                 list_of_jobs,
@@ -317,6 +332,8 @@ class SubmitScan:
 
             # Update dic_tree from cluster_submission
             self.dic_tree = cluster_submission.dic_tree
+
+        logging.info("Jobs have been submitted. Lock released.")
 
     def keep_submit_until_done(
         self, one_generation_at_a_time: bool = False, wait_time: float = 30

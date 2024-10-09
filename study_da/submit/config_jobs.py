@@ -290,6 +290,7 @@ class ConfigJobs:
         self.dic_all_jobs = {}
         self.skip_configured_jobs = None
 
+        logging.info("Finding and configuring jobs in the tree")
         self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=False)
 
         return self.dic_tree
@@ -305,6 +306,7 @@ class ConfigJobs:
         self.dic_all_jobs = {}
 
         # Find all jobs and associated generation
+        logging.info("Finding all jobs in the tree, with no configuration")
         self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=True)
 
         return self.dic_all_jobs

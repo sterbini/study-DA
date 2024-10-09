@@ -1,6 +1,12 @@
-# %%
+# Import standard library modules
+import logging
+
 from study_da import SubmitScan
 from study_da.utils.configuration import load_dic_from_path, write_dic_to_path
+
+# Set up the logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # %%
 # Mutate config to have proper path since study was moved
@@ -18,7 +24,7 @@ write_dic_to_path(config, "example_tune_scan/config_hllhc16.yaml", ryaml)
 # %%
 study_sub = SubmitScan(
     path_tree="example_tune_scan/tree.yaml",
-    path_python_environment="/home/cdroin/study-DA/.venv",
+    path_python_environment="/afs/cern.ch/work/c/cdroin/private/study-DA/.venv",
     path_python_environment_container="/usr/local/DA_study/miniforge_docker",
     path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:ba9941aa",
 )
