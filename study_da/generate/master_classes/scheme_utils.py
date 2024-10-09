@@ -200,7 +200,8 @@ def _compute_LR_per_bunch(
                 # This represents the relative position to the head-on bunch
                 positions = np.append(positions, first_to_consider + bunches_ineraction_partial)
 
-                # Set this varibale so later the normal syntax wihtout the wrap around checking can be used
+                # Set this varibale so later the normal syntax wihtout 
+                # the wrap around checking can be used
                 first_to_consider = 0
 
             if last_to_consider > number_of_bunches:

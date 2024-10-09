@@ -36,17 +36,21 @@ class ParticlesDistribution:
         __init__(configuration: dict):
             Initializes the ParticlesDistribution with the given configuration.
 
-        get_radial_list(lower_crop: float | None = None, upper_crop: float | None = None) -> np.ndarray:
+        get_radial_list(lower_crop: float | None = None, upper_crop: float | None = None)
+            -> np.ndarray:
             Generates a list of radial distances, optionally cropped.
 
         get_angular_list() -> np.ndarray:
             Generates a list of angular values.
 
-        return_distribution_as_list(split: bool = True, lower_crop: float | None = None, upper_crop: float | None) -> list[np.ndarray]:
-            Returns the particle distribution as a list of numpy arrays, optionally split for parallelization.
+        return_distribution_as_list(split: bool = True, lower_crop: float | None = None,
+            upper_crop: float | None) -> list[np.ndarray]:
+            Returns the particle distribution as a list of numpy arrays, optionally split for
+            parallelization.
 
         write_particle_distribution_to_disk(ll_particles: list[np.ndarray]) -> list[str]:
-            Writes the particle distribution to disk in Parquet format and returns the list of file paths.
+            Writes the particle distribution to disk in Parquet format and returns the list of file
+            paths.
     """
 
     def __init__(self, configuration: dict):
@@ -60,7 +64,8 @@ class ParticlesDistribution:
                 - n_r (int): Number of radius points.
                 - n_angles (int): Number of angle points.
                 - n_split (int): Number of splits for parallelization.
-                - path_distribution_folder (str): Path to the folder where the distribution will be saved.
+                - path_distribution_folder (str): Path to the folder where the distribution will be
+                    saved.
         """
         # Variables used to define the distribution
         self.r_min: int = configuration["r_min"]

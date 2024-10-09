@@ -6,6 +6,7 @@
 
 # Import standard library modules
 import logging
+from typing import Any
 
 # Import third-party modules
 import xtrack as xt
@@ -33,8 +34,8 @@ def compute_PU(luminosity: float, num_colliding_bunches: int, T_rev0: float, cro
 
 def luminosity_leveling_ip1_5(
     collider: xt.Multiline,
-    config_lumi_leveling_ip1_5: dict,
-    config_beambeam=dict,
+    config_lumi_leveling_ip1_5: dict[str, Any],
+    config_beambeam: dict[str, Any],
     crab: bool = False,
     cross_section: float = 81e-27,
 ):
@@ -111,10 +112,10 @@ def luminosity_leveling_ip1_5(
         method="bounded",
         options={"xatol": 1e7},
     )
-    if not res.success:
+    if not res.success:  # type: ignore
         logging.warning("Optimization for leveling in IP 1/5 failed. Please check the constraints.")
     else:
         logging.info(
-            f"Optimization for leveling in IP 1/5 succeeded with I={res.x:.2e} particles per bunch"
+            f"Optimization for leveling in IP 1/5 succeeded with I={res.x:.2e} particles per bunch"  # type: ignore
         )
-    return res.x
+    return res.x  # type: ignore

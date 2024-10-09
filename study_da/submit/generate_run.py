@@ -180,8 +180,8 @@ def _generate_run_file_htc(
     sed_commands = ""
     for dependency in dic_to_mutate:
         dependency_value = find_item_in_dict(config, dependency)
-        path_dependency = dependency_value.replace("/", "\/")
-        new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")
+        path_dependency = dependency_value.replace("/", "\/")  # type: ignore
+        new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")  # type: ignore
         sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}\n'
 
     # Return final run script

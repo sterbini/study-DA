@@ -136,6 +136,7 @@ class MadCollider:
         return self._ost
 
     def prepare_mad_collider(self) -> tuple[Madx, Madx]:
+        # sourcery skip: extract-duplicate-method
         """
         Prepares the MAD-X collider environment and sequences for beam 1/2 and beam 4.
 

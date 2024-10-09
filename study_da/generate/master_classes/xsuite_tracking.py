@@ -112,9 +112,9 @@ class XsuiteTracking:
                     self._context = xo.ContextCpu()
         return self._context
 
-    def prepare_particle_distribution_for_tracking(
-        self, collider: xt.Multiline
-    ) -> tuple[xp.Particles, np.ndarray, np.ndarray, np.ndarray]:
+    # ? I removed type hints for the output as I get an unclear linting error
+    # TODO: Check the proper type hints for the output
+    def prepare_particle_distribution_for_tracking(self, collider: xt.Multiline):
         """
         Prepare a particle distribution for tracking in the collider.
 

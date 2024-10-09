@@ -14,7 +14,7 @@ from xmask.lhc import install_errors_placeholders_hllhc
 # ==================================================================================================
 # --- Functions specific to each (HL-)LHC version
 # ==================================================================================================
-def check_madx_lattices(mad: Madx) -> None:
+def check_madx_lattices(mad: Madx) -> None:  # sourcery skip: extract-method
     """Check the consistency of the MAD-X lattice for the (HL-)LHC.
 
     Args:

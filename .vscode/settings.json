@@ -1,0 +1,3 @@
+{
+  "python.analysis.extraPaths": ["./external_dependencies/xmask"]
+}

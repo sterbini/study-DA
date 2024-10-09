@@ -171,78 +171,24 @@ class GenerateScan:
                     generation
                 ]["common_parameters"][parameter]
 
-        # Get dictionnary of parametric values being scanned
-        dic_parameter_lists = {}
-        dic_parameter_lists_for_naming = {}
-        array_conditions = None
-        ll_concomitant_parameters = []
+        # Check that the generation has scans
         if (
             "scans" not in self.config["structure"][generation]
             or self.config["structure"][generation]["scans"] is None
         ):
-            dic_parameter_lists[""] = [generation]
-            dic_parameter_lists_for_naming[""] = [generation]
+            dic_parameter_lists = {"": [generation]}
+            dic_parameter_lists_for_naming = {"": [generation]}
+            array_conditions = None
+            ll_concomitant_parameters = []
         else:
-            l_conditions = []
-            dic_subvariables = {}
-            for parameter in self.config["structure"][generation]["scans"]:
-                dic_curr_parameter = self.config["structure"][generation]["scans"][parameter]
-                if "linspace" in dic_curr_parameter:
-                    parameter_list = linspace(dic_curr_parameter["linspace"])
-                    dic_parameter_lists_for_naming[parameter] = parameter_list
-                elif "logspace" in dic_curr_parameter:
-                    parameter_list = logspace(dic_curr_parameter["logspace"])
-                    dic_parameter_lists_for_naming[parameter] = parameter_list
-                elif "path_list" in dic_curr_parameter:
-                    l_values_path_list = dic_curr_parameter["path_list"]
-                    parameter_list = list_values_path(
-                        l_values_path_list, self.dic_common_parameters
-                    )
-                    dic_parameter_lists_for_naming[parameter] = [
-                        f"{n:02d}" for n, path in enumerate(parameter_list)
-                    ]
-                elif "list" in dic_curr_parameter:
-                    parameter_list = dic_curr_parameter["list"]
-                    dic_parameter_lists_for_naming[parameter] = parameter_list
-                elif "expression" in dic_curr_parameter:
-                    parameter_list = np.round(
-                        eval(dic_curr_parameter["expression"], copy.deepcopy(dic_parameter_lists)),
-                        8,
-                    )
-                    dic_parameter_lists_for_naming[parameter] = parameter_list
-                else:
-                    raise ValueError(
-                        f"Scanning method for parameter {parameter} is not recognized."
-                    )
-
-                # Temporarily store the list of parameters as array (no matter the scanning method)
-                # This is needed to evaluate expressions or conditions
-                dic_parameter_lists[parameter] = np.array(parameter_list)
-
-                # Store potential subvariables
-                if "subvariables" in dic_curr_parameter:
-                    dic_subvariables[parameter] = dic_curr_parameter["subvariables"]
-
-                # Save the condition if it exists
-                if "condition" in dic_curr_parameter:
-                    l_conditions.append(dic_curr_parameter["condition"])
-
-                # Save the concomitant parameters if they exist
-                if "concomitant" in dic_curr_parameter:
-                    if not isinstance(dic_curr_parameter["concomitant"], list):
-                        dic_curr_parameter["concomitant"] = [dic_curr_parameter["concomitant"]]
-                    for concomitant_parameter in dic_curr_parameter["concomitant"]:
-                        # Assert that the parameters list have the same size
-                        assert len(parameter_list) == len(
-                            dic_parameter_lists[concomitant_parameter]
-                        ), (
-                            f"Parameters {parameter} and {concomitant_parameter} must have the "
-                            "same size."
-                        )
-                    # Add to the list for filtering later
-                    ll_concomitant_parameters.append(
-                        [parameter] + dic_curr_parameter["concomitant"]
-                    )
+            # Browse and collect the parameter space for the generation
+            (
+                dic_parameter_lists,
+                dic_parameter_lists_for_naming,
+                dic_subvariables,
+                ll_concomitant_parameters,
+                l_conditions,
+            ) = self.browse_and_collect_parameter_space(generation)
 
             # Get the dimension corresponding to each parameter
             dic_dimension_indices = {
@@ -259,32 +205,152 @@ class GenerateScan:
             )
 
             # Postprocess the parameter lists and update the dictionaries
-            for parameter in dic_parameter_lists:
-                parameter_list = dic_parameter_lists[parameter]
-                parameter_list_for_naming = dic_parameter_lists_for_naming[parameter]
-
-                # Ensure that all values are not numpy types (to avoid serialization issues)
-                parameter_list = [
-                    x.item() if isinstance(x, np.generic) else x for x in parameter_list
-                ]
-
-                # Handle nested parameters
-                if parameter in dic_subvariables:
-                    parameter_list_updated = convert_for_subvariables(
-                        dic_subvariables[parameter], parameter_list
-                    )
-                else:
-                    parameter_list_updated = parameter_list
-
-                # Update the dictionaries
-                dic_parameter_lists[parameter] = parameter_list_updated
-                dic_parameter_lists_for_naming[parameter] = parameter_list_for_naming
+            dic_parameter_lists, dic_parameter_lists_for_naming = self.postprocess_parameter_lists(
+                dic_parameter_lists, dic_parameter_lists_for_naming, dic_subvariables
+            )
 
         return (
             dic_parameter_lists,
             dic_parameter_lists_for_naming,
             array_conditions,
         )
+
+    def parse_parameter_space(
+        self,
+        parameter: str,
+        dic_curr_parameter: dict[str, Any],
+        dic_parameter_lists: dict[str, Any],
+        dic_parameter_lists_for_naming: dict[str, Any],
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """
+        Parses the parameter space for a given parameter.
+
+        Args:
+            parameter (str): The parameter name.
+            dic_curr_parameter (dict[str, Any]): The dictionary of current parameter values.
+            dic_parameter_lists (dict[str, Any]): The dictionary of parameter lists.
+            dic_parameter_lists_for_naming (dict[str, Any]): The dictionary of parameter lists for naming.
+
+        Returns:
+            tuple[dict[str, Any], dict[str, Any]]: The updated dictionaries of parameter lists.
+        """
+
+        if "linspace" in dic_curr_parameter:
+            parameter_list = linspace(dic_curr_parameter["linspace"])
+            dic_parameter_lists_for_naming[parameter] = parameter_list
+        elif "logspace" in dic_curr_parameter:
+            parameter_list = logspace(dic_curr_parameter["logspace"])
+            dic_parameter_lists_for_naming[parameter] = parameter_list
+        elif "path_list" in dic_curr_parameter:
+            l_values_path_list = dic_curr_parameter["path_list"]
+            parameter_list = list_values_path(l_values_path_list, self.dic_common_parameters)
+            dic_parameter_lists_for_naming[parameter] = [
+                f"{n:02d}" for n, path in enumerate(parameter_list)
+            ]
+        elif "list" in dic_curr_parameter:
+            parameter_list = dic_curr_parameter["list"]
+            dic_parameter_lists_for_naming[parameter] = parameter_list
+        elif "expression" in dic_curr_parameter:
+            parameter_list = np.round(
+                eval(dic_curr_parameter["expression"], copy.deepcopy(dic_parameter_lists)),
+                8,
+            )
+            dic_parameter_lists_for_naming[parameter] = parameter_list
+        else:
+            raise ValueError(f"Scanning method for parameter {parameter} is not recognized.")
+
+        dic_parameter_lists[parameter] = np.array(parameter_list)
+        return dic_parameter_lists, dic_parameter_lists_for_naming
+
+    def browse_and_collect_parameter_space(
+        self,
+        generation: str,
+    ) -> tuple[
+        dict[str, Any],
+        dict[str, Any],
+        dict[str, Any],
+        list[list[str]],
+        list[str],
+    ]:
+        """
+        Browses and collects the parameter space for a given generation.
+
+        Args:
+            generation (str): The generation name.
+            ll_concomitant_parameters (list[list[str]]): The list of concomitant parameters.
+            l_conditions (list[str]): The list of conditions to filter out some parameter values.
+
+        Returns:
+            tuple[dict[str, Any], dict[str, Any], dict[str, Any], list[list[str]]]: The updated dictionaries of parameter lists.
+        """
+
+        l_conditions = []
+        ll_concomitant_parameters = []
+        dic_subvariables = {}
+        dic_parameter_lists = {}
+        dic_parameter_lists_for_naming = {}
+        for parameter in self.config["structure"][generation]["scans"]:
+            dic_curr_parameter = self.config["structure"][generation]["scans"][parameter]
+
+            # Parse the parameter space
+            dic_parameter_lists, dic_parameter_lists_for_naming = self.parse_parameter_space(
+                parameter, dic_curr_parameter, dic_parameter_lists, dic_parameter_lists_for_naming
+            )
+
+            # Store potential subvariables
+            if "subvariables" in dic_curr_parameter:
+                dic_subvariables[parameter] = dic_curr_parameter["subvariables"]
+
+            # Save the condition if it exists
+            if "condition" in dic_curr_parameter:
+                l_conditions.append(dic_curr_parameter["condition"])
+
+            # Save the concomitant parameters if they exist
+            if "concomitant" in dic_curr_parameter:
+                if not isinstance(dic_curr_parameter["concomitant"], list):
+                    dic_curr_parameter["concomitant"] = [dic_curr_parameter["concomitant"]]
+                for concomitant_parameter in dic_curr_parameter["concomitant"]:
+                    # Assert that the parameters list have the same size
+                    assert len(dic_parameter_lists[parameter]) == len(
+                        dic_parameter_lists[concomitant_parameter]
+                    ), (
+                        f"Parameters {parameter} and {concomitant_parameter} must have the "
+                        "same size."
+                    )
+                # Add to the list for filtering later
+                ll_concomitant_parameters.append([parameter] + dic_curr_parameter["concomitant"])
+
+        return (
+            dic_parameter_lists,
+            dic_parameter_lists_for_naming,
+            dic_subvariables,
+            ll_concomitant_parameters,
+            l_conditions,
+        )
+
+    def postprocess_parameter_lists(
+        self,
+        dic_parameter_lists: dict[str, Any],
+        dic_parameter_lists_for_naming: dict[str, Any],
+        dic_subvariables: dict[str, Any],
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        for parameter, parameter_list in dic_parameter_lists.items():
+            parameter_list_for_naming = dic_parameter_lists_for_naming[parameter]
+
+            # Ensure that all values are not numpy types (to avoid serialization issues)
+            parameter_list = [x.item() if isinstance(x, np.generic) else x for x in parameter_list]
+
+            # Handle nested parameters
+            parameter_list_updated = (
+                convert_for_subvariables(dic_subvariables[parameter], parameter_list)
+                if parameter in dic_subvariables
+                else parameter_list
+            )
+            # Update the dictionaries
+            dic_parameter_lists[parameter] = parameter_list_updated
+            dic_parameter_lists_for_naming[parameter] = parameter_list_for_naming
+
+        return dic_parameter_lists, dic_parameter_lists_for_naming
 
     def create_scans(
         self,

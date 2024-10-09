@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import pathlib
+from typing import Any
 from zipfile import ZipFile
 
 # Import third-party modules
@@ -110,9 +111,9 @@ class XsuiteCollider:
         self.collider_filepath = collider_filepath
 
         # Configuration variables
-        self.config_beambeam: dict = configuration["config_beambeam"]
-        self.config_knobs_and_tuning: dict = configuration["config_knobs_and_tuning"]
-        self.config_lumi_leveling: dict = configuration["config_lumi_leveling"]
+        self.config_beambeam: dict[str, Any] = configuration["config_beambeam"]
+        self.config_knobs_and_tuning: dict[str, Any] = configuration["config_knobs_and_tuning"]
+        self.config_lumi_leveling: dict[str, Any] = configuration["config_lumi_leveling"]
 
         # self.config_lumi_leveling_ip1_5 will be None if not present in the configuration
         self.config_lumi_leveling_ip1_5 = configuration.get("config_lumi_leveling_ip1_5")
@@ -324,10 +325,9 @@ class XsuiteCollider:
             if ask_worst_bunch:
                 while self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] is None:
                     bool_inp = input(
-                        "The bunch number for beam 1 has not been provided. Do you want to use the bunch"
-                        " with the largest number of long-range interactions? It is the bunch number "
-                        + str(worst_bunch_b1)
-                        + " (y/n): "
+                        "The bunch number for beam 1 has not been provided. Do you want to use the"
+                        " bunch with the largest number of long-range interactions? It is the bunch"
+                        " number " + str(worst_bunch_b1) + " (y/n): "
                     )
                     if bool_inp == "y":
                         self.config_beambeam["mask_with_filling_pattern"]["i_bunch_b1"] = (
@@ -442,7 +442,7 @@ class XsuiteCollider:
                 logging.warning(f"IP {ip} is not in the configuration")
 
         # ! Crabs are not handled in the following function
-        xm.lhc.luminosity_leveling(
+        xm.lhc.luminosity_leveling(  # type: ignore
             collider,
             config_lumi_leveling=self.config_lumi_leveling,
             config_beambeam=self.config_beambeam,
@@ -492,14 +492,14 @@ class XsuiteCollider:
             # Update the number of bunches in the configuration file
             self.config_lumi_leveling_ip1_5["num_colliding_bunches"] = n_collisions_ip1_and_5
 
-        # Do the levelling
-        bunch_intensity = luminosity_leveling_ip1_5(
-            collider,
-            self.config_lumi_leveling_ip1_5,
-            self.config_beambeam,
-            crab=self.crab,
-            cross_section=self.config_beambeam["cross_section"],
-        )
+            # Do the levelling
+            bunch_intensity = luminosity_leveling_ip1_5(
+                collider,
+                self.config_lumi_leveling_ip1_5,
+                self.config_beambeam,
+                crab=self.crab,
+                cross_section=self.config_beambeam["cross_section"],
+            )
 
         # Update the configuration
         self.config_beambeam["final_num_particles_per_bunch"] = float(bunch_intensity)
@@ -531,7 +531,7 @@ class XsuiteCollider:
             self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
 
         # Do levelling in IP2 and IP8
-        xm.lhc.luminosity_leveling(
+        xm.lhc.luminosity_leveling( # type: ignore
             collider,
             config_lumi_leveling=self.config_lumi_leveling,
             config_beambeam=self.config_beambeam,
