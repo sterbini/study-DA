@@ -6,12 +6,13 @@ and potentially a set of template files."""
 # ==================================================================================================
 
 # Import standard library modules
+import copy
 import inspect
 import itertools
 import logging
 import os
 import shutil
-from typing import Any
+from typing import Any, Optional
 
 # Import third-party modules
 import numpy as np
@@ -45,7 +46,7 @@ class GenerateScan:
         str_parameters: str,
         template_path: str,
         template_name: str,
-        dependencies: dict[str, str] = {},
+        dependencies: Optional[dict[str, str]] = None,
     ) -> str:
         """
         Renders the study file using a template.
@@ -59,6 +60,11 @@ class GenerateScan:
         Returns:
             str: The rendered study file.
         """
+
+        # Handle mutable default argument
+        if dependencies is None:
+            dependencies = {}
+
         # Generate generations from template
         environment = Environment(loader=FileSystemLoader(template_path))
         template = environment.get_template(template_name)
@@ -168,6 +174,7 @@ class GenerateScan:
         dic_parameter_lists = {}
         dic_parameter_lists_for_naming = {}
         array_conditions = None
+        ll_concomitant_parameters = []
         if (
             "scans" not in self.config["structure"][generation]
             or self.config["structure"][generation]["scans"] is None
@@ -196,13 +203,20 @@ class GenerateScan:
                 elif "list" in dic_curr_parameter:
                     parameter_list = dic_curr_parameter["list"]
                     dic_parameter_lists_for_naming[parameter] = parameter_list
+                elif "expression" in dic_curr_parameter:
+                    parameter_list = np.round(
+                        eval(dic_curr_parameter["expression"], copy.deepcopy(dic_parameter_lists)),
+                        8,
+                    )
+                    dic_parameter_lists_for_naming[parameter] = parameter_list
                 else:
                     raise ValueError(
                         f"Scanning method for parameter {parameter} is not recognized."
                     )
 
-                # Store the list of parameters (no matter the scanning method)
-                dic_parameter_lists[parameter] = parameter_list
+                # Temporarily store the list of parameters as array (no matter the scanning method)
+                # This is needed to evaluate expressions or conditions
+                dic_parameter_lists[parameter] = np.array(parameter_list)
 
                 # Store potential subvariables
                 if "subvariables" in dic_curr_parameter:
@@ -212,9 +226,36 @@ class GenerateScan:
                 if "condition" in dic_curr_parameter:
                     l_conditions.append(dic_curr_parameter["condition"])
 
+                # Save the concomitant parameters if they exist
+                if "concomitant" in dic_curr_parameter:
+                    if not isinstance(dic_curr_parameter["concomitant"], list):
+                        dic_curr_parameter["concomitant"] = [dic_curr_parameter["concomitant"]]
+                    for concomitant_parameter in dic_curr_parameter["concomitant"]:
+                        # Assert that the parameters list have the same size
+                        assert len(parameter_list) == len(
+                            dic_parameter_lists[concomitant_parameter]
+                        ), (
+                            f"Parameters {parameter} and {concomitant_parameter} must have the "
+                            "same size."
+                        )
+                    # Add to the list for filtering later
+                    ll_concomitant_parameters.append(
+                        [parameter] + dic_curr_parameter["concomitant"]
+                    )
+
+            # Get the dimension corresponding to each parameter
+            dic_dimension_indices = {
+                parameter: idx for idx, parameter in enumerate(dic_parameter_lists)
+            }
+
             # Generate array of conditions to filter out some of the values later
-            if l_conditions:
-                array_conditions = self.eval_conditions(l_conditions, dic_parameter_lists)
+            # Is an array of True values if no conditions are present
+            array_conditions = self.eval_conditions(l_conditions, dic_parameter_lists)
+
+            # Filter for concomitant parameters
+            array_conditions = self.filter_for_concomitant_parameters(
+                array_conditions, ll_concomitant_parameters, dic_dimension_indices
+            )
 
             # Postprocess the parameter lists and update the dictionaries
             for parameter in dic_parameter_lists:
@@ -238,7 +279,11 @@ class GenerateScan:
                 dic_parameter_lists[parameter] = parameter_list_updated
                 dic_parameter_lists_for_naming[parameter] = parameter_list_for_naming
 
-        return dic_parameter_lists, dic_parameter_lists_for_naming, array_conditions
+        return (
+            dic_parameter_lists,
+            dic_parameter_lists_for_naming,
+            array_conditions,
+        )
 
     def create_scans(
         self,
@@ -436,7 +481,7 @@ class GenerateScan:
             self.write_tree(dictionary_tree)
 
     @staticmethod
-    def eval_conditions(l_condition: list[str], dic_parameter_lists: dict[str:Any]) -> np.ndarray:
+    def eval_conditions(l_condition: list[str], dic_parameter_lists: dict[str, Any]) -> np.ndarray:
         """
         Evaluates the conditions to filter out some parameter values.
 
@@ -458,5 +503,46 @@ class GenerateScan:
         array_conditions = np.ones_like(meshgrid[0], dtype=bool)
         for condition in l_condition:
             array_conditions = array_conditions & eval(condition, dic_param_mesh)
+
+        return array_conditions
+
+    @staticmethod
+    def filter_for_concomitant_parameters(
+        array_conditions: np.ndarray,
+        ll_concomitant_parameters: list[list[str]],
+        dic_dimension_indices: dict[str, int],
+    ) -> np.ndarray:
+        """
+        Filters the conditions for concomitant parameters.
+
+        Args:
+            array_conditions (np.ndarray): The array of conditions.
+            ll_concomitant_parameters (list[list[str]]): The list of concomitant parameters.
+            dic_dimension_indices (dict[str, int]): The dictionary of dimension indices.
+
+        Returns:
+            np.ndarray: The filtered array of conditions.
+        """
+
+        # Return the array of conditions if no concomitant parameters
+        if not ll_concomitant_parameters:
+            return array_conditions
+
+        # Get the indices of the concomitant parameters
+        ll_idx_concomitant_parameters = [
+            [dic_dimension_indices[parameter] for parameter in concomitant_parameters]
+            for concomitant_parameters in ll_concomitant_parameters
+        ]
+
+        # Browse all the values of array_conditions
+        for idx, _ in np.ndenumerate(array_conditions):
+            # Check if the value is on the diagonal of the concomitant parameters
+            for l_idx_concomitant_parameter in ll_idx_concomitant_parameters:
+                if any(
+                    idx[i] != idx[j]
+                    for i, j in itertools.combinations(l_idx_concomitant_parameter, 2)
+                ):
+                    array_conditions[idx] = False
+                    break
 
         return array_conditions

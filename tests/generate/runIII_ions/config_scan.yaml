@@ -37,4 +37,5 @@ structure:
         linspace: [62.31, 62.32, 2]
       qy:
         subvariables: [lhcb1, lhcb2]
-        list: [60.32, 60.33]
+        expression: qx + 0.6
+        concomitant: [qx]
