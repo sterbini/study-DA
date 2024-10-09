@@ -18,7 +18,7 @@ structure:
     common_parameters:
       # Needs to be redeclared as it's used for parallelization
       # And re-used ine the second generation
-      n_split: 5
+      n_split: 2
 
   # Second generation depends on the config from the first generation
   generation_2:

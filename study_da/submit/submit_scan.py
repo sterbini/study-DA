@@ -151,12 +151,14 @@ class SubmitScan:
 
     def get_all_jobs(self) -> dict:
         """
-        Retrieves all jobs from the configuration.
+        Retrieves all jobs from the configuration, without modifying the tree.
 
         Returns:
             dict: A dictionary containing all jobs.
         """
-        return ConfigJobs(self.dic_tree).find_all_jobs()
+        # Get a copy of the tree as it's safer
+        dic_tree = self.dic_tree
+        return ConfigJobs(dic_tree).find_all_jobs()
 
     def generate_run_files(
         self,
@@ -274,8 +276,7 @@ class SubmitScan:
                 # If job parents are finished and job is not finished, submit it
                 if (
                     len(l_dep) == 0
-                    and nested_get(self.dic_tree, dic_all_jobs[job]["l_keys"] + ["status"])
-                    != "finished"
+                    and nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "finished"
                 ):
                     gen = dic_all_jobs[job]["gen"]
                     if gen not in dic_to_submit_by_gen:
@@ -352,6 +353,8 @@ class SubmitScan:
             logging.warning("Setting wait time to 10 seconds.")
             wait_time = 10 / 60
 
+        # I don't need to lock the tree here since the status cheking is read only and
+        # the lock is acquired in the submit method for the submission
         while self.dic_tree["status"] != "finished":
             self.submit(one_generation_at_a_time)
             # Wait for a certain amount of time before checking again
