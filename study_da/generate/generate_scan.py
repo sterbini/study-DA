@@ -291,6 +291,8 @@ class GenerateScan:
         generation_path: str,
         template_name: str,
         template_path: str,
+        dic_parameter_lists: Optional[dict[str, Any]] = None,
+        dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
     ) -> list[str]:
         """
         Creates study files for parametric scans.
@@ -304,10 +306,15 @@ class GenerateScan:
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
-        # Get dictionnary of parametric values being scanned
-        dic_parameter_lists, dic_parameter_lists_for_naming, array_conditions = (
-            self.get_dic_parametric_scans(generation)
-        )
+        if dic_parameter_lists is None:
+            # Get dictionnary of parametric values being scanned
+            dic_parameter_lists, dic_parameter_lists_for_naming, array_conditions = (
+                self.get_dic_parametric_scans(generation)
+            )
+        else:
+            if dic_parameter_lists_for_naming is None:
+                dic_parameter_lists_for_naming = copy.deepcopy(dic_parameter_lists)
+            array_conditions = None
 
         # Generate render write for cartesian product of all parameters
         l_study_path = []
@@ -401,7 +408,13 @@ class GenerateScan:
             ryaml.indent(sequence=4, offset=2)
             ryaml.dump(dictionary_tree, yaml_file)
 
-    def create_study_for_current_gen(self, generation: str, study_path: str) -> list[str]:
+    def create_study_for_current_gen(
+        self,
+        generation: str,
+        study_path: str,
+        dic_parameter_lists: Optional[dict[str, Any]] = None,
+        dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
+    ) -> list[str]:
         """
         Creates study files for the current generation.
 
@@ -420,12 +433,21 @@ class GenerateScan:
         else:
             raise ValueError("Executables that are not templates are not implemented yet.")
 
-        return self.create_scans(generation, study_path, executable_name, executable_path)
+        return self.create_scans(
+            generation,
+            study_path,
+            executable_name,
+            executable_path,
+            dic_parameter_lists,
+            dic_parameter_lists_for_naming,
+        )
 
     def create_study(
         self,
         tree_file: bool = True,
         force_overwrite: bool = False,
+        dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]] = None,
+        dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]] = None,
     ) -> None:
         l_study_path = [self.config["name"] + "/"]
         dictionary_tree = {}
@@ -441,6 +463,12 @@ class GenerateScan:
         Returns:
             list[str]: The list of study file strings.
         """
+        # Raise an error if dic_parameter_all_gen_naming is not None while dic_parameter_all_gen is None
+        if dic_parameter_all_gen is None and dic_parameter_all_gen_naming is not None:
+            raise ValueError(
+                "If dic_parameter_all_gen_naming is defined, dic_parameter_all_gen must be defined."
+            )
+
         # Remove existing study if force_overwrite
         if os.path.exists(self.config["name"]):
             if not force_overwrite:
@@ -458,9 +486,25 @@ class GenerateScan:
         for idx, generation in enumerate(l_generations):
             l_study_path_all_next_generation = []
             for study_path in l_study_path:
+                if dic_parameter_all_gen is None or generation not in dic_parameter_all_gen:
+                    dic_parameter_current_gen = None
+                    dic_parameter_naming_current_gen = None
+                else:
+                    dic_parameter_current_gen = dic_parameter_all_gen[generation]
+                    if (
+                        dic_parameter_all_gen_naming is not None
+                        and generation in dic_parameter_all_gen_naming
+                    ):
+                        dic_parameter_naming_current_gen = dic_parameter_all_gen_naming[generation]
+                    else:
+                        dic_parameter_naming_current_gen = None
+
                 # Get list of paths for the children of the current study
                 l_study_path_next_generation = self.create_study_for_current_gen(
-                    generation, study_path
+                    generation,
+                    study_path,
+                    dic_parameter_current_gen,
+                    dic_parameter_naming_current_gen,
                 )
                 # Update tree
                 dictionary_tree = self.complete_tree(

@@ -5,8 +5,14 @@
 # Import standard library modules
 # Import third-party modules
 # Import user-defined modules
+import numpy as np
+
 from study_da import GenerateScan
-from study_da.utils.configuration import load_dic_from_path, write_dic_to_path
+from study_da.utils.configuration import (
+    find_item_in_dict,
+    load_dic_from_path,
+    write_dic_to_path,
+)
 
 # ==================================================================================================
 # --- Script to generate a study
@@ -28,5 +34,33 @@ config["config_simulation"]["n_turns"] = 100
 write_dic_to_path(config, "config_hllhc16.yaml", ryaml)
 
 # Now generate the study in the local directory
-study_da = GenerateScan(path_config="config_scan.yaml")
-study_da.create_study(tree_file=True, force_overwrite=True)
+# study_da = GenerateScan(path_config="config_scan.yaml")
+# study_da.create_study(tree_file=True, force_overwrite=True)
+
+study_da = GenerateScan(path_config="config_scan_manual_gen_2.yaml")
+
+# Load configuration
+config, ryaml = load_dic_from_path("config_scan_manual_gen_2.yaml")
+n_split = find_item_in_dict(config, "n_split")
+
+dic_parameter_all_gen = {
+    "generation_2": {
+        "path_list": [f"{x}.parquet" for x in range(n_split)],
+        "qx": {key: qx for key in ["lhcb1", "lhcb2"] for qx in np.linspace(62.31, 62.32, 10)},
+        "qy": {key: qy for key in ["lhcb1", "lhcb2"] for qy in np.linspace(60.32, 60.33, 10)},
+    }
+}
+dic_parameter_all_gen_naming = {
+    "generation_2": {
+        "path_list": [f"{x}.parquet" for x in range(n_split)],
+        "qx": np.linspace(62.31, 62.32, 10),
+        "qy": np.linspace(60.32, 60.33, 10),
+    }
+}
+
+study_da.create_study(
+    tree_file=True,
+    force_overwrite=True,
+    dic_parameter_all_gen=dic_parameter_all_gen,
+    dic_parameter_all_gen_naming=dic_parameter_all_gen_naming,
+)
