@@ -2,6 +2,7 @@
 # --- Imports
 # ==================================================================================================
 # Import standard library modules
+import logging
 from typing import Any
 
 # Import third-party modules
@@ -42,7 +43,7 @@ def check_madx_lattices(mad: Madx) -> None:
         assert df["x"].std() < 1e-8
         assert df["y"].std() < 1e-8
     except AssertionError:
-        print("WARNING: Some sanity checks have failed during the madx lattice check")
+        logging.warning("WARNING: Some sanity checks have failed during the madx lattice check")
 
 
 def build_sequence(

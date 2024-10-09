@@ -2,6 +2,7 @@
 # --- Imports
 # ==================================================================================================
 # Import standard library modules
+import logging
 from typing import Any
 
 # Import third-party modules
@@ -34,7 +35,9 @@ def check_madx_lattices(mad: Madx) -> None:
         assert np.isclose(mad.table.summ.dq1, mad.globals["qpxb1"], atol=5e-01)
         assert np.isclose(mad.table.summ.dq2, mad.globals["qpyb1"], atol=5e-01)
     except AssertionError:
-        print("Warning: some of the Qx, Qy, DQx, DQy values are not close to the expected ones")
+        logging.warning(
+            "Warning: some of the Qx, Qy, DQx, DQy values are not close to the expected ones"
+        )
 
     df = mad.table.twiss.dframe()
     for my_ip in [1, 2, 5, 8]:
@@ -50,7 +53,7 @@ def check_madx_lattices(mad: Madx) -> None:
         assert df["x"].std() < 1e-6
         assert df["y"].std() < 1e-6
     except AssertionError:
-        print("Warning: the standard deviation of x and y are not close to zero")
+        logging.warning("Warning: the standard deviation of x and y are not close to zero")
 
 
 def build_sequence(
@@ -112,7 +115,7 @@ def build_sequence(
                     f"sequence={my_sequence}, style=teapot, makedipedge=true;"
                 )
     else:
-        print("WARNING: The sequences are not thin!")
+        logging.warning("WARNING: The sequences are not thin!")
 
     # Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
     if not ignore_cycling:

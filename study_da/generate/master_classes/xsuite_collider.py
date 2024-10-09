@@ -184,7 +184,7 @@ class XsuiteCollider:
             return xt.Multiline.from_json(self.collider_filepath)
 
         # Uncompress file locally
-        print(f"Unzipping {self.collider_filepath}")
+        logging.info(f"Unzipping {self.collider_filepath}")
         with ZipFile(self.collider_filepath, "r") as zip_ref:
             zip_ref.extractall()
         return xt.Multiline.from_json(self.collider_filepath.split("/")[-1].replace(".zip", ""))

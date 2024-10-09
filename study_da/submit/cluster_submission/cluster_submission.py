@@ -4,6 +4,7 @@
 # --- Imports
 # ==================================================================================================
 # Standard library imports
+import logging
 import os
 import subprocess
 from pathlib import Path
@@ -265,8 +266,8 @@ class ClusterSubmission:
         queuing_jobs = self.querying_jobs(check_local, check_htc, check_slurm, status="queuing")
         self._update_dic_id_to_path_job(running_jobs, queuing_jobs)
         if verbose:
-            print("Running: \n" + "\n".join(running_jobs))
-            print("queuing: \n" + "\n".join(queuing_jobs))
+            logging.info("Running: \n" + "\n".join(running_jobs))
+            logging.info("queuing: \n" + "\n".join(queuing_jobs))
         return running_jobs, queuing_jobs
 
     def _test_job(
@@ -288,15 +289,15 @@ class ClusterSubmission:
         l_keys = self.dic_all_jobs[job]["l_keys"]
         completed = nested_get(self.dic_tree, l_keys + ["status"]) == "finished"
         if completed:
-            print(f"{path_job} is already completed.")
+            logging.info(f"{path_job} is already completed.")
 
         # Test if job is running
         elif path_job in running_jobs:
-            print(f"{path_job} is already running.")
+            logging.info(f"{path_job} is already running.")
 
         # Test if job is queuing
         elif path_job in queuing_jobs:
-            print(f"{path_job} is already queuing.")
+            logging.info(f"{path_job} is already queuing.")
 
         # True if job must be (re)submitted
         else:
@@ -373,7 +374,7 @@ class ClusterSubmission:
 
                 # Write the submission files
                 # ! Careful, I implemented a fix for path due to the temporary home recovery folder
-                print(f'Writing submission file for node "{abs_path_job}"')
+                logging.info(f'Writing submission file for node "{abs_path_job}"')
                 fix = True
                 Sub = self.dic_submission["slurm_docker"](
                     filename_sub, abs_path_job, context, self.dic_tree["container_image"], fix=fix
@@ -492,7 +493,7 @@ class ClusterSubmission:
 
                 # Test if job is running, queuing or completed
                 if self._test_job(job, path_job, running_jobs, queuing_jobs):
-                    print(f'Writing submission command for node "{abs_path_job}"')
+                    logging.info(f'Writing submission command for node "{abs_path_job}"')
 
                     # Get context
                     l_keys = self.dic_all_jobs[job]["l_keys"]
@@ -690,7 +691,7 @@ class ClusterSubmission:
 
         # Check that at least one job is being submitted
         if not l_submission_filenames:
-            print("No job being submitted.")
+            logging.info("No job being submitted.")
 
         # Submit
         dic_id_to_path_job_temp = {}
@@ -727,7 +728,7 @@ class ClusterSubmission:
             dic_id_to_path_job = dic_id_to_path_job_temp
             self.dic_id_to_path_job = dic_id_to_path_job
 
-        print("Jobs status after submission:")
+        logging.info("Jobs status after submission:")
         _, _ = self._get_state_jobs(verbose=True)
 
     def _get_local_jobs(self) -> list[str]:
@@ -804,7 +805,7 @@ class ClusterSubmission:
                     if jobid in self.dic_id_to_path_job:
                         l_path_jobs.append(self.dic_id_to_path_job[jobid])
                     elif first_missing_job:
-                        print(
+                        logging.warning(
                             "Warning, some jobs are queuing/running and are not in the id-job"
                             " file. They may come from another study. Ignoring them."
                         )
@@ -812,7 +813,7 @@ class ClusterSubmission:
 
                 elif force_query_individually:
                     if first_line:
-                        print(
+                        logging.warning(
                             "Warning, some jobs are queuing/running and the id-job file is"
                             " missing... Querying them individually."
                         )
@@ -827,7 +828,7 @@ class ClusterSubmission:
                     l_path_jobs.append(f"{self.study_name}{job}")
 
                 elif first_line:
-                    print(
+                    logging.warning(
                         "Warning, some jobs are queuing/running and the id-job file is"
                         " missing... Ignoring them."
                     )
@@ -877,7 +878,7 @@ class ClusterSubmission:
                 if jobid in self.dic_id_to_path_job:
                     l_path_jobs.append(self.dic_id_to_path_job[jobid])
                 elif first_missing_job:
-                    print(
+                    logging.warning(
                         "Warning, some jobs are queuing/running and are not in the id-job"
                         " file. They may come from another study. Ignoring them."
                     )
@@ -885,7 +886,7 @@ class ClusterSubmission:
 
             elif force_query_individually:
                 if first_line:
-                    print(
+                    logging.warning(
                         "Warning, some jobs are queuing/running and the id-job file is"
                         " missing... Querying them individually."
                     )
@@ -903,7 +904,7 @@ class ClusterSubmission:
                 l_path_jobs.append(f"{self.study_name}{job}")
 
             elif first_line:
-                print(
+                logging.warning(
                     "Warning, some jobs are queuing/running and the id-job file is"
                     " missing... Ignoring them."
                 )

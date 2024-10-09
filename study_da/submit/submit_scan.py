@@ -293,7 +293,7 @@ class SubmitScan:
             # Write to the tree if no more jobs are to be submitted
             if not l_jobs_to_submit:
                 dic_tree["status"] = "finished"
-                print("All jobs are done.")
+                logging.info("All jobs are done.")
 
             path_submission_file = (
                 f"{self.abs_path}/{self.study_name}/submission/submission_file.sub"

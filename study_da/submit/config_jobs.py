@@ -7,6 +7,7 @@ This module contains the ConfigJobs class that allows to configure jobs in the t
 # ==================================================================================================
 # Standard library imports
 import copy
+import logging
 from typing import Any
 
 
@@ -260,7 +261,7 @@ class ConfigJobs:
         Returns:
             None
         """
-        print(f"Found job at depth {depth}: {value}")
+        logging.info(f"Found job at depth {depth}: {value}")
         # Set context and run_on
         ask_and_set_context(dic_gen)
         ask_and_set_run_on(dic_gen)
