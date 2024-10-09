@@ -5,7 +5,7 @@
 # Import standard library modules
 # Import third-party modules
 # Import user-defined modules
-from study_da import GenerateScan
+from study_da import create
 from study_da.utils.configuration import load_dic_from_path, write_dic_to_path
 
 # ==================================================================================================
@@ -28,5 +28,4 @@ config["config_simulation"]["n_turns"] = 100
 write_dic_to_path(config, "config_hllhc13.yaml", ryaml)
 
 # Now generate the study in the local directory
-study_da = GenerateScan(path_config="config_scan.yaml")
-study_da.create_study(tree_file=True, force_overwrite=True)
+create(path_config="config_scan.yaml", tree_file=True, force_overwrite=True)

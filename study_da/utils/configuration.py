@@ -8,6 +8,7 @@
 from typing import Any
 
 # Import third-party modules
+import numpy as np
 import ruamel.yaml
 
 # Import user-defined modules
@@ -141,3 +142,28 @@ def set_item_in_dict(obj: dict, key: str, value: Any, found: bool = False) -> No
     for v in obj.values():
         if isinstance(v, dict):
             set_item_in_dict(v, key, value, found)
+
+
+# This function can probably be made more robust
+def clean_dict(o: Any) -> None:
+    """Convert numpy types to standard types in a nested dictionary containing number and lists.
+
+    Args:
+        o (Any): The object to convert.
+
+    Returns:
+        None
+    """
+    if not isinstance(o, dict):
+        return
+    for k, v in o.items():
+        if isinstance(v, np.generic):
+            o[k] = v.item()
+        elif isinstance(v, list):
+            for i, x in enumerate(v):
+                if isinstance(x, np.generic):
+                    v[i] = x.item()
+                if isinstance(x, dict):
+                    clean_dict(x)
+        else:
+            clean_dict(v)

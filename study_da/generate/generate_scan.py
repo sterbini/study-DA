@@ -20,7 +20,7 @@ import ruamel.yaml as yaml
 from jinja2 import Environment, FileSystemLoader
 
 # Import user-defined modules
-from study_da.utils import load_dic_from_path, nested_set
+from study_da.utils import clean_dict, load_dic_from_path, nested_set
 
 from .parameter_space import (
     convert_for_subvariables,
@@ -432,6 +432,11 @@ class GenerateScan:
             executable_path = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_scripts/"
         else:
             raise ValueError("Executables that are not templates are not implemented yet.")
+
+        # Ensure that the values in dic_parameter_lists can be dumped with ryaml
+        if dic_parameter_lists is not None:
+            # Recursively convert all numpy types to standard types
+            clean_dict(dic_parameter_lists)
 
         return self.create_scans(
             generation,

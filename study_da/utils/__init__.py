@@ -2,6 +2,7 @@
 # --- Imports
 # ==================================================================================================
 from .configuration import (
+    clean_dict,
     find_item_in_dict,
     load_dic_from_path,
     nested_get,
@@ -17,4 +18,5 @@ __all__ = [
     "set_item_in_dict",
     "nested_get",
     "nested_set",
+    "clean_dict",
 ]

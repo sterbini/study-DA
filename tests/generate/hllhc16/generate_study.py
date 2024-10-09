@@ -7,7 +7,7 @@
 # Import user-defined modules
 import numpy as np
 
-from study_da import GenerateScan
+from study_da import create
 from study_da.utils.configuration import (
     find_item_in_dict,
     load_dic_from_path,
@@ -37,7 +37,6 @@ write_dic_to_path(config, "config_hllhc16.yaml", ryaml)
 # study_da = GenerateScan(path_config="config_scan.yaml")
 # study_da.create_study(tree_file=True, force_overwrite=True)
 
-study_da = GenerateScan(path_config="config_scan_manual_gen_2.yaml")
 
 # Load configuration
 config, ryaml = load_dic_from_path("config_scan_manual_gen_2.yaml")
@@ -57,8 +56,8 @@ dic_parameter_all_gen_naming = {
         "qy": np.linspace(60.32, 60.33, 10),
     }
 }
-
-study_da.create_study(
+create(
+    path_config="config_scan_manual_gen_2.yaml",
     tree_file=True,
     force_overwrite=True,
     dic_parameter_all_gen=dic_parameter_all_gen,
