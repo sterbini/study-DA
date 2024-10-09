@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "study-da"
-version = "0.2.2"
+version = "0.2.3"
 description = "A tool to create large-scale DA simulations."
 authors = ["Colas <colasdroin@gmail.com>"]
 readme = "README.md"
