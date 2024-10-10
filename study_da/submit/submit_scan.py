@@ -8,7 +8,7 @@ on a cluster."""
 import logging
 import os
 import time
-from typing import Optional
+from typing import Any, Optional
 
 # Third party imports
 from filelock import SoftFileLock
@@ -118,12 +118,18 @@ class SubmitScan:
         logging.info(f"Writing tree to {self.path_tree}")
         write_dic_to_path(value, self.path_tree)
 
-    def configure_jobs(self, force_configure: bool = False) -> None:
+    def configure_jobs(
+        self,
+        force_configure: bool = False,
+        dic_config_jobs: Optional[dict[str, dict[str, Any]]] = None,
+    ) -> None:
         """
         Configures the jobs by modifying the tree structure.
 
         Args:
             force_configure (bool, optional): Whether to force reconfiguration. Defaults to False.
+            dic_config_jobs (Optional[dict[str, dict[str, Any]]], optional): A dictionary containing
+                the configuration of the jobs. Defaults to None.
         """
         # Lock since we are modifying the tree
         logging.info("Acquiring lock to configure jobs")
@@ -136,7 +142,7 @@ class SubmitScan:
                 logging.warning("Jobs have already been configured. Skipping.")
                 return
 
-            dic_tree = ConfigJobs(dic_tree).find_and_configure_jobs()
+            dic_tree = ConfigJobs(dic_tree).find_and_configure_jobs(dic_config_jobs)
             # Add the python environment, container image and absolute path of the study to the tree
             dic_tree["python_environment"] = self.path_python_environment
             dic_tree["container_image"] = self.path_container_image
@@ -337,7 +343,12 @@ class SubmitScan:
         logging.info("Jobs have been submitted. Lock released.")
 
     def keep_submit_until_done(
-        self, one_generation_at_a_time: bool = False, wait_time: float = 30
+        self,
+        one_generation_at_a_time: bool = False,
+        dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
+        dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
+        name_config: str = "config.yaml",
+        wait_time: float = 30,
     ) -> None:
         """
         Keeps submitting jobs until all jobs are finished.
@@ -345,8 +356,17 @@ class SubmitScan:
         Args:
             one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
                 time. Defaults to False.
+            dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
+                generation. Defaults to {}.
+            dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
+                Defaults to {}.
+            name_config (str, optional): The name of the configuration file.
+                Defaults to "config.yaml".
             wait_time (float, optional): The wait time between submissions in minutes.
                 Defaults to 30.
+
+        Returns:
+            None
         """
         if wait_time < 1 / 20:
             logging.warning("Wait time should be at least 10 seconds to prevent locking errors.")
@@ -356,6 +376,11 @@ class SubmitScan:
         # I don't need to lock the tree here since the status cheking is read only and
         # the lock is acquired in the submit method for the submission
         while self.dic_tree["status"] != "finished":
-            self.submit(one_generation_at_a_time)
+            self.submit(
+                one_generation_at_a_time,
+                dic_additional_commands_per_gen,
+                dic_dependencies_per_gen,
+                name_config,
+            )
             # Wait for a certain amount of time before checking again
             time.sleep(wait_time * 60)

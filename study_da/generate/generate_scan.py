@@ -17,6 +17,7 @@ from typing import Any, Optional
 # Import third-party modules
 import numpy as np
 import ruamel.yaml as yaml
+from black import FileMode, format_str
 from jinja2 import Environment, FileSystemLoader
 
 # Import user-defined modules
@@ -71,14 +72,20 @@ class GenerateScan:
 
         return template.render(parameters=str_parameters, **dependencies)
 
-    def write(self, study_str: str, file_path: str):
+    def write(self, study_str: str, file_path: str, format_with_black: bool = True):
         """
         Writes the study file to disk.
 
         Args:
             study_str (str): The study file string.
             file_path (str): The path to write the study file.
+            format_with_black (bool, optional): Whether to format the output file with black.
+                Defaults to True.
         """
+
+        # Format the string with black
+        if format_with_black:
+            study_str = format_str(study_str, mode=FileMode())
 
         # Make folder if it doesn't exist
         folder = os.path.dirname(file_path)

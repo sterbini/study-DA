@@ -8,7 +8,7 @@ This module contains the ConfigJobs class that allows to configure jobs in the t
 # Standard library imports
 import copy
 import logging
-from typing import Any
+from typing import Any, Optional
 
 
 # ==================================================================================================
@@ -241,13 +241,44 @@ class ConfigJobs:
                         return
 
                 # If it's the first time we find the job, ask for context and run_on
+                # Note that a job can be configured and not be in self.dic_config_jobs
+                # self.dic_config_jobs contains the archetypical main jobs (one per gen), not all jobs
                 if job_name not in self.dic_config_jobs:
                     self._get_context_and_run_on(depth, value, dic_gen, job_name)
                 else:
+                    # Check that the config for the current job is ok
+                    self.check_config_jobs(job_name)
+
                     # Merge the configuration of the job with the existing one
                     dic_gen |= self.dic_config_jobs[job_name]
 
-    def _get_context_and_run_on(self, depth: int, value: str, dic_gen: dict, job_name: str):
+    def check_config_jobs(self, job_name: str) -> None:
+        """
+        Check the configuration of a job and ensure that it is properly set.
+        Useful when the dic_config_jobs is provided externally.
+
+        Args:
+            job_name (str): The name of the job to be configured.
+            dic_gen (dict[str, str]): The dictionary containing job configuration.
+
+        Returns:
+            dict: The updated job configuration.
+        """
+
+        # Ensure flavour is set for htc jobs
+        if (
+            self.dic_config_jobs[job_name]["submission_type"] in ["htc", "htc_docker"]
+            and "htc_flavor" not in self.dic_config_jobs[job_name]
+        ):
+            raise ValueError(
+                f"Job {job_name} is not properly configured. Please set the htc_flavor."
+            )
+
+        # Set status to to_submit if not already set
+        if "status" not in self.dic_config_jobs[job_name]:
+            self.dic_config_jobs[job_name]["status"] = "to_submit"
+
+    def _get_context_and_run_on(self, depth: int, value: str, dic_gen: dict, job_name: str) -> None:
         """
         Sets the context and run-on parameters for a job, updates the job configuration,
         and stores it in the job dictionary if the user chooses to keep the settings.
@@ -278,15 +309,21 @@ class ConfigJobs:
                 "htc_flavor": dic_gen["htc_flavor"],
             }
 
-    def find_and_configure_jobs(self) -> dict:
+    def find_and_configure_jobs(
+        self, dic_config_jobs: Optional[dict[str, dict[str, Any]]] = None
+    ) -> dict:
         """
         Finds and configures all jobs in the tree.
+
+        Args:
+            dic_config_jobs (dict[str, dict[str, Any]], optional): A dictionary containing the
+                configuration of the jobs. Defaults to None.
 
         Returns:
             dict: The updated job tree with configurations.
         """
         # Variables to store the jobs and their configuration
-        self.dic_config_jobs = {}
+        self.dic_config_jobs = dic_config_jobs if dic_config_jobs is not None else {}
         self.dic_all_jobs = {}
         self.skip_configured_jobs = None
 
@@ -306,7 +343,7 @@ class ConfigJobs:
         self.dic_all_jobs = {}
 
         # Find all jobs and associated generation
-        logging.info("Finding all jobs in the tree, with no configuration")
+        logging.info("Finding all jobs in the tree")
         self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=True)
 
         return self.dic_all_jobs
