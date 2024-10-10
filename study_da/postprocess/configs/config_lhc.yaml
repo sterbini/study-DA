@@ -86,10 +86,6 @@ Pile-up_ip5_without_beam_beam: ["config_collider", "config_beambeam", "Pile-up_i
 Pile-up_ip5_with_beam_beam: ["config_collider", "config_beambeam", "Pile-up_ip5_with_beam_beam"]
 Pile-up_ip8_without_beam_beam: ["config_collider", "config_beambeam", "Pile-up_ip8_without_beam_beam"]
 
-
-
-# config_lumi_leveling_ip1_5
-
 # Config simulation
 beam: ["config_simulation", "beam"]
 delta_max: ["config_simulation", "delta_max"]

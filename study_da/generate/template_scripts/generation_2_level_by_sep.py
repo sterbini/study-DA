@@ -23,6 +23,10 @@ from study_da.utils import (
     write_dic_to_path,
 )
 
+# Set up the logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 # ==================================================================================================
 # --- Script functions
