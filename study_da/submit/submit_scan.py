@@ -163,7 +163,8 @@ class SubmitScan:
             dict: A dictionary containing all jobs.
         """
         # Get a copy of the tree as it's safer
-        dic_tree = self.dic_tree
+        with self.lock:
+            dic_tree = self.dic_tree
         return ConfigJobs(dic_tree).find_all_jobs()
 
     def generate_run_files(
