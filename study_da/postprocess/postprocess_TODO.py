@@ -3,10 +3,12 @@
 # ==================================================================================================
 # Standard library imports
 import logging
-import time
 
 # Third party imports
 import pandas as pd
+
+# Local imports
+from study_da.utils import nested_get
 
 
 # ==================================================================================================
@@ -62,10 +64,22 @@ def reorganize_particles_data(l_df_output, dic_parameters_of_interest):
 
 def merge_and_group_by_parameters_of_interest(
     l_df_output,
-    l_group_by_parameters=["beam", "name base collider", "qx", "qy"],
+    l_group_by_parameters=None,
     only_keep_lost_particles=True,
-    l_parameters_to_keep=["normalized amplitude in xy-plane", "qx", "qy", "dqx", "dqy"],
+    l_parameters_to_keep=None,
 ):
+    # Handle mutable default arguments
+    if l_group_by_parameters is None:
+        l_group_by_parameters = ["beam", "name base collider", "qx", "qy"]
+    if l_parameters_to_keep is None:
+        l_parameters_to_keep = [
+            "normalized amplitude in xy-plane",
+            "qx",
+            "qy",
+            "dqx",
+            "dqy",
+        ]
+
     # Merge the dataframes from all simulations together
     df_all_sim = pd.concat(l_df_output)
 
@@ -93,7 +107,6 @@ def merge_and_group_by_parameters_of_interest(
 if __name__ == "__main__":
     # Start of the script
     print("Analysis of output simulation files started")
-    start = time.time()
 
     # Load Data
     study_name = "example_tunescan"
@@ -139,5 +152,3 @@ if __name__ == "__main__":
 
     # Save data and print time
     df_final.to_parquet(f"../scans/{study_name}/da.parquet")
-    end = time.time()
-    print("Elapsed time: ", end - start)

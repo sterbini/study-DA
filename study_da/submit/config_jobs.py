@@ -108,7 +108,7 @@ def ask_and_set_run_on(dic_gen: dict[str, Any]) -> None:
     dic_gen["submission_type"] = dict_submission_type[submission_type]
 
 
-def ask_keep_setting() -> bool:
+def ask_keep_setting(job_name: str) -> bool:
     """
     Prompts the user to decide whether to keep the same settings for identical jobs.
 
@@ -116,7 +116,7 @@ def ask_keep_setting() -> bool:
         bool: True if the user wants to keep the same settings, False otherwise.
     """
     keep_setting = input(
-        "Do you want to keep the same setting for identical jobs? (y/n). Default is y."
+        f"Do you want to keep the same setting for all jobs of the type{job_name} ? (y/n). Default is y."
     )
     while keep_setting not in ["", "y", "n"]:
         keep_setting = input("Invalid input. Please enter y, n or skip question.")
@@ -301,7 +301,7 @@ class ConfigJobs:
         else:
             dic_gen["htc_flavor"] = None
         dic_gen["status"] = "to_submit"
-        if ask_keep_setting():
+        if ask_keep_setting(job_name):
             self.dic_config_jobs[job_name] = {
                 "context": dic_gen["context"],
                 "submission_type": dic_gen["submission_type"],

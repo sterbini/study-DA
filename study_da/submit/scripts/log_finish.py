@@ -5,6 +5,7 @@
 # ==================================================================================================
 # Standard library imports
 import sys
+import time
 
 # Third party imports
 from filelock import SoftFileLock
@@ -21,7 +22,7 @@ tree_path = sys.argv[1]
 l_keys = sys.argv[2:]
 
 # Define lock
-lock = SoftFileLock(f"{tree_path}.lock", timeout=30)
+lock = SoftFileLock(f"{tree_path}.lock", timeout=200)
 
 # Update tag
 with lock:
@@ -33,3 +34,6 @@ with lock:
 
     # Write the tree
     write_dic_to_path(tree, tree_path)
+
+    # Wait one tenth of second to ensure the file is properly written when the lock is released
+    time.sleep(0.1)
