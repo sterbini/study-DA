@@ -2,7 +2,10 @@
 # --- Imports
 # ==================================================================================================
 # Standard library imports
+import inspect
 import logging
+import os
+from typing import Optional
 
 # Third party imports
 import pandas as pd
@@ -75,12 +78,18 @@ def merge_and_group_by_parameters_of_interest(
     ).transpose()
 
 
-def aggregate_output_data(path_tree, write_output=True):
+def aggregate_output_data(
+    path_tree: str,
+    l_group_by_parameters: list[str],
+    write_output=True,
+    only_keep_lost_particles=True,
+    dic_parameters_of_interest=None,
+    l_parameters_to_keep: Optional[list[str]] = None,
+    name_template_parameters="parameters_lhc.yaml",
+    path_template_parameters=None,
+):
     # Start of the script
     logging.warning("Analysis of output simulation files started")
-
-    # Load Data
-    study_name = "example_tunescan"
 
     # Load the tree
     dic_tree, _ = load_dic_from_path(path_tree)
@@ -92,32 +101,41 @@ def aggregate_output_data(path_tree, write_output=True):
     l_df_sim = get_particles_data(dic_all_jobs)
 
     # Define parameters of interest
-    dic_parameters_of_interest = {
-,
-    }
+    if dic_parameters_of_interest is None:
+        if path_template_parameters is not None:
+            # Load dic_parameters_of_interest from the template configs
+            logging.info("Loading parameters of interest from the provided configuration file")
+        else:
+            if name_template_parameters is None:
+                raise ValueError(
+                    "No template configuration file provided for the parameters of interest"
+                )
+
+            # Load dic_parameters_of_interest from the template configs
+            logging.info("Loading parameters of interest from the template configuration file")
+            path_template_parameters = (
+                f"{os.path.dirname(inspect.getfile(aggregate_output_data))}"
+                f"/configs/{name_template_parameters}"
+            )
+        dic_parameters_of_interest, _ = load_dic_from_path(path_template_parameters)
 
     # Reorganize data
     l_df_output = add_parameters_from_config(l_df_sim, dic_parameters_of_interest)
 
+    # Keep only the parameters of interest (all by default)
+    if l_parameters_to_keep is None:
+        logging.info("No list of parameters to keep provided, keeping all parameters")
+        l_parameters_to_keep = list(dic_parameters_of_interest.keys())
+
     # Merge and group by parameters of interest
-    l_group_by_parameters = ["beam", "name base collider", "qx", "qy"]
-    l_parameters_to_keep = [
-        "normalized amplitude in xy-plane",
-        "qx",
-        "qy",
-        "dqx",
-        "dqy",
-        "i_bunch",
-        "i_oct",
-        "num_particles_per_bunch",
-    ]
-    only_keep_lost_particles = True
     df_final = merge_and_group_by_parameters_of_interest(
         l_df_output, l_group_by_parameters, only_keep_lost_particles, l_parameters_to_keep
     )
-    print("Final dataframe for current set of simulations: ", df_final)
 
-    # Save data and print time
-    df_final.to_parquet(f"../scans/{study_name}/da.parquet")
+    # Save data
+    if write_output:
+        path_study = "/".join(path_tree.split("/")[:-1])
+        df_final.to_parquet(f"{path_study}/da.parquet")
 
+    logging.info("Final dataframe for current set of simulations: ", df_final)
     return df_final

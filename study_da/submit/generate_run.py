@@ -200,10 +200,8 @@ def _generate_run_file_htc(
         f"python {abs_path}/{job_name} > output_python.txt 2> error_python.txt\n\n"
         # Tag the job
         f"{tag_str(tree_path, l_keys)}"
-        # Check the current path
-        f"echo $PWD\n"
-        # Check the list of files in the current directory
-        f"ls -l\n"
+        f"# Delete the config file from the above directory, otherwise it will be copied back and overwrite the new config\n"
+        f"rm ../{name_config}\n"
         f"# Copy back output, including the new config\n"
         f"cp -f *.txt *.parquet *.yaml {abs_path}\n\n"
         f"# Store abs path as a variable in case it's needed for additional commands\n"
