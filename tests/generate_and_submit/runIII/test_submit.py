@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 # %%
 # Mutate config to have proper path since study was moved
 # Load the configuration from hllhc16
-config, ryaml = load_dic_from_path("example_tune_scan/config_hllhc16.yaml")
+config, ryaml = load_dic_from_path("example_tune_scan/config_runIII.yaml")
 
 # Adapt the path to the acc-models-lhc
 config["config_mad"]["links"]["acc-models-lhc"] = (
@@ -19,7 +19,7 @@ config["config_mad"]["links"]["acc-models-lhc"] = (
 )
 
 # Drop the configuration locally
-write_dic_to_path(config, "example_tune_scan/config_hllhc16.yaml", ryaml)
+write_dic_to_path(config, "example_tune_scan/config_runIII.yaml", ryaml)
 
 # %%
 study_sub = SubmitScan(
@@ -51,7 +51,7 @@ dic_additional_commands_per_gen = {
 
 # Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
 dic_dependencies_per_gen = {1: ["acc-models-lhc"], 2: ["collider_file", "particle_folder"]}
-name_config = "config_hllhc16.yaml"
+name_config = "config_runIII.yaml"
 
 # %%
 study_sub.submit(

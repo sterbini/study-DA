@@ -4,6 +4,7 @@
 
 # Import standard library modules
 import logging
+import os
 
 # Import third-party modules
 import numpy as np
@@ -70,3 +71,6 @@ create(
     dic_parameter_all_gen=dic_parameter_all_gen,
     dic_parameter_all_gen_naming=dic_parameter_all_gen_naming,
 )
+
+# Delete the configuration
+os.remove("config_hllhc16.yaml")
