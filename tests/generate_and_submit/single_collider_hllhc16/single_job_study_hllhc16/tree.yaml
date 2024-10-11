@@ -4,7 +4,7 @@ generation_1:
     context: cpu
     submission_type: local
     htc_flavor:
-    status: to_submit
+    status: finished
     path_run: 
       /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/single_collider_hllhc16/single_job_study_hllhc16/generation_1/run.sh
   generation_2:
@@ -13,10 +13,12 @@ generation_1:
       context: cpu
       submission_type: local
       htc_flavor:
-      status: to_submit
+      status: finished
+      path_run: 
+        /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/single_collider_hllhc16/single_job_study_hllhc16/generation_1/generation_2/run.sh
 python_environment: /afs/cern.ch/work/c/cdroin/private/study-DA/.venv/bin/activate
 container_image: /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:42ac73a5
 absolute_path: 
   /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/single_collider_hllhc16
-status: To finish
+status: finished
 configured: true

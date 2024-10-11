@@ -815,3 +815,413 @@ Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1
 Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1r1` as a drift.
 Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1l2` as a drift.
 Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1r2` as a drift.
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348768972739527 53.5464987584364 
+
+q1 dq1 betxmax dxmax 
+62.3100008082859 1.53491374717063 21632.0245472961 2.71684188994937 
+
+dxrms xcomax xcorms q2 
+1.44269229289474 0 0 60.3200004899217 
+
+dq2 betymax dymax dyrms 
+1.99999999948666 21632.0245451669 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+beta.ip1           = 0.149999999999415 ;
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348768972739527 53.5464987584364 
+
+q1 dq1 betxmax dxmax 
+62.3100008082859 1.53491374717063 21632.0245472961 2.71684188994937 
+
+dxrms xcomax xcorms q2 
+1.44269229289474 0 0 60.3200004899217 
+
+dq2 betymax dymax dyrms 
+1.99999999948666 21632.0245451669 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348768972739527 53.5464987584364 
+
+q1 dq1 betxmax dxmax 
+62.3100008082859 1.53491374717063 21632.0245472961 2.71684188994937 
+
+dxrms xcomax xcorms q2 
+1.44269229289474 0 0 60.3200004899217 
+
+dq2 betymax dymax dyrms 
+1.99999999948666 21632.0245451669 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+++++++ warning: Cannot save an empty error table ignored
+ Energy is   7000.0000000000000      GeV
+ ******Sector******            1           2
+ 308         MB   slices in sector  1
+  16         MQTF slices in sector  1
+  16         MQTD slices in sector  1
+   4         MQS  slices in sector  1
+ 154         MCS  slices in sector  1
+   0         MCO  slices in sector  1
+  76         MCD  slices in sector  1
+ ******Sector******            2           3
+ 308         MB   slices in sector  2
+  16         MQTF slices in sector  2
+  16         MQTD slices in sector  2
+   4         MQS  slices in sector  2
+ 154         MCS  slices in sector  2
+  77         MCO  slices in sector  2
+  77         MCD  slices in sector  2
+ ******Sector******            3           4
+ 308         MB   slices in sector  3
+  16         MQTF slices in sector  3
+  16         MQTD slices in sector  3
+   4         MQS  slices in sector  3
+ 154         MCS  slices in sector  3
+  77         MCO  slices in sector  3
+  77         MCD  slices in sector  3
+ ******Sector******            4           5
+ 308         MB   slices in sector  4
+  16         MQTF slices in sector  4
+  16         MQTD slices in sector  4
+   4         MQS  slices in sector  4
+ 154         MCS  slices in sector  4
+   0         MCO  slices in sector  4
+  77         MCD  slices in sector  4
+ ******Sector******            5           6
+ 308         MB   slices in sector  5
+  16         MQTF slices in sector  5
+  16         MQTD slices in sector  5
+   4         MQS  slices in sector  5
+ 154         MCS  slices in sector  5
+  77         MCO  slices in sector  5
+  77         MCD  slices in sector  5
+ ******Sector******            6           7
+ 308         MB   slices in sector  6
+  16         MQTF slices in sector  6
+  16         MQTD slices in sector  6
+   4         MQS  slices in sector  6
+ 154         MCS  slices in sector  6
+  77         MCO  slices in sector  6
+  77         MCD  slices in sector  6
+ ******Sector******            7           8
+ 308         MB   slices in sector  7
+  16         MQTF slices in sector  7
+  16         MQTD slices in sector  7
+   4         MQS  slices in sector  7
+ 154         MCS  slices in sector  7
+   0         MCO  slices in sector  7
+  77         MCD  slices in sector  7
+ ******Sector******            8           1
+ 308         MB   slices in sector  8
+   8         MQTF slices in sector  8
+  16         MQTD slices in sector  8
+   4         MQS  slices in sector  8
+ 154         MCS  slices in sector  8
+  77         MCO  slices in sector  8
+  77         MCD  slices in sector  8
+ Collision energy
+ a2res           1   0.0000000000000000     
+ a3res           1   0.0000000000000000     
+ a2res           2   0.0000000000000000     
+ a3res           2   0.0000000000000000     
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1r2` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1l2` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1r1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1l1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1r5` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1l5` as a drift.
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348043052020831 53.6023112010129 
+
+q1 dq1 betxmax dxmax 
+62.310000349145 1.91163387115918 21632.0245462871 2.76386731887264 
+
+dxrms xcomax xcorms q2 
+1.4426327325219 0 0 60.3200004754083 
+
+dq2 betymax dymax dyrms 
+1.99999999922574 21632.0245457543 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+beta.ip1           = 0.149999999999534 ;
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348043052020831 53.6023112010129 
+
+q1 dq1 betxmax dxmax 
+62.310000349145 1.91163387115918 21632.0245462871 2.76386731887264 
+
+dxrms xcomax xcorms q2 
+1.4426327325219 0 0 60.3200004754083 
+
+dq2 betymax dymax dyrms 
+1.99999999922574 21632.0245457543 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348043052020831 53.6023112010129 
+
+q1 dq1 betxmax dxmax 
+62.310000349145 1.91163387115918 21632.0245462871 2.76386731887264 
+
+dxrms xcomax xcorms q2 
+1.4426327325219 0 0 60.3200004754083 
+
+dq2 betymax dymax dyrms 
+1.99999999922574 21632.0245457543 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+++++++ warning: Cannot save an empty error table ignored
+ Energy is   7000.0000000000000      GeV
+ ******Sector******            1           2
+ 308         MB   slices in sector  1
+  16         MQTF slices in sector  1
+  16         MQTD slices in sector  1
+   4         MQS  slices in sector  1
+ 153         MCS  slices in sector  1
+  77         MCO  slices in sector  1
+  77         MCD  slices in sector  1
+ ******Sector******            2           3
+ 308         MB   slices in sector  2
+  16         MQTF slices in sector  2
+  16         MQTD slices in sector  2
+   4         MQS  slices in sector  2
+ 154         MCS  slices in sector  2
+  77         MCO  slices in sector  2
+  77         MCD  slices in sector  2
+ ******Sector******            3           4
+ 308         MB   slices in sector  3
+  16         MQTF slices in sector  3
+  16         MQTD slices in sector  3
+   4         MQS  slices in sector  3
+ 151         MCS  slices in sector  3
+  76         MCO  slices in sector  3
+  77         MCD  slices in sector  3
+ ******Sector******            4           5
+ 308         MB   slices in sector  4
+  16         MQTF slices in sector  4
+  16         MQTD slices in sector  4
+   4         MQS  slices in sector  4
+ 154         MCS  slices in sector  4
+  77         MCO  slices in sector  4
+  77         MCD  slices in sector  4
+ ******Sector******            5           6
+ 308         MB   slices in sector  5
+  16         MQTF slices in sector  5
+  16         MQTD slices in sector  5
+   4         MQS  slices in sector  5
+ 154         MCS  slices in sector  5
+  77         MCO  slices in sector  5
+  77         MCD  slices in sector  5
+ ******Sector******            6           7
+ 308         MB   slices in sector  6
+  16         MQTF slices in sector  6
+  16         MQTD slices in sector  6
+   4         MQS  slices in sector  6
+ 154         MCS  slices in sector  6
+  77         MCO  slices in sector  6
+  77         MCD  slices in sector  6
+ ******Sector******            7           8
+ 308         MB   slices in sector  7
+  16         MQTF slices in sector  7
+  16         MQTD slices in sector  7
+   4         MQS  slices in sector  7
+ 150         MCS  slices in sector  7
+   0         MCO  slices in sector  7
+  77         MCD  slices in sector  7
+ ******Sector******            8           1
+ 308         MB   slices in sector  8
+  16         MQTF slices in sector  8
+  16         MQTD slices in sector  8
+   4         MQS  slices in sector  8
+ 154         MCS  slices in sector  8
+  75         MCO  slices in sector  8
+  77         MCD  slices in sector  8
+ Collision energy
+ a2res           1   0.0000000000000000     
+ a3res           1   0.0000000000000000     
+ a2res           2   0.0000000000000000     
+ a3res           2   0.0000000000000000     
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1l5` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1r5` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1l1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1r1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1l2` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1r2` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1r2` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1l2` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1r1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1l1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1r5` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1l5` as a drift.
+--- Now displaying Twiss result at all IPS for line <Line  at 139785902612496>---
+TwissTable: 9 rows, 52 cols
+name               s             x            px             y            py          zeta ...
+ip3                0             0             0             0             0             0
+ip4          3332.28             0             0             0             0             0
+ip5          6664.57             0             0             0             0             0
+ip6          9997.01             0             0             0             0             0
+ip7          13329.4             0             0             0             0             0
+ip8          16650.7             0             0             0             0             0
+ip1.l1       19994.2             0             0             0             0             0
+ip1          19994.2             0             0             0             0             0
+ip2          23326.6             0             0             0             0             0
+--- Now displaying Qx and Qy for line <Line  at 139785902612496>---
+62.310000851877284 60.320000447084404
+--- Now displaying Twiss result at all IPS for line <Line  at 139785780816400>---
+TwissTable: 9 rows, 52 cols
+name               s             x            px             y            py          zeta ...
+ip3                0             0             0             0             0             0
+ip2          3332.44             0             0             0             0             0
+ip1          6664.72             0             0             0             0             0
+ip1.l1       6664.72             0             0             0             0             0
+ip8          10008.4             0             0             0             0             0
+ip7          13329.4             0             0             0             0             0
+ip6          16661.7             0             0             0             0             0
+ip5            19994             0             0             0             0             0
+ip4          23326.4             0             0             0             0             0
+--- Now displaying Qx and Qy for line <Line  at 139785780816400>---
+62.31000035752713 60.320000423324686
+
+  Number of warnings: 40
+33 in C and 7 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.152056E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.102851E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.152056E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.102851E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.152056E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.152056E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.152056E-11 (symplectifying R)                                                                                                               
+
+  Number of warnings: 68
+64 in C and 4 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.123190E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.123190E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.123190E-11 (symplectifying R)                                                                                                               
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.123190E-11 (symplectifying R)                                                                                                               

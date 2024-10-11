@@ -116,7 +116,8 @@ def ask_keep_setting(job_name: str) -> bool:
         bool: True if the user wants to keep the same settings, False otherwise.
     """
     keep_setting = input(
-        f"Do you want to keep the same setting for all jobs of the type{job_name} ? (y/n). Default is y."
+        f"Do you want to keep the same setting for all jobs of the type {job_name} ? (y/n)."
+        f"Default is y."
     )
     while keep_setting not in ["", "y", "n"]:
         keep_setting = input("Invalid input. Please enter y, n or skip question.")

@@ -757,8 +757,17 @@ class ClusterSubmission:
                 job = str(Path(aux[-1]).parent)
 
                 # Only get path after name of the study
-                job = job.split(self.study_name)[1]
-                l_path_jobs.append(f"{self.study_name}{job}/")
+                print("DEBUG", self.study_name)
+                print("DEBUG", job)
+                try:
+                    job = job.split(self.study_name)[1]
+                    l_path_jobs.append(f"{self.study_name}{job}/")
+                except IndexError:
+                    logging.warning(
+                        "Some jobs from another study are running. Acquiring the full path as the "
+                        "study name is unknown."
+                    )
+                    l_path_jobs.append(job)
         return l_path_jobs
 
     def _get_condor_jobs(self, status: str, force_query_individually: bool = False) -> list[str]:
