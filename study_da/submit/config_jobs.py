@@ -167,8 +167,12 @@ class ConfigJobs:
 
         Args:
             dic_tree (dict): The dictionary representing the job tree.
+
         """
         self.dic_tree: dict = dic_tree
+
+        # Flag set to True if self.find_all_jobs() has been called at least once
+        self.all_jobs_found: bool = False
 
     def _find_and_configure_jobs_recursion(
         self,
@@ -302,13 +306,20 @@ class ConfigJobs:
         else:
             dic_gen["htc_flavor"] = None
         dic_gen["status"] = "to_submit"
-        if ask_keep_setting(job_name):
-            self.dic_config_jobs[job_name] = {
-                "context": dic_gen["context"],
-                "submission_type": dic_gen["submission_type"],
-                "status": dic_gen["status"],
-                "htc_flavor": dic_gen["htc_flavor"],
-            }
+
+        # Compute all jobs to see if there are at least two jobs in the current generation
+        self.find_all_jobs()
+        # Ensure there are more than one job of the same type to ask the user
+        # sourcery skip: merge-nested-ifs
+        if [x["gen"] == depth for x in self.dic_all_jobs.values()].count(True) > 1:
+            # Ask the user if they want to keep the settings for all jobs of the same type
+            if ask_keep_setting(job_name):
+                self.dic_config_jobs[job_name] = {
+                    "context": dic_gen["context"],
+                    "submission_type": dic_gen["submission_type"],
+                    "status": dic_gen["status"],
+                    "htc_flavor": dic_gen["htc_flavor"],
+                }
 
     def find_and_configure_jobs(
         self, dic_config_jobs: Optional[dict[str, dict[str, Any]]] = None
@@ -340,11 +351,17 @@ class ConfigJobs:
         Returns:
             dict: A dictionary containing all jobs and their details.
         """
-        # Variables to store the jobs and their configuration
-        self.dic_all_jobs = {}
+        if not self.all_jobs_found:
+            # Variables to store the jobs and their configuration
+            self.dic_all_jobs = {}
 
-        # Find all jobs and associated generation
-        logging.info("Finding all jobs in the tree")
-        self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=True)
+            # Find all jobs and associated generation
+            logging.info("Finding all jobs in the tree")
+            self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=True)
+
+            # Write the jobs as found
+            self.all_jobs_found = True
+        else:
+            logging.info("All jobs have already been found. Returning the existing dictionary.")
 
         return self.dic_all_jobs
