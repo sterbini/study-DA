@@ -585,7 +585,7 @@ class GenerateScan:
         if not os.path.isfile(executable_path):
             # Check if the executable path corresponds to a file in the template folder
             executable_path_template = f"{path_local_template}{executable_path}"
-            if not os.path.isfile(executable_path):
+            if not os.path.isfile(executable_path_template):
                 raise FileNotFoundError(
                     f"Executable file {executable_path} not found locally nor in the study-da "
                     "template folder."
