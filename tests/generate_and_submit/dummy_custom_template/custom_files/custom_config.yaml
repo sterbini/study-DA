@@ -1,0 +1,6 @@
+a_random_nest:
+  x: -1
+y: -2
+another_random_nest:
+  and_another:
+    z: -3

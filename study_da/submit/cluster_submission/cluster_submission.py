@@ -757,8 +757,6 @@ class ClusterSubmission:
                 job = str(Path(aux[-1]).parent)
 
                 # Only get path after name of the study
-                print("DEBUG", self.study_name)
-                print("DEBUG", job)
                 try:
                     job = job.split(self.study_name)[1]
                     l_path_jobs.append(f"{self.study_name}{job}/")

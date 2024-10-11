@@ -584,12 +584,14 @@ class GenerateScan:
         # Check if the executable path corresponds to a file
         if not os.path.isfile(executable_path):
             # Check if the executable path corresponds to a file in the template folder
-            executable_path = f"{path_local_template}{executable_path}"
+            executable_path_template = f"{path_local_template}{executable_path}"
             if not os.path.isfile(executable_path):
                 raise FileNotFoundError(
                     f"Executable file {executable_path} not found locally nor in the study-da "
                     "template folder."
                 )
+            else:
+                executable_path = executable_path_template
 
         # Ensure that the values in dic_parameter_lists can be dumped with ryaml
         if dic_parameter_lists is not None:
