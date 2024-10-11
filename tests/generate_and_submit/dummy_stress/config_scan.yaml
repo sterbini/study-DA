@@ -1,0 +1,40 @@
+# ==================================================================================================
+# --- Structure of the study ---
+# ==================================================================================================
+name: example_dummy_stress
+
+# List all useful files that will be used by executable in generations below
+# These files are placed at the root of the study
+dependencies:
+  main_configuration: custom_files/custom_config.yaml
+
+structure:
+  # First generation is always at the root of the study
+  # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
+  generation_1:
+    executable: custom_files/generation_1_custom_dummy.py
+    scans:
+      x:
+        linspace: [1, 1000, 5]
+
+  # Second generation depends on the config from the first generation
+  generation_2:
+    executable: custom_files/generation_2_custom_dummy.py
+    scans:
+      y:
+        # Number of paths is set by n_split in the main config
+        linspace: [1, 5, 5]
+
+  generation_3:
+    executable: custom_files/generation_3_custom_dummy.py
+    scans:
+      a:
+        # Number of paths is set by n_split in the main config
+        linspace: [1, 10, 5]
+
+  generation_4:
+    executable: custom_files/generation_4_custom_dummy.py
+    scans:
+      b:
+        # Number of paths is set by n_split in the main config
+        linspace: [20, 21, 5]

@@ -203,7 +203,9 @@ class ConfigJobs:
 
         # Recursively look for job key in the tree, keeping track of the depth
         # of the job in the tree
-        for key, value in dic_gen.items():
+        # Browse a list of keys rather than than the keys() generator not to create mutation errors
+        for key in list(dic_gen.keys()):
+            value = dic_gen[key]
             if isinstance(value, dict):
                 self._find_and_configure_jobs_recursion(
                     dic_gen=value, depth=depth + 1, l_keys=l_keys + [key], find_only=find_only
@@ -230,9 +232,11 @@ class ConfigJobs:
                         "this method"
                     )
 
-                # ! This hasn't been propertly tested
-                # Delete path_run key if it exists
+                # Put path_run to None if it exists
                 if "path_run" in dic_gen:
+                    logging.warning(
+                        f"Job {value} has a path_run attribute. It will be set to None."
+                    )
                     dic_gen["path_run"] = None
 
                 # If all is fine so far, get job name and configure
