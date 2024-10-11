@@ -12,9 +12,7 @@ structure:
   # First generation is always at the root of the study
   # such that config_runIII.yaml is accessible as ../config_runIII.yaml
   generation_1:
-    executable:
-      name: generation_1.py
-      template: true
+    executable: generation_1.py
     scans:
     common_parameters:
       # Needs to be redeclared as it's used for parallelization
@@ -23,9 +21,7 @@ structure:
 
   # Second generation depends on the config from the first generation
   generation_2:
-    executable:
-      name: generation_2_level_by_nb.py
-      template: true
+    executable: generation_2_level_by_nb.py
     scans:
       particle_file:
         # Number of paths is set by n_split in the main config

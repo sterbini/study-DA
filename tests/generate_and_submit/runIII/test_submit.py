@@ -16,7 +16,7 @@ study_sub = SubmitScan(
 )
 
 # %%
-study_sub.configure_jobs(force_configure=False)
+# study_sub.configure_jobs(force_configure=False)
 
 # %%
 ### Additional commands to be executed at the end of the run file (generation-specific)

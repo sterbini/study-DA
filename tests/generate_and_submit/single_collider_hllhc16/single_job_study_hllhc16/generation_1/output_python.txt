@@ -1,0 +1,817 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.09.03  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2024.04.25               +
+  + Execution date: 2024.10.11 10:29:07      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.09.03  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2024.04.25               +
+  + Execution date: 2024.10.11 10:29:07      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+postaxsl1          =             19.979 ;
+postaxsr1          =             19.971 ;
+postaxsl5          =              19.95 ;
+postaxsr5          =              19.95 ;
+posq1a             =             25.041 ;
+posq1b             =             29.805 ;
+posq2a             =             39.115 ;
+posq2b             =             48.401 ;
+posq3a             =             57.711 ;
+posq3b             =             62.475 ;
+kmax_mcbxfb        =        2.083333333 ;
+posmcbxfba         =             34.488 ;
+posmcbxfba         =             34.488 ;
+posmcbxfbb         =             53.028 ;
+posmcbxfbb         =             53.028 ;
+posmcbxfa          =             68.416 ;
+posmqsxf           =            70.0255 ;
+posmctxf           =            70.6655 ;
+posmctsxf          =            71.1035 ;
+posmcdxf           =            71.3735 ;
+posmcdsxf          =            71.6635 ;
+posmcoxf           =            71.9535 ;
+posmcosxf          =            72.2435 ;
+posmcsxf           =             72.543 ;
+posmcssxf          =             72.851 ;
+posmcbxfa          =             68.416 ;
+posmcbxfa          =             68.416 ;
+posmqsxf           =            70.0255 ;
+posmctxf           =            70.6655 ;
+posmctsxf          =            71.1035 ;
+posmcdxf           =            71.3735 ;
+posmcdsxf          =            71.6635 ;
+posmcoxf           =            71.9535 ;
+posmcosxf          =            72.2435 ;
+posmcsxf           =             72.543 ;
+posmcssxf          =             72.851 ;
+posd1              =             77.534 ;
+posdfxj            =            91.2555 ;
+posvmbxf           =             81.826 ;
+posvmbxfa          =             81.836 ;
+posvmbxfb          =             82.386 ;
+posbpm1            =             21.871 ;
+posbpm2            =             33.108 ;
+posbpm3            =             43.893 ;
+posbpm4            =             54.679 ;
+posbpm5            =              65.77 ;
+posbpm6            =             73.723 ;
+posbpm1            =             21.871 ;
+posbpm2            =             33.108 ;
+posbpm3            =             43.893 ;
+posbpm4            =             54.679 ;
+posbpm5            =              65.77 ;
+posbpm6            =             73.723 ;
+posd1              =             77.534 ;
+posd2              =            142.095 ;
+posd2-posd1        =             64.561 ;
+posmcbrda          =            147.306 ;
+posmcbrdb          =             149.53 ;
+posbpmwq           =                  0 ;
+sepbpmwq           =              0.194 ;
+ad1.lr1            =     0.001502453912 ;
+l.mbxf             =               6.27 ;
+ad1.lr1/l.mbxf*brho =         5.59499921 ;
+ad1.lr1*brho       =        35.08064505 ;
+ad2.l1             =     0.001502453912 ;
+l.mbrd             =              7.778 ;
+ad2.l1/l.mbrd*brho =        4.510239785 ;
+ad2.l1*brho        =        35.08064505 ;
+posd2              =            142.095 ;
+posbpmqbcza        =            151.818 ;
+posbpmqbczb        =            151.878 ;
+posmcbrda          =            147.306 ;
+posmcbrdb          =             149.53 ;
+posmcbrdb          =             149.53 ;
+posmcbrda          =            147.306 ;
+posq4-dposmcby.b4  =           177.5315 ;
+posq4-dposmcby.4   =           176.2365 ;
+posq4-dposmcby.a4  =           174.9415 ;
+posbpmya.4         =            182.727 ;
+posq4              =            180.053 ;
+posq5              =             206.99 ;
+posq5-dposbpm      =            203.845 ;
+posq5+dposbpm      =            210.135 ;
+posq5+dposmcbc     =            210.034 ;
+posq5-dposmcbc     =            203.946 ;
+posq6              =             228.39 ;
+dposmcbc           =              3.044 ;
+dposbpm            =              3.145 ;
+posq6              =             228.39 ;
+posmsq10           =              2.764 ;
+posmcbq10          =              3.357 ;
+on_cutms.10        =                  0 ;
+on_cutms.14        =                  0 ;
+posrfdb1a          =           159.8582 ;
+posrfdb2a          =           155.8849 ;
+posdqwb1a          =           159.8268 ;
+posdqwb2a          =           156.1347 ;
+posrfdb1b          =           161.0407 ;
+posrfdb2b          =           157.0674 ;
+posdqwb1b          =           160.7893 ;
+posdqwb2b          =           157.0972 ;
+postclmb.4c        =            171.704 ;
+postclmb.4c        =            171.704 ;
+postclmc.5c        =            201.254 ;
+postclmc.5q        =            201.861 ;
+postclmc.6c        =            222.717 ;
+postclmc.6q        =            223.324 ;
+l.taxn             =               3.31 ;
+l.tclpx            =                  1 ;
+l.tctpxh           =                  1 ;
+l.tctpxv           =                  1 ;
+postaxn            =            129.489 ;
+postaxna           =            127.812 ;
+postaxnb           =            131.144 ;
+septaxn            =             0.1561 ;
+septaxna           =             0.1511 ;
+septaxnb           =             0.1611 ;
+postclpx           =            135.614 ;
+postclpxa          =            135.114 ;
+postclpxb          =            136.114 ;
+septclpx           =             0.1745 ;
+septclpxa          =              0.173 ;
+septclpxb          =              0.176 ;
+postctpxh          =            134.028 ;
+postctpxha         =            133.528 ;
+postctpxhb         =            134.528 ;
+septctpxh          =             0.1698 ;
+septctpxha         =             0.1683 ;
+septctpxhb         =             0.1713 ;
+postctpxv          =           132.4895 ;
+postctpxva         =           131.9895 ;
+postctpxvb         =           132.9895 ;
+septctpxv          =             0.1651 ;
+septctpxva         =             0.1636 ;
+septctpxvb         =             0.1666 ;
+postcl.5c          =            199.394 ;
+postcl.5q          =            200.001 ;
+postcl.6c          =            220.857 ;
+postcl.6q          =            221.464 ;
+postctpv.6q        =            213.136 ;
+postctph.6q        =            215.136 ;
+postctpv.6c        =            213.743 ;
+postctph.6c        =            215.743 ;
+posbptqx           =           165.5988 ;
+posbptqx           =           165.5988 ;
+bptqr.4
+posbptqr1          =           163.5763 ;
+posbptqr2          =           162.7763 ;
+postaxn            =            129.489 ;
+postaxna           =            127.812 ;
+postaxna           =            127.812 ;
+postaxnb           =            131.144 ;
+postaxnb           =            131.144 ;
+bblr.4
+posbblrb           =             192.87 ;
+posbblra           =             188.07 ;
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb1
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb2
+installing mqxfa.a1r5..FL mqxfa.a1r5..FR
+installing mqxfa.b1r5..FL mqxfa.b1r5..FR
+installing mqxfb.a2r5..FL mqxfb.a2r5..FR
+installing mqxfb.b2r5..FL mqxfb.b2r5..FR
+installing mqxfa.a3r5..FL mqxfa.a3r5..FR
+installing mqxfa.b3r5..FL mqxfa.b3r5..FR
+installing mqxfa.a1l5..FL mqxfa.a1l5..FR
+installing mqxfa.b1l5..FL mqxfa.b1l5..FR
+installing mqxfb.a2l5..FL mqxfb.a2l5..FR
+installing mqxfb.b2l5..FL mqxfb.b2l5..FR
+installing mqxfa.a3l5..FL mqxfa.a3l5..FR
+installing mqxfa.b3l5..FL mqxfa.b3l5..FR
+installing mqxfa.a1r1..FL mqxfa.a1r1..FR
+installing mqxfa.b1r1..FL mqxfa.b1r1..FR
+installing mqxfb.a2r1..FL mqxfb.a2r1..FR
+installing mqxfb.b2r1..FL mqxfb.b2r1..FR
+installing mqxfa.a3r1..FL mqxfa.a3r1..FR
+installing mqxfa.b3r1..FL mqxfa.b3r1..FR
+installing mqxfa.a1l1..FL mqxfa.a1l1..FR
+installing mqxfa.b1l1..FL mqxfa.b1l1..FR
+installing mqxfb.a2l1..FL mqxfb.a2l1..FR
+installing mqxfb.b2l1..FL mqxfb.b2l1..FR
+installing mqxfa.a3l1..FL mqxfa.a3l1..FR
+installing mqxfa.b3l1..FL mqxfa.b3l1..FR
+installing mcbxfbh.a2l1..r
+installing mcbxfbh.a2r1..r
+installing mcbxfbh.a2l5..r
+installing mcbxfbh.a2r5..r
+installing mcbxfbh.b2l1..r
+installing mcbxfbh.b2r1..r
+installing mcbxfbh.b2l5..r
+installing mcbxfbh.b2r5..r
+installing mcbxfbv.a2l1..r
+installing mcbxfbv.a2r1..r
+installing mcbxfbv.a2l5..r
+installing mcbxfbv.a2r5..r
+installing mcbxfbv.b2l1..r
+installing mcbxfbv.b2r1..r
+installing mcbxfbv.b2l5..r
+installing mcbxfbv.b2r5..r
+installing mcbxfah.3l1..r
+installing mcbxfah.3r1..r
+installing mcbxfah.3l5..r
+installing mcbxfah.3r5..r
+installing mcbxfav.3l1..r
+installing mcbxfav.3r1..r
+installing mcbxfav.3l5..r
+installing mcbxfav.3r5..r
+installing mcbrdh.4l1..r
+installing mcbrdh.4r1..r
+installing mcbrdh.4l5..r
+installing mcbrdh.4r5..r
+installing mcbrdv.4l1..r
+installing mcbrdv.4r1..r
+installing mcbrdv.4l5..r
+installing mcbrdv.4r5..r
+installing mqsxf.3l1..r
+installing mqsxf.3r1..r
+installing mqsxf.3l5..r
+installing mqsxf.3r5..r
+installing mcsxf.3l1..r
+installing mcsxf.3r1..r
+installing mcsxf.3l5..r
+installing mcsxf.3r5..r
+installing mcssxf.3l1..r
+installing mcssxf.3r1..r
+installing mcssxf.3l5..r
+installing mcssxf.3r5..r
+installing mcoxf.3l1..r
+installing mcoxf.3r1..r
+installing mcoxf.3l5..r
+installing mcoxf.3r5..r
+installing mcosxf.3l1..r
+installing mcosxf.3r1..r
+installing mcosxf.3l5..r
+installing mcosxf.3r5..r
+installing mcdxf.3l1..r
+installing mcdxf.3r1..r
+installing mcdxf.3l5..r
+installing mcdxf.3r5..r
+installing mcdsxf.3l1..r
+installing mcdsxf.3r1..r
+installing mcdsxf.3l5..r
+installing mcdsxf.3r5..r
+installing mctxf.3l1..r
+installing mctxf.3r1..r
+installing mctxf.3l5..r
+installing mctxf.3r5..r
+installing mctsxf.3l1..r
+installing mctsxf.3r1..r
+installing mctsxf.3l5..r
+installing mctsxf.3r5..r
+++++++ warning: ignored because of unknown element: acfcah.4al5.b1
+++++++ warning: ignored because of unknown element: acfcah.4ar5.b1
+++++++ warning: ignored because of unknown element: acfcah.4al1.b1
+++++++ warning: ignored because of unknown element: acfcah.4ar1.b1
+++++++ warning: ignored because of unknown element: acfcav.4al5.b1
+++++++ warning: ignored because of unknown element: acfcav.4ar5.b1
+++++++ warning: ignored because of unknown element: acfcav.4al1.b1
+++++++ warning: ignored because of unknown element: acfcav.4ar1.b1
+++++++ warning: ignored because of unknown element: acfcah.4al5.b2
+++++++ warning: ignored because of unknown element: acfcah.4ar5.b2
+++++++ warning: ignored because of unknown element: acfcah.4al1.b2
+++++++ warning: ignored because of unknown element: acfcah.4ar1.b2
+++++++ warning: ignored because of unknown element: acfcav.4al5.b2
+++++++ warning: ignored because of unknown element: acfcav.4ar5.b2
+++++++ warning: ignored because of unknown element: acfcav.4al1.b2
+++++++ warning: ignored because of unknown element: acfcav.4ar1.b2
+++++++ warning: ignored because of unknown element: acfcah.4bl5.b1
+++++++ warning: ignored because of unknown element: acfcah.4br5.b1
+++++++ warning: ignored because of unknown element: acfcah.4bl1.b1
+++++++ warning: ignored because of unknown element: acfcah.4br1.b1
+++++++ warning: ignored because of unknown element: acfcav.4bl5.b1
+++++++ warning: ignored because of unknown element: acfcav.4br5.b1
+++++++ warning: ignored because of unknown element: acfcav.4bl1.b1
+++++++ warning: ignored because of unknown element: acfcav.4br1.b1
+++++++ warning: ignored because of unknown element: acfcah.4bl5.b2
+++++++ warning: ignored because of unknown element: acfcah.4br5.b2
+++++++ warning: ignored because of unknown element: acfcah.4bl1.b2
+++++++ warning: ignored because of unknown element: acfcah.4br1.b2
+++++++ warning: ignored because of unknown element: acfcav.4bl5.b2
+++++++ warning: ignored because of unknown element: acfcav.4br5.b2
+++++++ warning: ignored because of unknown element: acfcav.4bl1.b2
+++++++ warning: ignored because of unknown element: acfcav.4br1.b2
+making acfcah.4al5.b1
+making acfcav.4al5.b1
+making acfcah.4al5.b2
+making acfcav.4al5.b2
+making acfcah.4ar5.b1
+making acfcav.4ar5.b1
+making acfcah.4ar5.b2
+making acfcav.4ar5.b2
+making acfcah.4al1.b1
+making acfcav.4al1.b1
+making acfcah.4al1.b2
+making acfcav.4al1.b2
+making acfcah.4ar1.b1
+making acfcav.4ar1.b1
+making acfcah.4ar1.b2
+making acfcav.4ar1.b2
+making acfcah.4bl5.b1
+making acfcav.4bl5.b1
+making acfcah.4bl5.b2
+making acfcav.4bl5.b2
+making acfcah.4br5.b1
+making acfcav.4br5.b1
+making acfcah.4br5.b2
+making acfcav.4br5.b2
+making acfcah.4bl1.b1
+making acfcav.4bl1.b1
+making acfcah.4bl1.b2
+making acfcav.4bl1.b2
+making acfcah.4br1.b1
+making acfcav.4br1.b1
+making acfcah.4br1.b2
+making acfcav.4br1.b2
+postaxsl1          =             19.979 ;
+postaxsr1          =             19.971 ;
+postaxsl5          =              19.95 ;
+postaxsr5          =              19.95 ;
+posq1a             =             25.041 ;
+posq1b             =             29.805 ;
+posq2a             =             39.115 ;
+posq2b             =             48.401 ;
+posq3a             =             57.711 ;
+posq3b             =             62.475 ;
+kmax_mcbxfb        =        2.083333333 ;
+posmcbxfba         =             34.488 ;
+posmcbxfba         =             34.488 ;
+posmcbxfbb         =             53.028 ;
+posmcbxfbb         =             53.028 ;
+posmcbxfa          =             68.416 ;
+posmqsxf           =            70.0255 ;
+posmctxf           =            70.6655 ;
+posmctsxf          =            71.1035 ;
+posmcdxf           =            71.3735 ;
+posmcdsxf          =            71.6635 ;
+posmcoxf           =            71.9535 ;
+posmcosxf          =            72.2435 ;
+posmcsxf           =             72.543 ;
+posmcssxf          =             72.851 ;
+posmcbxfa          =             68.416 ;
+posmcbxfa          =             68.416 ;
+posmqsxf           =            70.0255 ;
+posmctxf           =            70.6655 ;
+posmctsxf          =            71.1035 ;
+posmcdxf           =            71.3735 ;
+posmcdsxf          =            71.6635 ;
+posmcoxf           =            71.9535 ;
+posmcosxf          =            72.2435 ;
+posmcsxf           =             72.543 ;
+posmcssxf          =             72.851 ;
+posd1              =             77.534 ;
+posdfxj            =            91.2555 ;
+posvmbxf           =             81.826 ;
+posvmbxfa          =             81.836 ;
+posvmbxfb          =             82.386 ;
+posbpm1            =             21.871 ;
+posbpm2            =             33.108 ;
+posbpm3            =             43.893 ;
+posbpm4            =             54.679 ;
+posbpm5            =              65.77 ;
+posbpm6            =             73.723 ;
+posbpm1            =             21.871 ;
+posbpm2            =             33.108 ;
+posbpm3            =             43.893 ;
+posbpm4            =             54.679 ;
+posbpm5            =              65.77 ;
+posbpm6            =             73.723 ;
+posd1              =             77.534 ;
+posd2              =            142.095 ;
+posd2-posd1        =             64.561 ;
+posmcbrda          =            147.306 ;
+posmcbrdb          =             149.53 ;
+posbpmwq           =                  0 ;
+sepbpmwq           =              0.194 ;
+ad1.lr1            =     0.001502453912 ;
+l.mbxf             =               6.27 ;
+ad1.lr1/l.mbxf*brho =         5.59499921 ;
+ad1.lr1*brho       =        35.08064505 ;
+ad2.l1             =     0.001502453912 ;
+l.mbrd             =              7.778 ;
+ad2.l1/l.mbrd*brho =        4.510239785 ;
+ad2.l1*brho        =        35.08064505 ;
+posd2              =            142.095 ;
+posbpmqbcza        =            151.818 ;
+posbpmqbczb        =            151.878 ;
+posmcbrda          =            147.306 ;
+posmcbrdb          =             149.53 ;
+posmcbrdb          =             149.53 ;
+posmcbrda          =            147.306 ;
+posq4-dposmcby.b4  =           177.5315 ;
+posq4-dposmcby.4   =           176.2365 ;
+posq4-dposmcby.a4  =           174.9415 ;
+posbpmya.4         =            182.727 ;
+posq4              =            180.053 ;
+posq5              =             206.99 ;
+posq5-dposbpm      =            203.845 ;
+posq5+dposbpm      =            210.135 ;
+posq5+dposmcbc     =            210.034 ;
+posq5-dposmcbc     =            203.946 ;
+posq6              =             228.39 ;
+dposmcbc           =              3.044 ;
+dposbpm            =              3.145 ;
+posq6              =             228.39 ;
+posmsq10           =              2.764 ;
+posmcbq10          =              3.357 ;
+on_cutms.10        =                  0 ;
+on_cutms.14        =                  0 ;
+posrfdb1a          =           159.8582 ;
+posrfdb2a          =           155.8849 ;
+posdqwb1a          =           159.8268 ;
+posdqwb2a          =           156.1347 ;
+posrfdb1b          =           161.0407 ;
+posrfdb2b          =           157.0674 ;
+posdqwb1b          =           160.7893 ;
+posdqwb2b          =           157.0972 ;
+postclmb.4c        =            171.704 ;
+postclmb.4c        =            171.704 ;
+postclmc.5c        =            201.254 ;
+postclmc.5q        =            201.861 ;
+postclmc.6c        =            222.717 ;
+postclmc.6q        =            223.324 ;
+l.taxn             =               3.31 ;
+l.tclpx            =                  1 ;
+l.tctpxh           =                  1 ;
+l.tctpxv           =                  1 ;
+postaxn            =            129.489 ;
+postaxna           =            127.812 ;
+postaxnb           =            131.144 ;
+septaxn            =             0.1561 ;
+septaxna           =             0.1511 ;
+septaxnb           =             0.1611 ;
+postclpx           =            135.614 ;
+postclpxa          =            135.114 ;
+postclpxb          =            136.114 ;
+septclpx           =             0.1745 ;
+septclpxa          =              0.173 ;
+septclpxb          =              0.176 ;
+postctpxh          =            134.028 ;
+postctpxha         =            133.528 ;
+postctpxhb         =            134.528 ;
+septctpxh          =             0.1698 ;
+septctpxha         =             0.1683 ;
+septctpxhb         =             0.1713 ;
+postctpxv          =           132.4895 ;
+postctpxva         =           131.9895 ;
+postctpxvb         =           132.9895 ;
+septctpxv          =             0.1651 ;
+septctpxva         =             0.1636 ;
+septctpxvb         =             0.1666 ;
+postcl.5c          =            199.394 ;
+postcl.5q          =            200.001 ;
+postcl.6c          =            220.857 ;
+postcl.6q          =            221.464 ;
+postctpv.6q        =            213.136 ;
+postctph.6q        =            215.136 ;
+postctpv.6c        =            213.743 ;
+postctph.6c        =            215.743 ;
+posbptqx           =           165.5988 ;
+posbptqx           =           165.5988 ;
+bptqr.4
+posbptqr1          =           163.5763 ;
+posbptqr2          =           162.7763 ;
+postaxn            =            129.489 ;
+postaxna           =            127.812 ;
+postaxna           =            127.812 ;
+postaxnb           =            131.144 ;
+postaxnb           =            131.144 ;
+bblr.4
+posbblrb           =             192.87 ;
+posbblra           =             188.07 ;
+++++++ warning: skipped, command or element unknown: acsca.d5l4.b1
+++++++ warning: skipped, command or element unknown: acsca.c5l4.b1
+++++++ warning: skipped, command or element unknown: acsca.b5l4.b1
+++++++ warning: skipped, command or element unknown: acsca.a5l4.b1
+++++++ warning: skipped, command or element unknown: acsca.a5r4.b1
+++++++ warning: skipped, command or element unknown: acsca.b5r4.b1
+++++++ warning: skipped, command or element unknown: acsca.c5r4.b1
+++++++ warning: skipped, command or element unknown: acsca.d5r4.b1
+++++++ warning: unknown sequence skipped: lhcb1
+makethin: style chosen : teapot
+++++++ warning: makethin selection without active sequence, ignored
+++++++ warning: unknown sequence ignored: lhcb1
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb2
+installing mqxfa.a1r5..FL mqxfa.a1r5..FR
+installing mqxfa.b1r5..FL mqxfa.b1r5..FR
+installing mqxfb.a2r5..FL mqxfb.a2r5..FR
+installing mqxfb.b2r5..FL mqxfb.b2r5..FR
+installing mqxfa.a3r5..FL mqxfa.a3r5..FR
+installing mqxfa.b3r5..FL mqxfa.b3r5..FR
+installing mqxfa.a1l5..FL mqxfa.a1l5..FR
+installing mqxfa.b1l5..FL mqxfa.b1l5..FR
+installing mqxfb.a2l5..FL mqxfb.a2l5..FR
+installing mqxfb.b2l5..FL mqxfb.b2l5..FR
+installing mqxfa.a3l5..FL mqxfa.a3l5..FR
+installing mqxfa.b3l5..FL mqxfa.b3l5..FR
+installing mqxfa.a1r1..FL mqxfa.a1r1..FR
+installing mqxfa.b1r1..FL mqxfa.b1r1..FR
+installing mqxfb.a2r1..FL mqxfb.a2r1..FR
+installing mqxfb.b2r1..FL mqxfb.b2r1..FR
+installing mqxfa.a3r1..FL mqxfa.a3r1..FR
+installing mqxfa.b3r1..FL mqxfa.b3r1..FR
+installing mqxfa.a1l1..FL mqxfa.a1l1..FR
+installing mqxfa.b1l1..FL mqxfa.b1l1..FR
+installing mqxfb.a2l1..FL mqxfb.a2l1..FR
+installing mqxfb.b2l1..FL mqxfb.b2l1..FR
+installing mqxfa.a3l1..FL mqxfa.a3l1..FR
+installing mqxfa.b3l1..FL mqxfa.b3l1..FR
+installing mcbxfbh.a2l1..r
+installing mcbxfbh.a2r1..r
+installing mcbxfbh.a2l5..r
+installing mcbxfbh.a2r5..r
+installing mcbxfbh.b2l1..r
+installing mcbxfbh.b2r1..r
+installing mcbxfbh.b2l5..r
+installing mcbxfbh.b2r5..r
+installing mcbxfbv.a2l1..r
+installing mcbxfbv.a2r1..r
+installing mcbxfbv.a2l5..r
+installing mcbxfbv.a2r5..r
+installing mcbxfbv.b2l1..r
+installing mcbxfbv.b2r1..r
+installing mcbxfbv.b2l5..r
+installing mcbxfbv.b2r5..r
+installing mcbxfah.3l1..r
+installing mcbxfah.3r1..r
+installing mcbxfah.3l5..r
+installing mcbxfah.3r5..r
+installing mcbxfav.3l1..r
+installing mcbxfav.3r1..r
+installing mcbxfav.3l5..r
+installing mcbxfav.3r5..r
+installing mcbrdh.4l1..r
+installing mcbrdh.4r1..r
+installing mcbrdh.4l5..r
+installing mcbrdh.4r5..r
+installing mcbrdv.4l1..r
+installing mcbrdv.4r1..r
+installing mcbrdv.4l5..r
+installing mcbrdv.4r5..r
+installing mqsxf.3l1..r
+installing mqsxf.3r1..r
+installing mqsxf.3l5..r
+installing mqsxf.3r5..r
+installing mcsxf.3l1..r
+installing mcsxf.3r1..r
+installing mcsxf.3l5..r
+installing mcsxf.3r5..r
+installing mcssxf.3l1..r
+installing mcssxf.3r1..r
+installing mcssxf.3l5..r
+installing mcssxf.3r5..r
+installing mcoxf.3l1..r
+installing mcoxf.3r1..r
+installing mcoxf.3l5..r
+installing mcoxf.3r5..r
+installing mcosxf.3l1..r
+installing mcosxf.3r1..r
+installing mcosxf.3l5..r
+installing mcosxf.3r5..r
+installing mcdxf.3l1..r
+installing mcdxf.3r1..r
+installing mcdxf.3l5..r
+installing mcdxf.3r5..r
+installing mcdsxf.3l1..r
+installing mcdsxf.3r1..r
+installing mcdsxf.3l5..r
+installing mcdsxf.3r5..r
+installing mctxf.3l1..r
+installing mctxf.3r1..r
+installing mctxf.3l5..r
+installing mctxf.3r5..r
+installing mctsxf.3l1..r
+installing mctsxf.3r1..r
+installing mctsxf.3l5..r
+installing mctsxf.3r5..r
+++++++ warning: ignored because of unknown element: acfcah.4al5.b2
+++++++ warning: ignored because of unknown element: acfcah.4ar5.b2
+++++++ warning: ignored because of unknown element: acfcah.4al1.b2
+++++++ warning: ignored because of unknown element: acfcah.4ar1.b2
+++++++ warning: ignored because of unknown element: acfcav.4al5.b2
+++++++ warning: ignored because of unknown element: acfcav.4ar5.b2
+++++++ warning: ignored because of unknown element: acfcav.4al1.b2
+++++++ warning: ignored because of unknown element: acfcav.4ar1.b2
+++++++ warning: ignored because of unknown element: acfcah.4bl5.b2
+++++++ warning: ignored because of unknown element: acfcah.4br5.b2
+++++++ warning: ignored because of unknown element: acfcah.4bl1.b2
+++++++ warning: ignored because of unknown element: acfcah.4br1.b2
+++++++ warning: ignored because of unknown element: acfcav.4bl5.b2
+++++++ warning: ignored because of unknown element: acfcav.4br5.b2
+++++++ warning: ignored because of unknown element: acfcav.4bl1.b2
+++++++ warning: ignored because of unknown element: acfcav.4br1.b2
+making acfcah.4al5.b1
+making acfcav.4al5.b1
+making acfcah.4al5.b2
+making acfcav.4al5.b2
+making acfcah.4ar5.b1
+making acfcav.4ar5.b1
+making acfcah.4ar5.b2
+making acfcav.4ar5.b2
+making acfcah.4al1.b1
+making acfcav.4al1.b1
+making acfcah.4al1.b2
+making acfcav.4al1.b2
+making acfcah.4ar1.b1
+making acfcav.4ar1.b1
+making acfcah.4ar1.b2
+making acfcav.4ar1.b2
+making acfcah.4bl5.b1
+making acfcav.4bl5.b1
+making acfcah.4bl5.b2
+making acfcav.4bl5.b2
+making acfcah.4br5.b1
+making acfcav.4br5.b1
+making acfcah.4br5.b2
+making acfcav.4br5.b2
+making acfcah.4bl1.b1
+making acfcav.4bl1.b1
+making acfcah.4bl1.b2
+making acfcav.4bl1.b2
+making acfcah.4br1.b1
+making acfcav.4br1.b1
+making acfcah.4br1.b2
+making acfcav.4br1.b2
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348768972739527 53.5464987584364 
+
+q1 dq1 betxmax dxmax 
+62.3100008082859 1.53491374717063 21632.0245472961 2.71684188994937 
+
+dxrms xcomax xcorms q2 
+1.44269229289474 0 0 60.3200004899217 
+
+dq2 betymax dymax dyrms 
+1.99999999948666 21632.0245451669 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348043052020831 53.6023112010129 
+
+q1 dq1 betxmax dxmax 
+62.3100003491406 2.12692023857939 21632.0245465065 2.76386731887623 
+
+dxrms xcomax xcorms q2 
+1.4426327325219 0 0 60.3200004754053 
+
+dq2 betymax dymax dyrms 
+1.99999999975913 21632.0245455847 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+enter Twiss module
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_alice_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+++++++ warning: division by zero, result set to zero, expr: on_lhcb_normalized*7000./nrj
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348043052020845 53.6023112010119 
+
+q1 dq1 betxmax dxmax 
+62.3100003491448 1.91169367053422 21632.0245462774 2.76386765489466 
+
+dxrms xcomax xcorms q2 
+1.44263290791255 0 0 60.3200004754083 
+
+dq2 betymax dymax dyrms 
+2.00000024238024 21632.0245457543 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348768972739527 53.5464987584364 
+
+q1 dq1 betxmax dxmax 
+62.3100008082859 1.53491374717063 21632.0245472961 2.71684188994937 
+
+dxrms xcomax xcorms q2 
+1.44269229289474 0 0 60.3200004899217 
+
+dq2 betymax dymax dyrms 
+1.99999999948666 21632.0245451669 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+enter Twiss module
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000348043052020831 53.6023112010129 
+
+q1 dq1 betxmax dxmax 
+62.3100003491406 2.12692023857939 21632.0245465065 2.76386731887623 
+
+dxrms xcomax xcorms q2 
+1.4426327325219 0 0 60.3200004754053 
+
+dq2 betymax dymax dyrms 
+1.99999999975913 21632.0245455847 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
+++++++ warning: Both energy and pc specified; pc was ignored.
+++++++ warning: Both energy and gamma specified; gamma was ignored.
+++++++ warning: Both energy and beta specified; beta was ignored.
+++++++ warning: Both energy and bhro specified; brho was ignored.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1l5` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbcs2.1r5` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1l1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbas2.1r1` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1l2` as a drift.
+Warning: Thin solenoids are not yet implemented, reverting to importing `mbls2.1r2` as a drift.

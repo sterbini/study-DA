@@ -35,9 +35,73 @@ from .parameter_space import (
 # --- Class definition
 # ==================================================================================================
 class GenerateScan:
-    def __init__(self, path_config: str):
-        # Load configuration
-        self.config, self.ryaml = load_dic_from_path(path_config)
+    """
+    A class to generate a study (along with the corresponding tree) from a parameter file,
+    and potentially a set of template files.
+
+    Attributes:
+        config (dict): The configuration dictionary.
+        ryaml (yaml.YAML): The YAML parser.
+        dic_common_parameters (dict): Dictionary of common parameters across generations.
+
+    Methods:
+        __init__(path_config=None, dic_scan=None): Initializes the generation scan with a
+            configuration file or dictionary.
+        render(str_parameters, template_path, dependencies=None): Renders the study file using a
+            template.
+        write(study_str, file_path, format_with_black=True): Writes the study file to disk.
+        generate_render_write(gen_name, study_path, template_path, dic_mutated_parameters={}):
+            Generates, renders, and writes the study file.
+        get_dic_parametric_scans(generation): Retrieves dictionaries of parametric scan values.
+        parse_parameter_space(parameter, dic_curr_parameter, dic_parameter_lists,
+            dic_parameter_lists_for_naming): Parses the parameter space for a given parameter.
+        browse_and_collect_parameter_space(generation): Browses and collects the parameter space
+            for a given generation.
+        postprocess_parameter_lists(dic_parameter_lists, dic_parameter_lists_for_naming,
+            dic_subvariables): Postprocesses the parameter lists.
+        create_scans(generation, generation_path, template_path, dic_parameter_lists=None,
+            dic_parameter_lists_for_naming=None): Creates study files for parametric scans.
+        complete_tree(dictionary_tree, l_study_path_next_gen, gen): Completes the tree structure of
+            the study dictionary.
+        write_tree(dictionary_tree): Writes the study tree structure to a YAML file.
+        create_study_for_current_gen(generation, study_path, dic_parameter_lists=None,
+            dic_parameter_lists_for_naming=None): Creates study files for the current generation.
+        create_study(tree_file=True, force_overwrite=False, dic_parameter_all_gen=None,
+            dic_parameter_all_gen_naming=None): Creates study files for the entire study.
+        eval_conditions(l_condition, dic_parameter_lists): Evaluates the conditions to filter out
+            some parameter values.
+        filter_for_concomitant_parameters(array_conditions, ll_concomitant_parameters,
+            dic_dimension_indices): Filters the conditions for concomitant parameters.
+    """
+
+    def __init__(
+        self, path_config: Optional[str] = None, dic_scan: Optional[dict[str, Any]] = None
+    ):  # sourcery skip: remove-redundant-if
+        """
+        Initialize the generation scan with a configuration file or dictionary.
+
+        Args:
+            path_config (Optional[str]): Path to the configuration file. Default is None.
+            dic_scan (Optional[dict[str, Any]]): Dictionary containing the scan configuration.
+                Default is None.
+
+        Raises:
+            ValueError: If neither or both of `path_config` and `dic_scan` are provided.
+        """
+        # Load the study configuration from file or dictionary
+        if dic_scan is None and path_config is None:
+            raise ValueError(
+                "Either a path to the configuration file or a dictionary must be provided."
+            )
+        elif dic_scan is not None and path_config is not None:
+            raise ValueError("Only one of the configuration file or dictionary must be provided.")
+        elif path_config is not None:
+            self.config, self.ryaml = load_dic_from_path(path_config)
+        elif dic_scan is not None:
+            self.config = dic_scan
+            self.ryaml = yaml.YAML()
+        else:
+            raise ValueError("An unexpected error occurred.")
 
         # Parameters common across all generations (e.g. for parallelization)
         self.dic_common_parameters: dict[str, Any] = {}
@@ -46,7 +110,6 @@ class GenerateScan:
         self,
         str_parameters: str,
         template_path: str,
-        template_name: str,
         dependencies: Optional[dict[str, str]] = None,
     ) -> str:
         """
@@ -55,7 +118,6 @@ class GenerateScan:
         Args:
             str_parameters (str): The string representation of parameters to declare/mutate.
             template_path (str): The path to the template file.
-            template_name (str): The name of the template file.
             dependencies (dict[str, str], optional): The dictionary of dependencies. Defaults to {}.
 
         Returns:
@@ -67,7 +129,9 @@ class GenerateScan:
             dependencies = {}
 
         # Generate generations from template
-        environment = Environment(loader=FileSystemLoader(template_path))
+        directory_path = os.path.dirname(template_path)
+        template_name = os.path.basename(template_path)
+        environment = Environment(loader=FileSystemLoader(directory_path))
         template = environment.get_template(template_name)
 
         return template.render(parameters=str_parameters, **dependencies)
@@ -99,7 +163,6 @@ class GenerateScan:
         self,
         gen_name: str,
         study_path: str,
-        template_name: str,
         template_path: str,
         dic_mutated_parameters: dict[str, Any] = {},
     ) -> list[str]:  # sourcery skip: default-mutable-arg
@@ -109,7 +172,6 @@ class GenerateScan:
         Args:
             gen_name (str): The name of the generation.
             study_path (str): The path to the study folder.
-            template_name (str): The name of the template file.
             template_path (str): The path to the template folder.
             dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters.
                 Defaults to {}.
@@ -144,7 +206,6 @@ class GenerateScan:
         # Render and write the study file
         study_str = self.render(
             str_parameters,
-            template_name=template_name,
             template_path=template_path,
             dependencies=dic_dependencies,
         )
@@ -341,6 +402,21 @@ class GenerateScan:
         dic_parameter_lists_for_naming: dict[str, Any],
         dic_subvariables: dict[str, Any],
     ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """
+        Post-processes parameter lists by ensuring values are not numpy types and handling nested
+        parameters.
+
+        Args:
+            dic_parameter_lists (dict[str, Any]): Dictionary containing parameter lists.
+            dic_parameter_lists_for_naming (dict[str, Any]): Dictionary containing parameter lists
+                for naming.
+            dic_subvariables (dict[str, Any]): Dictionary containing subvariables for nested
+                parameters.
+
+        Returns:
+            tuple[dict[str, Any], dict[str, Any]]: Updated dictionaries of parameter lists and
+                parameter lists for naming.
+        """
         for parameter, parameter_list in dic_parameter_lists.items():
             parameter_list_for_naming = dic_parameter_lists_for_naming[parameter]
 
@@ -363,7 +439,6 @@ class GenerateScan:
         self,
         generation: str,
         generation_path: str,
-        template_name: str,
         template_path: str,
         dic_parameter_lists: Optional[dict[str, Any]] = None,
         dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
@@ -374,7 +449,6 @@ class GenerateScan:
         Args:
             generation (str): The generation name.
             generation_path (str): The path to the layer folder.
-            template_name (str): The name of the template file.
             template_path (str): The path to the template folder.
 
         Returns:
@@ -434,7 +508,6 @@ class GenerateScan:
             self.generate_render_write(
                 generation,
                 path,
-                template_name,
                 template_path,
                 dic_mutated_parameters=dic_mutated_parameters,
             )
@@ -505,12 +578,18 @@ class GenerateScan:
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
-        executable_name = self.config["structure"][generation]["executable"]["name"]
-        template = self.config["structure"][generation]["executable"]["template"]
-        if template:
-            executable_path = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_scripts/"
-        else:
-            raise ValueError("Executables that are not templates are not implemented yet.")
+        executable_path = self.config["structure"][generation]["executable"]
+        path_local_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_scripts/"
+
+        # Check if the executable path corresponds to a file
+        if not os.path.isfile(executable_path):
+            # Check if the executable path corresponds to a file in the template folder
+            executable_path = f"{path_local_template}{executable_path}"
+            if not os.path.isfile(executable_path):
+                raise FileNotFoundError(
+                    f"Executable file {executable_path} not found locally nor in the study-da "
+                    "template folder."
+                )
 
         # Ensure that the values in dic_parameter_lists can be dumped with ryaml
         if dic_parameter_lists is not None:
@@ -523,7 +602,6 @@ class GenerateScan:
         return self.create_scans(
             generation,
             study_path,
-            executable_name,
             executable_path,
             dic_parameter_lists,
             dic_parameter_lists_for_naming,

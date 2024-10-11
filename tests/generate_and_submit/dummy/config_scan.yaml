@@ -12,9 +12,7 @@ structure:
   # First generation is always at the root of the study
   # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
   generation_1:
-    executable:
-      name: generation_1_dummy.py
-      template: true
+    executable: generation_1_dummy.py
     scans:
       n_angles:
         list: [5]
@@ -25,9 +23,7 @@ structure:
 
   # Second generation depends on the config from the first generation
   generation_2:
-    executable:
-      name: generation_2_dummy.py
-      template: true
+    executable: generation_2_dummy.py
     scans:
       particle_file:
         # Number of paths is set by n_split in the main config
@@ -35,9 +31,7 @@ structure:
 
   # Second generation depends on the config from the first generation
   generation_3:
-    executable:
-      name: generation_3_dummy.py
-      template: true
+    executable: generation_3_dummy.py
     scans:
       device_number:
         # Number of paths is set by n_split in the main config
