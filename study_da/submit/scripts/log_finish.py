@@ -22,7 +22,7 @@ tree_path = sys.argv[1]
 l_keys = sys.argv[2:]
 
 # Define lock
-lock = SoftFileLock(f"{tree_path}.lock", timeout=3600)
+lock = SoftFileLock(f"{tree_path}.lock", timeout=1000)
 
 # Update tag
 with lock:
@@ -36,4 +36,4 @@ with lock:
     write_dic_to_path(tree, tree_path)
 
     # Wait 0.2 seconds to ensure the file is properly written when the lock is released
-    time.sleep(0.2)
+    time.sleep(0.1)

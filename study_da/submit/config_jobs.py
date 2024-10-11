@@ -233,7 +233,7 @@ class ConfigJobs:
                 # ! This hasn't been propertly tested
                 # Delete path_run key if it exists
                 if "path_run" in dic_gen:
-                    del dic_gen["path_run"]
+                    dic_gen["path_run"] = None
 
                 # If all is fine so far, get job name and configure
                 job_name = value.split("/")[-1]

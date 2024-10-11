@@ -215,7 +215,10 @@ class SubmitScan:
             )
 
             # Ensure that the run file does not already exist
-            if "path_run" in nested_get(dic_tree, l_keys):
+            if (
+                "path_run" in nested_get(dic_tree, l_keys)
+                and nested_get(dic_tree, l_keys + ["path_run"]) is not None
+            ):
                 logging.warning(f"Run file already exists for job {job}. Skipping.")
                 continue
 

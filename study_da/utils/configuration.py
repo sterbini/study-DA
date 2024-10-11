@@ -5,6 +5,7 @@
 # ==================================================================================================
 
 # Import standard library modules
+import os
 from typing import Any
 
 # Import third-party modules
@@ -64,6 +65,9 @@ def write_dic_to_path(dic: dict, path: str, ryaml: ruamel.yaml.YAML | None = Non
     # Write dic
     with open(path, "w") as fid:
         ryaml.dump(dic, fid)
+        # Force os to write to disk now, to avoid race conditions
+        fid.flush()
+        os.fsync(fid.fileno())
 
 
 def nested_get(dic: dict, keys: list) -> Any:
