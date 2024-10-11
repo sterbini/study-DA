@@ -92,7 +92,7 @@ class SubmitScan:
             self.path_python_environment_container += "/bin/activate"
 
         # Lock file to avoid concurrent access (softlock as several platforms are used)
-        self.lock = SoftFileLock(f"{self.path_tree}.lock", timeout=30)
+        self.lock = SoftFileLock(f"{self.path_tree}.lock", timeout=60)
 
     # dic_tree as a property so that it is reloaded every time it is accessed
     @property
@@ -219,7 +219,7 @@ class SubmitScan:
                 "path_run" in nested_get(dic_tree, l_keys)
                 and nested_get(dic_tree, l_keys + ["path_run"]) is not None
             ):
-                logging.warning(f"Run file already exists for job {job}. Skipping.")
+                logging.info(f"Run file already exists for job {job}. Skipping.")
                 continue
 
             run_str = generate_run_file(
@@ -250,7 +250,7 @@ class SubmitScan:
         dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
         dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
         name_config: str = "config.yaml",
-    ) -> None:
+    ) -> str:
         """
         Submits the jobs to the cluster.
 
@@ -263,6 +263,9 @@ class SubmitScan:
                 Defaults to {}.
             name_config (str, optional): The name of the configuration file.
                 Defaults to "config.yaml".
+
+        Returns:
+            str: The final status of the jobs.
         """
 
         # Handle the mutable default arguments
@@ -271,7 +274,7 @@ class SubmitScan:
         if dic_dependencies_per_gen is None:
             dic_dependencies_per_gen = {}
         dic_all_jobs = self.get_all_jobs()
-
+        final_status = "To finish"
         logging.info("Acquiring lock to submit jobs")
         with self.lock:
             # Get dic tree once to avoid reloading it for every job
@@ -317,7 +320,7 @@ class SubmitScan:
 
             # Write to the tree if no more jobs are to be submitted
             if not l_jobs_to_submit:
-                dic_tree["status"] = "finished"
+                dic_tree["status"] = final_status = "finished"
                 logging.info("All jobs are done.")
 
             path_submission_file = (
@@ -345,6 +348,7 @@ class SubmitScan:
             self.dic_tree = cluster_submission.dic_tree
 
         logging.info("Jobs have been submitted. Lock released.")
+        return final_status
 
     def keep_submit_until_done(
         self,
@@ -379,12 +383,17 @@ class SubmitScan:
 
         # I don't need to lock the tree here since the status cheking is read only and
         # the lock is acquired in the submit method for the submission
-        while self.dic_tree["status"] != "finished":
+        while (
             self.submit(
                 one_generation_at_a_time,
                 dic_additional_commands_per_gen,
                 dic_dependencies_per_gen,
                 name_config,
             )
+            != "finished"
+        ):
             # Wait for a certain amount of time before checking again
+            logging.info(f"Waiting {wait_time} minutes before checking again.")
             time.sleep(wait_time * 60)
+
+        logging.info("All jobs are finished.")

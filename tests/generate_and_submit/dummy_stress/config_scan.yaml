@@ -15,7 +15,7 @@ structure:
     executable: custom_files/generation_1_custom_dummy.py
     scans:
       x:
-        linspace: [1, 1000, 5]
+        linspace: [1, 1000, 3]
 
   # Second generation depends on the config from the first generation
   generation_2:
@@ -23,18 +23,18 @@ structure:
     scans:
       y:
         # Number of paths is set by n_split in the main config
-        linspace: [1, 5, 5]
+        linspace: [1, 5, 3]
 
   generation_3:
     executable: custom_files/generation_3_custom_dummy.py
     scans:
       a:
         # Number of paths is set by n_split in the main config
-        linspace: [1, 10, 5]
+        linspace: [1, 10, 3]
 
   generation_4:
     executable: custom_files/generation_4_custom_dummy.py
     scans:
       b:
         # Number of paths is set by n_split in the main config
-        linspace: [20, 21, 5]
+        linspace: [20, 21, 3]
