@@ -25,6 +25,8 @@ def apply_high_quality(vectorial=False):
     else:
         matplotlib_inline.backend_inline.set_matplotlib_formats("retina")
 
+def apply_standard_quality():
+    matplotlib_inline.backend_inline.set_matplotlib_formats("png")
 
 def use_latex_fonts(italic=False):
     matplotlib.rcParams["mathtext.fontset"] = "cm"
@@ -32,6 +34,12 @@ def use_latex_fonts(italic=False):
     if not italic:
         matplotlib.rcParams["mathtext.default"] = "regular"
         matplotlib.rcParams["font.weight"] = "light"
+        
+def use_default_fonts():
+    matplotlib.rcParams["mathtext.fontset"] = "dejavusans"
+    matplotlib.rcParams["font.family"] = "DejaVu Sans"
+    matplotlib.rcParams["mathtext.default"] = "it"
+    matplotlib.rcParams["font.weight"] = "normal"
 
 
 def apply_nicer_style(remove_right_upper_spines=True):
@@ -168,11 +176,14 @@ def add_QR_code(fig, link):
 
 
 def plot_heatmap(
-    df_to_plot,
+    dataframe_data,
+    horizontal_variable,
+    vertical_variable,
+    color_variable,
     link=None,
     plot_contours=True,
-    xlabel="Horizontal tune " + r"$Q_x$",
-    ylabel="Vertical tune " + r"$Q_y$",
+    xlabel=None,
+    ylabel=None,
     symmetric=True,
     mask_lower_triangle=True,
     mask_upper_triangle=False,
@@ -196,6 +207,11 @@ def plot_heatmap(
 ):
     # Use the requested style
     plt.style.use(style)
+
+    # Get the dataframe to plot
+    df_to_plot = dataframe_data.pivot(
+        index=vertical_variable, columns=horizontal_variable, values=color_variable
+    )
 
     # Get numpy array from dataframe
     data_array = df_to_plot.to_numpy()
@@ -245,6 +261,10 @@ def plot_heatmap(
     )
 
     # Set axis labels
+    if xlabel is None:
+        xlabel = horizontal_variable
+    if ylabel is None:
+        ylabel = vertical_variable
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_xlim(-0.5, data_array.shape[1] - 0.5)

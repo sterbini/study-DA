@@ -7,7 +7,7 @@
 import yaml
 
 # Local imports
-from study_da.utils import find_item_in_dict
+from study_da.utils import find_item_in_dic
 
 
 # ==================================================================================================
@@ -169,7 +169,7 @@ def _generate_run_file_htc(
     dic_to_mutate = {}
     for dependency in l_dependencies:
         # Check if dependency exist, otherwise throw an error
-        dependency_value = find_item_in_dict(config, dependency)
+        dependency_value = find_item_in_dic(config, dependency)
         if dependency_value is None:
             raise KeyError("The dependency you want to update doesn't exist or is set to None.")
         if not dependency_value.startswith("/"):
@@ -179,7 +179,7 @@ def _generate_run_file_htc(
     # Prepare strings for sed
     sed_commands = ""
     for dependency in dic_to_mutate:
-        dependency_value = find_item_in_dict(config, dependency)
+        dependency_value = find_item_in_dic(config, dependency)
         path_dependency = dependency_value.replace("/", "\/")  # type: ignore
         new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")  # type: ignore
         sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}\n'

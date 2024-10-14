@@ -19,7 +19,7 @@ import pandas as pd
 from study_da.generate import XsuiteCollider, XsuiteTracking
 from study_da.utils import (
     load_dic_from_path,
-    set_item_in_dict,
+    set_item_in_dic,
     write_dic_to_path,
 )
 
@@ -38,9 +38,7 @@ def configure_collider(full_configuration):
     collider_filepath = full_configuration["config_simulation"]["collider_file"]
 
     # Build object for configuring collider
-    xc = XsuiteCollider(
-        config_collider, collider_filepath, ver_hllhc_optics, ver_lhc_run, ions
-    )
+    xc = XsuiteCollider(config_collider, collider_filepath, ver_hllhc_optics, ver_lhc_run, ions)
 
     # Load collider
     collider = xc.load_collider()
@@ -63,15 +61,10 @@ def configure_collider(full_configuration):
     xc.set_filling_and_bunch_tracked(ask_worst_bunch=False)
 
     # Compute the number of collisions in the different IPs
-    n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8 = (
-        xc.compute_collision_from_scheme()
-    )
+    n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8 = xc.compute_collision_from_scheme()
 
     # Do the leveling if requested
-    if (
-        "config_lumi_leveling" in config_collider
-        and not config_collider["skip_leveling"]
-    ):
+    if "config_lumi_leveling" in config_collider and not config_collider["skip_leveling"]:
         xc.level_ip1_5_by_bunch_intensity(collider, n_collisions_ip1_and_5)
         xc.level_ip2_8_by_separation(n_collisions_ip2, n_collisions_ip8, collider)
     else:
@@ -118,8 +111,8 @@ def track_particles(full_configuration, collider, fingerprint):
     xst = XsuiteTracking(full_configuration["config_simulation"], n_emitt_x, n_emitt_y)
 
     # Prepare particle distribution
-    particles, particle_id, l_amplitude, l_angle = (
-        xst.prepare_particle_distribution_for_tracking(collider)
+    particles, particle_id, l_amplitude, l_angle = xst.prepare_particle_distribution_for_tracking(
+        collider
     )
 
     # Track
@@ -146,9 +139,7 @@ def track_particles(full_configuration, collider, fingerprint):
     particles_df.attrs["date"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     # Save output
-    particles_df.to_parquet(
-        full_configuration["config_simulation"]["path_output_particles"]
-    )
+    particles_df.to_parquet(full_configuration["config_simulation"]["path_output_particles"])
 
 
 def clean():
@@ -176,7 +167,7 @@ if __name__ == "__main__":
 
     # Mutate parameters in configuration
     for key, value in dict_mutated_parameters.items():
-        set_item_in_dict(full_configuration, key, value)
+        set_item_in_dic(full_configuration, key, value)
 
     # Configure collider
     collider, fingerprint = configure_collider(full_configuration)

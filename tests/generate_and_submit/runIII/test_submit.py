@@ -2,7 +2,7 @@
 import logging
 
 from study_da import SubmitScan
-from study_da.utils.configuration import load_dic_from_path, write_dic_to_path
+from study_da.utils import load_dic_from_path, write_dic_to_path
 
 # Set up the logger
 logger = logging.getLogger(__name__)

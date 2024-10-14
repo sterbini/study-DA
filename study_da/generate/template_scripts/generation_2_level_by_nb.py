@@ -19,7 +19,7 @@ import pandas as pd
 from study_da.generate import XsuiteCollider, XsuiteTracking
 from study_da.utils import (
     load_dic_from_path,
-    set_item_in_dict,
+    set_item_in_dic,
     write_dic_to_path,
 )
 
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     # Mutate parameters in configuration
     for key, value in dict_mutated_parameters.items():
-        set_item_in_dict(full_configuration, key, value)
+        set_item_in_dic(full_configuration, key, value)
 
     # Configure collider
     collider, fingerprint = configure_collider(full_configuration)

@@ -12,7 +12,7 @@ import numpy as np
 # Import user-defined modules
 from study_da import create
 from study_da.utils import (
-    find_item_in_dict,
+    find_item_in_dic,
     load_dic_from_path,
     write_dic_to_path,
 )
@@ -48,7 +48,7 @@ write_dic_to_path(config, "config_hllhc16.yaml", ryaml)
 
 # Load configuration
 config, ryaml = load_dic_from_path("config_scan_manual_gen_2.yaml")
-n_split = find_item_in_dict(config, "n_split")
+n_split = find_item_in_dic(config, "n_split")
 
 dic_parameter_all_gen = {
     "generation_2": {

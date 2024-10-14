@@ -21,7 +21,7 @@ from black import FileMode, format_str
 from jinja2 import Environment, FileSystemLoader
 
 # Import user-defined modules
-from study_da.utils import clean_dict, load_dic_from_path, nested_set
+from study_da.utils import clean_dic, load_dic_from_path, nested_set
 
 from .parameter_space import (
     convert_for_subvariables,
@@ -596,7 +596,7 @@ class GenerateScan:
         # Ensure that the values in dic_parameter_lists can be dumped with ryaml
         if dic_parameter_lists is not None:
             # Recursively convert all numpy types to standard types
-            clean_dict(dic_parameter_lists)
+            clean_dic(dic_parameter_lists)
             logging.info("An external dictionary of parameters was provided.")
         else:
             logging.info("Creating the dictionnary of parameters from the configuration file.")

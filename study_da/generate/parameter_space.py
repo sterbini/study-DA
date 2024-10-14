@@ -11,7 +11,7 @@ from typing import Any
 import numpy as np
 
 # Import user-defined modules
-from study_da.utils import find_item_in_dict
+from study_da.utils import find_item_in_dic
 
 # ==================================================================================================
 # --- Functions
@@ -100,7 +100,7 @@ def list_values_path(
             "All values in the list for the list_values_path function must be strings."
         )
     n_path_arg = l_values_path_list[1]
-    n_path = find_item_in_dict(dic_common_parameters, n_path_arg)
+    n_path = find_item_in_dic(dic_common_parameters, n_path_arg)
     if n_path is None:
         raise ValueError(f"Parameter {n_path_arg} is not defined in the scan configuration.")
     return [l_values_path_list[0].replace("____", f"{n:02d}") for n in range(n_path)]

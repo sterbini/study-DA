@@ -104,7 +104,7 @@ def nested_set(dic: dict, keys: list, value: Any) -> None:
     dic[keys[-1]] = value
 
 
-def find_item_in_dict(obj: dict, key: str) -> Any:
+def find_item_in_dic(obj: dict, key: str) -> Any:
     """Find an item in a nested dictionary.
 
     Args:
@@ -119,12 +119,12 @@ def find_item_in_dict(obj: dict, key: str) -> Any:
         return obj[key]
     for v in obj.values():
         if isinstance(v, dict):
-            item = find_item_in_dict(v, key)
+            item = find_item_in_dic(v, key)
             if item is not None:
                 return item
 
 
-def set_item_in_dict(obj: dict, key: str, value: Any, found: bool = False) -> None:
+def set_item_in_dic(obj: dict, key: str, value: Any, found: bool = False) -> None:
     """Set an item in a nested dictionary.
 
     Args:
@@ -145,11 +145,11 @@ def set_item_in_dict(obj: dict, key: str, value: Any, found: bool = False) -> No
         found = True
     for v in obj.values():
         if isinstance(v, dict):
-            set_item_in_dict(v, key, value, found)
+            set_item_in_dic(v, key, value, found)
 
 
 # This function can probably be made more robust
-def clean_dict(o: Any) -> None:
+def clean_dic(o: Any) -> None:
     """Convert numpy types to standard types in a nested dictionary containing number and lists.
 
     Args:
@@ -168,6 +168,6 @@ def clean_dict(o: Any) -> None:
                 if isinstance(x, np.generic):
                     v[i] = x.item()
                 if isinstance(x, dict):
-                    clean_dict(x)
+                    clean_dic(x)
         else:
-            clean_dict(v)
+            clean_dic(v)

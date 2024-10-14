@@ -12,8 +12,7 @@ import pandas as pd
 
 # Local imports
 from study_da.submit.config_jobs import ConfigJobs
-from study_da.utils import nested_get
-from study_da.utils.configuration import load_dic_from_path
+from study_da.utils import load_dic_from_path, nested_get
 
 
 # ==================================================================================================
