@@ -8,49 +8,34 @@ from typing import Optional
 # Third party imports
 import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib_inline
 import numpy as np
 import qrcode
-import seaborn as sns
 from scipy.ndimage.filters import gaussian_filter
+
+# Local imports
+from .utils import (
+    apply_high_quality,
+    apply_nicer_style,
+    use_default_fonts,
+    use_latex_fonts,
+)
+
 
 # ==================================================================================================
 # --- Functions to create study plots
 # ==================================================================================================
-
-
-def apply_high_quality(vectorial=False):
-    if vectorial:
-        matplotlib_inline.backend_inline.set_matplotlib_formats("svg")
+def _set_style(style, latex_fonts, vectorize):
+    if latex_fonts:
+        use_latex_fonts()
     else:
-        matplotlib_inline.backend_inline.set_matplotlib_formats("retina")
+        use_default_fonts()
 
-def apply_standard_quality():
-    matplotlib_inline.backend_inline.set_matplotlib_formats("png")
+    if vectorize:
+        apply_high_quality(vectorial=True)
+    else:
+        apply_high_quality(vectorial=False)
 
-def use_latex_fonts(italic=False):
-    matplotlib.rcParams["mathtext.fontset"] = "cm"
-    matplotlib.rcParams["font.family"] = "STIXGeneral"
-    if not italic:
-        matplotlib.rcParams["mathtext.default"] = "regular"
-        matplotlib.rcParams["font.weight"] = "light"
-        
-def use_default_fonts():
-    matplotlib.rcParams["mathtext.fontset"] = "dejavusans"
-    matplotlib.rcParams["font.family"] = "DejaVu Sans"
-    matplotlib.rcParams["mathtext.default"] = "it"
-    matplotlib.rcParams["font.weight"] = "normal"
-
-
-def apply_nicer_style(remove_right_upper_spines=True):
-    sns.set_theme(style="whitegrid")
-
-    if remove_right_upper_spines:
-        custom_params = {"axes.spines.right": False, "axes.spines.top": False}
-        sns.set_theme(style="ticks", rc=custom_params)
-
-    # sns.set(font='Adobe Devanagari')
-    sns.set_context("paper", font_scale=1, rc={"lines.linewidth": 0.5, "grid.linewidth": 0.3})
+    plt.style.use(style)
 
 
 def _add_text_annotation(df_to_plot, data_array, ax, vmin, vmax):
@@ -68,11 +53,11 @@ def _add_text_annotation(df_to_plot, data_array, ax, vmin, vmax):
     return ax
 
 
-def _smooth(data_array, symmetric, mask_lower_triangle, mask_upper_triangle, k_masking=-1):
+def _smooth(data_array, symmetric_missing):
     # make the matrix symmetric by replacing the lower triangle with the upper triangle
     data_smoothed = np.copy(data_array)
     data_smoothed[np.isnan(data_array)] = 0
-    if symmetric:
+    if symmetric_missing:
         try:
             # sum the upper and lower triangle, but not the intersection of the two matrices
             intersection = np.zeros_like(data_smoothed)
@@ -87,8 +72,11 @@ def _smooth(data_array, symmetric, mask_lower_triangle, mask_upper_triangle, k_m
             logging.warning("Did not manage to smooth properly")
     data_smoothed = gaussian_filter(data_smoothed, 0.7)
 
-    # Mask the lower triangle of the smoothed matrix
-    # ! You might need to adjust the k_masking parameter if the matrix you work with is not symmetric
+    return data_smoothed
+
+
+def _mask(mask_lower_triangle, mask_upper_triangle, data_smoothed, k_masking):
+    # You might need to adjust the k_masking parameter if the matrix you work with is not symmetric
     if mask_lower_triangle:
         mask = np.tri(data_smoothed.shape[0], k=k_masking)
         return np.ma.masked_array(data_smoothed, mask=mask.T)
@@ -101,34 +89,19 @@ def _smooth(data_array, symmetric, mask_lower_triangle, mask_upper_triangle, k_m
 
 def _add_contours(ax, data_array, mx, green_contour, min_level=1, max_level=15, delta_levels=0.5):
     if green_contour is None:
-        CSS = ax.contour(
-            np.arange(0.5, data_array.shape[1]),
-            np.arange(0.5, data_array.shape[0]),
-            mx,
-            colors="black",
-            levels=list(np.arange(min_level, max_level, delta_levels)),
-            linewidths=0.2,
-        )
-        ax.clabel(CSS, inline=True, fontsize=6)
+        levels = list(np.arange(min_level, max_level, delta_levels))
     else:
-        CSS = ax.contour(
-            np.arange(0.5, data_array.shape[1]),
-            np.arange(0.5, data_array.shape[0]),
-            mx,
-            colors="black",
-            levels=list(np.arange(min_level, green_contour, delta_levels))
-            + list(np.arange(green_contour + delta_levels, max_level, delta_levels)),
-            linewidths=0.2,
+        levels = list(np.arange(min_level, green_contour, delta_levels)) + list(
+            np.arange(green_contour + delta_levels, max_level, delta_levels)
         )
-        ax.clabel(CSS, inline=True, fontsize=6)
-        CS2 = ax.contour(
-            np.arange(0.5, data_array.shape[1]),
-            np.arange(0.5, data_array.shape[0]),
-            mx,
-            colors="green",
-            levels=[green_contour],
-            linewidths=1,
-        )
+    X = np.arange(0.5, data_array.shape[1])
+    Y = np.arange(0.5, data_array.shape[0])
+
+    CSS = ax.contour(X, Y, mx, colors="black", levels=levels, linewidths=0.2)
+    ax.clabel(CSS, inline=True, fontsize=6)
+
+    if green_contour is not None:
+        CS2 = ax.contour(X, Y, mx, colors="green", levels=[green_contour], linewidths=1)
         ax.clabel(CS2, inline=1, fontsize=6)
 
     return ax
@@ -175,6 +148,46 @@ def add_QR_code(fig, link):
     return fig
 
 
+def _set_labels(
+    ax,
+    df_to_plot,
+    data_array,
+    horizontal_variable,
+    vertical_variable,
+    xlabel,
+    ylabel,
+    xaxis_ticks_on_top,
+):
+    # Filter out odd ticks and and label the rest with the respective list entries
+    ax.set_xticks(np.arange(len(df_to_plot.columns))[::2], labels=df_to_plot.columns[::2])
+    ax.set_yticks(np.arange(len(df_to_plot.index))[::2], labels=df_to_plot.index[::2])
+
+    if xlabel is None:
+        xlabel = horizontal_variable
+    if ylabel is None:
+        ylabel = vertical_variable
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_xlim(-0.5, data_array.shape[1] - 0.5)
+    ax.set_ylim(-0.5, data_array.shape[0] - 0.5)
+
+    # Ticks on top
+    if xaxis_ticks_on_top:
+        ax.xaxis.tick_top()
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(
+        ax.get_xticklabels(),
+        rotation=-30,
+        rotation_mode="anchor",
+        # ha="left",
+    )
+
+    # If the x-axis needs to be padded... This needs testing
+    # ax.tick_params(axis='x', which='major', pad=5)
+    return ax
+
+
 def plot_heatmap(
     dataframe_data,
     horizontal_variable,
@@ -184,7 +197,7 @@ def plot_heatmap(
     plot_contours=True,
     xlabel=None,
     ylabel=None,
-    symmetric=True,
+    symmetric_missing=True,
     mask_lower_triangle=True,
     mask_upper_triangle=False,
     plot_diagonal_lines=True,
@@ -200,13 +213,16 @@ def plot_heatmap(
     delta_levels_contours=0.5,
     figsize=None,
     label_cbar="Minimum DA (" + r"$\sigma$" + ")",
-    colormap="coolwarm",
+    colormap="coolwarm_r",
     style="ggplot",
     output_path="output.pdf",
     display_plot=True,
+    latex_fonts=True,
+    vectorize=False,
+    fill_missing_value_with: Optional[str | float] = None,
 ):
     # Use the requested style
-    plt.style.use(style)
+    _set_style(style, latex_fonts, vectorize)
 
     # Get the dataframe to plot
     df_to_plot = dataframe_data.pivot(
@@ -214,28 +230,37 @@ def plot_heatmap(
     )
 
     # Get numpy array from dataframe
-    data_array = df_to_plot.to_numpy()
+    data_array = df_to_plot.to_numpy(dtype=float)
+
+    # Replace NaNs with a value if requested
+    if fill_missing_value_with is not None:
+        if isinstance(fill_missing_value_with, (int, float)):
+            data_array[np.isnan(data_array)] = fill_missing_value_with
+        elif fill_missing_value_with == "interpolate":
+            raise NotImplementedError("Interpolation of missing values is not implemented yet")
 
     # Define colormap and set NaNs to white
     cmap = matplotlib.colormaps.get_cmap(colormap)
     cmap.set_bad("w")
 
+    # Mask the lower or upper triangle
+    if mask_lower_triangle or mask_upper_triangle:
+        data_array_masked = _mask(mask_lower_triangle, mask_upper_triangle, data_array, k_masking)
+    else:
+        data_array_masked = data_array
+
     # Build heatmap, with inverted y axis
     fig, ax = plt.subplots()
     if figsize is not None:
         fig.set_size_inches(figsize)
-    im = ax.imshow(data_array, cmap=cmap, vmin=vmin, vmax=vmax)
+    im = ax.imshow(data_array_masked, cmap=cmap, vmin=vmin, vmax=vmax)
     ax.invert_yaxis()
-
-    # Filter out odd ticks and and label the rest with the respective list entries
-    ax.set_xticks(np.arange(len(df_to_plot.columns))[::2], labels=df_to_plot.columns[::2])
-    ax.set_yticks(np.arange(len(df_to_plot.index))[::2], labels=df_to_plot.index[::2])
 
     # Add text annotations
     ax = _add_text_annotation(df_to_plot, data_array, ax, vmin, vmax)
 
     # Smooth data for contours
-    mx = _smooth(data_array, symmetric, mask_lower_triangle, mask_upper_triangle, k_masking)
+    mx = _smooth(data_array, symmetric_missing)
 
     # Plot contours if requested
     if plot_contours:
@@ -261,29 +286,16 @@ def plot_heatmap(
     )
 
     # Set axis labels
-    if xlabel is None:
-        xlabel = horizontal_variable
-    if ylabel is None:
-        ylabel = vertical_variable
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.set_xlim(-0.5, data_array.shape[1] - 0.5)
-    ax.set_ylim(-0.5, data_array.shape[0] - 0.5)
-
-    # Ticks on top
-    if xaxis_ticks_on_top:
-        ax.xaxis.tick_top()
-
-    # Rotate the tick labels and set their alignment.
-    plt.setp(
-        ax.get_xticklabels(),
-        rotation=-30,
-        rotation_mode="anchor",
-        # ha="left",
+    ax = _set_labels(
+        ax,
+        df_to_plot,
+        data_array,
+        horizontal_variable,
+        vertical_variable,
+        xlabel,
+        ylabel,
+        xaxis_ticks_on_top,
     )
-
-    # If the x-axis needs to be padded... This needs testing
-    # ax.tick_params(axis='x', which='major', pad=5)
 
     # Create colorbar
     cbar = ax.figure.colorbar(im, ax=ax, fraction=0.026, pad=0.04)
