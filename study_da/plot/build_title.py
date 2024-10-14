@@ -8,7 +8,7 @@ import logging
 import numpy as np
 
 # ==================================================================================================
-# --- Functions to create study plots
+# --- Functions to compute latex string for the plot title
 # ==================================================================================================
 
 
@@ -25,286 +25,425 @@ def latex_float(f, precision=3):
     return r"${0} \times 10^{{{1}}}$".format(base, int(exponent))
 
 
-def get_title_from_configuration(
-    conf_mad,
-    conf_collider=None,
-    type_crossing=None,
-    betx=None,
-    bety=None,
-    Nb=True,
-    levelling="",
-    CC=False,
-    display_intensity=True,
-    PU=True,
-    display_xing=True,
-    display_tune=False,
-    ignore_lumi_1_5=True,
-    display_chroma=True,
-    display_emit=True,
-):
-    # LHC version
-    LHC_version = "HL-LHC v1.6"
+def get_LHC_version_str(dataframe_data):
+    if "ver_hllhc_optics" in dataframe_data.columns:
+        LHC_version_value = dataframe_data["ver_hllhc_optics"].unique()[0]
+        return f"HL-LHC v{LHC_version_value}"
+    elif "ver_lhc_run" in dataframe_data.columns:
+        LHC_version_value = dataframe_data["ver_lhc_run"].unique()[0]
+        return f"LHC Run {LHC_version_value}"
+    else:
+        logging.warning("LHC version not found in the dataframe")
+        return ""
 
-    # Energy
-    energy_value = float(conf_mad["beam_config"]["lhcb1"]["beam_energy_tot"]) / 1000
-    energy = f"$E = {{{energy_value:.1f}}}$ $TeV$"
 
-    if conf_collider is not None:
-        # Levelling
-        levelling = levelling
-        if levelling != "":
-            levelling += " ."
+def get_energy_str(dataframe_data):
+    if "beam_energy_tot_b1" in dataframe_data.columns:
+        energy_value = dataframe_data["beam_energy_tot_b1"].unique()[0] / 1000
+        return f"$E = {{{energy_value:.1f}}}$ $TeV$"
+    else:
+        logging.warning("Energy not found in the dataframe")
+        return ""
 
-        # Bunch number
-        bunch_number_value = conf_collider["config_beambeam"]["mask_with_filling_pattern"][
-            "i_bunch_b1"
-        ]
-        bunch_number = f"Bunch {bunch_number_value}"
 
-        # Crab cavities
-        if CC:
-            if "on_crab1" in conf_collider["config_knobs_and_tuning"]["knob_settings"]:
-                if (
-                    conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_crab1"]
-                    is not None
-                ):
-                    CC_value = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_crab1"]
-                    crab_cavities = f"$CC = {{{CC_value:.1f}}}$ $\mu rad$. "  # type: ignore
-                else:
-                    crab_cavities = "CC OFF. "
+def get_bunch_index_str(dataframe_data):
+    if "i_bunch_b1" in dataframe_data.columns:
+        bunch_index_value = dataframe_data["i_bunch_b1"].unique()[0]
+        return f"Bunch {bunch_index_value}"
+    else:
+        logging.warning("Bunch index not found in the dataframe")
+        return ""
+
+
+def get_CC_crossing_str(dataframe_data):
+    if "on_crab1" in dataframe_data.columns:
+        CC_crossing_value = dataframe_data["on_crab1"].unique()[0]
+        return f"$CC = {{{CC_crossing_value:.1f}}}$ $\mu rad$"
+    else:
+        logging.warning("CC crossing not found in the dataframe")
+        return ""
+
+
+def get_bunch_intensity_str(dataframe_data):
+    if "final_num_particles_per_bunch" in dataframe_data.columns:
+        bunch_intensity_value = dataframe_data["final_num_particles_per_bunch"].unique()[0]
+        return f"$N_b \simeq ${latex_float(float(bunch_intensity_value))} ppb"
+    elif "num_particles_per_bunch" in dataframe_data.columns:
+        logging.warning(
+            "final_num_particles_per_bunch not found in the dataframe. Using num_particles_per_bunch instead."
+        )
+        bunch_intensity_value = dataframe_data["num_particles_per_bunch"].unique()[0]
+        return f"$N_b \simeq ${latex_float(float(bunch_intensity_value))} ppb"
+    else:
+        logging.warning("Bunch intensity not found in the dataframe")
+        return ""
+
+
+def get_beta_str(dataframe_data, betx_value, bety_value):
+    betx_str = r"$\beta^{*}_{x,1}$"
+    bety_str = r"$\beta^{*}_{y,1}$"
+    return f"{betx_str}$= {{{betx_value}}}$ m, {bety_str}" + f"$= {{{bety_value}}}$" + " m"
+
+
+def _get_plane_crossing_IP_1_5_str(dataframe_data, type_crossing):
+    optics_file = dataframe_data["optics_file"].unique()[0]
+
+    if "flatvh" in optics_file or type_crossing == "flatvh":
+        phi_1_str = r"$\Phi/2_{1(V)}$"
+        phi_5_str = r"$\Phi/2_{5(H)}$"
+
+    # Crossing angle at IP1/5
+    elif "flathv" in optics_file or type_crossing == "flathv":
+        phi_1_str = r"$\Phi/2_{1(H)}$"
+        phi_5_str = r"$\Phi/2_{5(V)}$"
+    else:
+        logging.warning(
+            "Type of crossing not found in the dataframe and not provided. Using flathv."
+        )
+        phi_1_str = r"$\Phi/2_{1(H)}$"
+        phi_5_str = r"$\Phi/2_{5(V)}$"
+
+    return phi_1_str, phi_5_str
+
+
+def _get_crossing_value_IP_1_5(dataframe_data, ip=1):
+    if f"final_on_x{ip}" in dataframe_data.columns:
+        return dataframe_data[f"final_on_x{ip}"].unique()[0]
+    elif f"on_x{ip}" in dataframe_data.columns:
+        logging.warning(f"final_on_x{ip} not found in the dataframe. Using on_x{ip} instead.")
+        return dataframe_data[f"on_x{ip}"].unique()[0]
+    else:
+        logging.warning(f"Crossing angle at IP{ip} not found in the dataframe")
+        return np.nan
+
+
+def get_crossing_IP_1_5_str(dataframe_data, type_crossing):
+    # Get crossing plane at IP1/5
+    phi_1_str, phi_5_str = _get_plane_crossing_IP_1_5_str(dataframe_data, type_crossing)
+
+    # Get crossing angle values at IP1 and IP5
+    xing_value_IP1 = _get_crossing_value_IP_1_5(dataframe_data, ip=1)
+    xing_value_IP5 = _get_crossing_value_IP_1_5(dataframe_data, ip=5)
+
+    # Get corresponding strings
+    xing_IP1_str = f"{phi_1_str}$= {{{xing_value_IP1:.0f}}}$" + " $\mu rad$"
+    xing_IP5_str = f"{phi_5_str}$= {{{xing_value_IP5:.0f}}}$" + " $\mu rad$"
+
+    return xing_IP1_str, xing_IP5_str
+
+
+def get_crossing_IP_2_8_str(dataframe_data):
+    # First collect crossing angle values
+    dic_xing_values = {}
+    for ip in [2, 8]:
+        dic_xing_values[ip] = {}
+        for type_angle in ["", "h", "v"]:
+            if f"on_x{ip}{type_angle}_final" in dataframe_data.columns:
+                xing_value = dataframe_data[f"on_x{ip}{type_angle}_final"].unique()[0]
+            elif f"on_x{ip}{type_angle}" in dataframe_data.columns:
+                logging.warning(
+                    f"on_x{ip}{type_angle}_final not found in the dataframe. Using on_x{ip}{type_angle} instead."
+                )
+                xing_value = dataframe_data[f"on_x{ip}{type_angle}"].unique()[0]
             else:
-                crab_cavities = "NO CC. "
-        else:
-            crab_cavities = ""
+                xing_value = 0
+            dic_xing_values[ip][type_angle] = xing_value
 
-        # Bunch intensity
-        if Nb:
-            try:
-                bunch_intensity_value = conf_collider["config_beambeam"][
-                    "num_particles_per_bunch_after_optimization"
-                ]
-            except Exception:
-                bunch_intensity_value = conf_collider["config_beambeam"]["num_particles_per_bunch"]
-            bunch_intensity = f"$N_b \simeq ${latex_float(float(bunch_intensity_value))} ppb, "  # type: ignore
-        else:
-            bunch_intensity = ""
-
-        try:
-            luminosity_value_1 = conf_collider["config_beambeam"][
-                "luminosity_ip1_after_optimization"
-            ]
-            luminosity_value_5 = conf_collider["config_beambeam"][
-                "luminosity_ip5_after_optimization"
-            ]
-            luminosity_value_1_5 = np.mean([luminosity_value_1, luminosity_value_5])
-            luminosity_value_2 = conf_collider["config_beambeam"][
-                "luminosity_ip2_after_optimization"
-            ]
-            luminosity_value_8 = conf_collider["config_beambeam"][
-                "luminosity_ip8_after_optimization"
-            ]
-        except:  # noqa: E722
-            print("Luminosity not found in config, setting to None")
-            luminosity_value_1_5 = None
-            luminosity_value_2 = None
-            luminosity_value_8 = None
-        if luminosity_value_1_5 is not None:
-            luminosity_1_5 = (
-                f"$L_{{1/5}} = ${latex_float(float(luminosity_value_1_5))}" + "cm$^{-2}$s$^{-1}$, "
+    # Then create the strings
+    l_xing_IP_str = []
+    for ip in [2, 8]:
+        if dic_xing_values[ip]["h"] != 0 and dic_xing_values[ip]["v"] == 0:
+            xing_IP_str = (
+                r"$\Phi/2_{"
+                + f"{ip},H"
+                + r"}$"
+                + f"$= {{{dic_xing_values[ip]['h']:.0f}}}$ $\mu rad$"
             )
-            luminosity_2 = (
-                f"$L_{{2}} = ${latex_float(float(luminosity_value_2))}" + "cm$^{-2}$s$^{-1}$, "
+        elif dic_xing_values[ip]["h"] == 0 and dic_xing_values[ip]["v"] != 0:
+            xing_IP_str = (
+                r"$\Phi/2_{"
+                + f"{ip},V"
+                + r"}$"
+                + f"$= {{{dic_xing_values[ip]['v']:.0f}}}$ $\mu rad$"
             )
-            luminosity_8 = (
-                f"$L_{{8}} = ${latex_float(float(luminosity_value_8))}" + "cm$^{-2}$s$^{-1}$"
+        elif dic_xing_values[ip]["h"] != 0 and dic_xing_values[ip]["v"] != 0:
+            logging.warning(
+                f"It seems that the crossing angles at IP{ip} are not orthogonal... "
+                f"Only keeping the plane with the maximum crossing angle, but you might want to double-check this."
+            )
+            xing_IP_str = (
+                r"$\Phi/2_{"
+                + f"{ip},H"
+                + r"}$"
+                + f"$= {{{dic_xing_values[ip]['h']:.0f}}}$ $\mu rad$"
+                if dic_xing_values[ip]["h"] > dic_xing_values[ip]["v"]
+                else r"$\Phi/2_{"
+                + f"{ip},V"
+                + r"}$"
+                + f"$= {{{dic_xing_values[ip]['v']:.0f}}}$ $\mu rad$"
+            )
+        elif dic_xing_values[ip][""] != 0:
+            xing_IP_str = (
+                r"$\Phi/2_{" + f"{ip}" + r"}$" + f"$= {{{dic_xing_values[ip]['']:.0f}}}$ $\mu rad$"
             )
         else:
-            luminosity_1_5 = ""
-            luminosity_2 = ""
-            luminosity_8 = ""
-        if ignore_lumi_1_5:
-            luminosity_1_5 = ""
+            logging.warning(f"Crossing angle at IP{ip} seems to be 0. Maybe double-check.")
+            xing_IP_str = r"$\Phi/2_{" + f"{ip}" + r"}$" + f"$= 0$ $\mu rad$"
+        l_xing_IP_str.append(xing_IP_str)
 
-        if PU:
-            try:
-                PU_value_1 = conf_collider["config_beambeam"]["Pile-up_ip1_5_after_optimization"]
-                PU_value_5 = conf_collider["config_beambeam"]["Pile-up_ip1_5_after_optimization"]
-            except:  # noqa: E722
-                try:
-                    PU_value_1 = conf_collider["config_beambeam"]["Pile-up_ip1_after_optimization"]
-                    PU_value_5 = conf_collider["config_beambeam"]["Pile-up_ip5_after_optimization"]
-                except:  # noqa: E722
-                    PU_value_1 = None
-                    PU_value_5 = None
+    return l_xing_IP_str
 
-            try:
-                PU_value_2 = conf_collider["config_beambeam"]["Pile-up_ip2_after_optimization"]
-                PU_value_8 = conf_collider["config_beambeam"]["Pile-up_ip8_after_optimization"]
-            except:  # noqa: E722
-                PU_value_2 = None
-                PU_value_8 = None
-            if PU_value_1 is not None:
-                PU_1_5 = f"$PU_{{1/5}} = ${latex_float(float(PU_value_1))}, "
-                PU_2 = f"$PU_{{2}} = ${latex_float(float(PU_value_2))}, "
-                PU_8 = f"$PU_{{8}} = ${latex_float(float(PU_value_8))}" + ""
-            else:
-                PU_1_5 = ""
-                PU_2 = ""
-                PU_8 = ""
-        else:
-            PU_1_5 = ""
-            PU_2 = ""
-            PU_8 = ""
 
-        # Beta star # ! Manually encoded for now
-        bet1 = r"$\beta^{*}_{x,1}$"
-        bet2 = r"$\beta^{*}_{y,1}$"
-        beta = bet1 + f"$= {{{betx}}}$" + " m, " + bet2 + f"$= {{{bety}}}$" + " m"
+def get_bunch_length_str(dataframe_data):
+    if "sigma_z" in dataframe_data.columns:
+        bunch_length_value = dataframe_data["sigma_z"].unique()[0] * 100
+        return f"$\sigma_{{z}} = {{{bunch_length_value}}}$ $cm$"
+    else:
+        logging.warning("Bunch length not found in the dataframe")
+        return ""
 
-        # Crossing angle at IP1/5
-        if "flathv" in conf_mad["optics_file"] or type_crossing == "flathv":
-            phi_1 = r"$\Phi/2_{1(H)}$"
-            phi_5 = r"$\Phi/2_{5(V)}$"
-        elif "flatvh" in conf_mad["optics_file"] or type_crossing == "flatvh":
-            phi_1 = r"$\Phi/2_{1(V)}$"
-            phi_5 = r"$\Phi/2_{5(H)}$"
-        else:
-            phi_1 = r"$\Phi/2_{1(H)}$"
-            phi_5 = r"$\Phi/2_{5(V)}$"
-        # else:
-        #     raise ValueError("Optics configuration not automatized yet")
-        xing_value_IP1 = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_x1"]
-        xing_IP1 = phi_1 + f"$= {{{xing_value_IP1:.0f}}}$" + " $\mu rad$, "
 
-        xing_value_IP5 = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_x5"]
-        xing_IP5 = phi_5 + f"$= {{{xing_value_IP5:.0f}}}$" + " $\mu rad$, "
+def get_polarity_IP_2_8_str(dataframe_data):
+    if (
+        "on_alice_normalized" in dataframe_data.columns
+        and "on_lhcb_normalized" in dataframe_data.columns
+    ):
+        polarity_value_IP2 = dataframe_data["on_alice_normalized"].unique()[0]
+        polarity_value_IP8 = dataframe_data["on_lhcb_normalized"].unique()[0]
+        return f"$polarity$ $IP_{{2/8}} = {{{polarity_value_IP2}}}/{{{polarity_value_IP8}}}$"
+    else:
+        logging.warning("Polarity at IP2 and IP8 not found in the dataframe")
+        return ""
 
-        if not display_xing:
-            xing_IP1 = ""
-            xing_IP5 = ""
 
-        # Bunch length
-        bunch_length_value = conf_collider["config_beambeam"]["sigma_z"] * 100
-        bunch_length = f"$\sigma_{{z}} = {{{bunch_length_value}}}$ $cm$"
+def get_normalized_emittance_str(dataframe_data):
+    if "nemitt_x" in dataframe_data.columns:
+        emittance_value = dataframe_data["nemitt_x"].unique()[0] / 1e-6
+        # Round to 5 digits
+        emittance_value = round(emittance_value, 5)
+        return f"$\epsilon_{{n}} = {{{emittance_value}}}$ $\mu m$"
+    else:
+        logging.warning("Emittance not found in the dataframe")
+        return ""
 
-        # Crosing angle at IP8
-        xing_value_IP8h = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_x8h"]
-        xing_value_IP8v = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_x8v"]
-        if xing_value_IP8v != 0 and xing_value_IP8h == 0:
-            xing_IP8 = r"$\Phi/2_{8,V}$" + f"$= {{{xing_value_IP8v:.0f}}}$ $\mu rad$"
-        elif xing_value_IP8v == 0 and xing_value_IP8h != 0:
-            xing_IP8 = r"$\Phi/2_{8,H}$" + f"$= {{{xing_value_IP8h:.0f}}}$ $\mu rad$"
-        else:
-            raise ValueError("Optics configuration not automatized yet")
 
-        # Crosing angle at IP2
-        try:
-            xing_value_IP2h = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_x2h"]
-            xing_value_IP2v = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_x2v"]
-        except:  # noqa: E722
-            xing_value_IP2h = 0
-            xing_value_IP2v = conf_collider["config_knobs_and_tuning"]["knob_settings"]["on_x2"]
-        if xing_value_IP2v != 0 and xing_value_IP2h == 0:
-            xing_IP2 = r"$\Phi/2_{2,V}$" + f"$= {{{xing_value_IP2v:.0f}}}$ $\mu rad$"
-        elif xing_value_IP8v == 0 and xing_value_IP8h != 0:
-            xing_IP2 = r"$\Phi/2_{2,H}$" + f"$= {{{xing_value_IP2h:.0f}}}$ $\mu rad$"
-        else:
-            raise ValueError("Optics configuration not automatized yet")
+def get_chromaticity_str(dataframe_data):
+    if "dqx_b1" in dataframe_data.columns:
+        chroma_value = dataframe_data["dqx_b1"].unique()[0]
+        return f"$Q' = {{{chroma_value}}}$"
+    else:
+        logging.warning("Chromaticity not found in the dataframe")
+        return ""
 
-        # Polarity IP 2 and 8
-        polarity_value_IP2 = conf_collider["config_knobs_and_tuning"]["knob_settings"][
-            "on_alice_normalized"
-        ]
-        polarity_value_IP8 = conf_collider["config_knobs_and_tuning"]["knob_settings"][
-            "on_lhcb_normalized"
-        ]
-        polarity = f"$polarity$ $IP_{{2/8}} = {{{polarity_value_IP2}}}/{{{polarity_value_IP8}}}$"
 
-        # Normalized emittance
-        emittance_value = round(conf_collider["config_beambeam"]["nemitt_x"] / 1e-6, 2)
-        emittance = f"$\epsilon_{{n}} = {{{emittance_value}}}$ $\mu m$"
-        if not display_emit:
-            emittance = ""
+def get_octupole_intensity_str(dataframe_data):
+    if "i_oct_b1" in dataframe_data.columns:
+        octupole_intensity_value = dataframe_data["i_oct_b1"].unique()[0]
+        return f"$I_{{OCT}} = {{{octupole_intensity_value}}}$ $A$"
+    else:
+        logging.warning("Octupole intensity not found in the dataframe")
+        return ""
 
-        # Chromaticity
-        chroma_value = conf_collider["config_knobs_and_tuning"]["dqx"]["lhcb1"]
-        chroma = r"$Q'$" + f"$= {{{chroma_value}}}$"
 
-        if not display_chroma:
-            chroma = ""
+def get_linear_coupling_str(dataframe_data):
+    if "delta_cmr" in dataframe_data.columns:
+        coupling_value = dataframe_data["delta_cmr"].unique()[0]
+        return f"$C^- = {{{coupling_value}}}$"
+    else:
+        logging.warning("Linear coupling not found in the dataframe")
+        return ""
 
-        # Intensity
-        if display_intensity:
-            intensity_value = conf_collider["config_knobs_and_tuning"]["knob_settings"]["i_oct_b1"]
-            intensity = f"$I_{{MO}} = {{{intensity_value}}}$ $A$, "
-        else:
-            intensity = ""
 
-        # Linear coupling
-        coupling_value = conf_collider["config_knobs_and_tuning"]["delta_cmr"]
-        coupling = f"$C^- = {{{coupling_value}}}$"
-
-        # Filling scheme
-        filling_scheme_value = conf_collider["config_beambeam"]["mask_with_filling_pattern"][
-            "pattern_fname"
-        ].split("filling_scheme/")[1]
+def get_filling_scheme_str(dataframe_data):
+    if "pattern_fname" in dataframe_data.columns:
+        filling_scheme_value = dataframe_data["pattern_fname"].unique()[0]
+        # Only keep the last part of the path, which is the filling scheme
+        filling_scheme_value = filling_scheme_value.split("/")[-1]
+        # Clean
         if "12inj" in filling_scheme_value:
             filling_scheme_value = filling_scheme_value.split("12inj")[0] + "12inj"
-        filling_scheme = f"{filling_scheme_value}"
-
-        # Tune
-        if display_tune:
-            tune_h_value = conf_collider["config_knobs_and_tuning"]["qx"]["lhcb1"]
-            tune_v_value = conf_collider["config_knobs_and_tuning"]["qy"]["lhcb1"]
-            qx = f"$Q_x = {{{tune_h_value}}}$, "
-            qy = f"$Q_y = {{{tune_v_value}}}$, "
-        else:
-            qx = ""
-            qy = ""
-
-        # Final title
-        title = (
-            LHC_version
-            + ". "
-            + energy
-            + ". "
-            + levelling
-            + crab_cavities
-            + bunch_intensity
-            + "\n"
-            + luminosity_1_5
-            + luminosity_2
-            + luminosity_8
-            + "\n"
-            + PU_1_5
-            # + PU_2
-            # + PU_8
-            + beta
-            + ", "
-            + polarity
-            + "\n"
-            + qx
-            + qy
-            + xing_IP1
-            + xing_IP5
-            + xing_IP2
-            + ", "
-            + xing_IP8
-            + "\n"
-            + bunch_length
-            + ", "
-            + emittance
-            + ", "
-            + chroma
-            + ", "
-            + intensity
-            + coupling
-            + "\n"
-            + filling_scheme
-            + ". "
-            + bunch_number
-            + "."
-        )
+        return f"{filling_scheme_value}"
     else:
-        title = LHC_version + ". " + energy + ". "
+        logging.warning("Filling scheme not found in the dataframe")
+        return ""
+
+
+def get_tune_str(dataframe_data):
+    if "qx_b1" in dataframe_data.columns and "qy_b1" in dataframe_data.columns:
+        tune_h_value = dataframe_data["qx_b1"].unique()[0]
+        tune_v_value = dataframe_data["qy_b1"].unique()[0]
+        return f"$Q_x = {tune_h_value}$, $Q_y = {tune_v_value}$"
+    else:
+        logging.warning("Tune not found in the dataframe")
+        return ""
+
+
+def get_luminosity_at_ip_str(dataframe_data, ip, beam_beam=True):
+    # sourcery skip: merge-else-if-into-elif, simplify-fstring-formatting
+    unit_luminosity = "cm$^{-2}$s$^{-1}$"
+    if beam_beam:
+        if f"luminosity_ip{ip}_with_beam_beam" in dataframe_data.columns:
+            luminosity_value = dataframe_data[f"luminosity_ip{ip}_with_beam_beam"].unique()[0]
+            return f"$L_{{IP{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
+        else:
+            logging.warning(f"Luminosity at IP{ip} with beam-beam not found in the dataframe")
+            return ""
+    else:
+        if f"luminosity_ip{ip}_without_beam_beam" in dataframe_data.columns:
+            luminosity_value = dataframe_data[f"luminosity_ip{ip}_without_beam_beam"].unique()[0]
+            return f"$L_{{IP{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
+        else:
+            logging.warning(f"Luminosity at IP{ip} without beam-beam not found in the dataframe")
+            return ""
+
+
+def get_PU_at_IP_str(dataframe_data, ip, beam_beam=True):
+    if beam_beam:
+        if f"Pile-up_ip{ip}_with_beam_beam" in dataframe_data.columns:
+            PU_value = dataframe_data[f"Pile-up_ip{ip}_with_beam_beam"].unique()[0]
+            return f"$PU_{{IP{ip}}} \simeq ${latex_float(float(PU_value))}"
+        else:
+            logging.warning(f"Pile-up at IP{ip} with beam-beam not found in the dataframe")
+            return ""
+    else:
+        if f"Pile-up_ip{ip}_without_beam_beam" in dataframe_data.columns:
+            PU_value = dataframe_data[f"Pile-up_ip{ip}_without_beam_beam"].unique()[0]
+            return f"$PU_{{IP{ip}}} \simeq ${latex_float(float(PU_value))}"
+        else:
+            logging.warning(f"Pile-up at IP{ip} without beam-beam not found in the dataframe")
+            return ""
+
+
+def get_title_from_configuration(
+    dataframe_data,
+    betx_value=np.nan,
+    bety_value=np.nan,
+    type_crossing="flathv",
+    display_LHC_version=True,
+    display_energy=True,
+    display_bunch_index=True,
+    display_CC_crossing=True,
+    display_bunch_intensity=True,
+    display_beta=True,
+    display_crossing_IP_1=True,
+    display_crossing_IP_2=True,
+    display_crossing_IP_5=True,
+    display_crossing_IP_8=True,
+    display_bunch_length=True,
+    display_polarity_IP_2_8=True,
+    display_emittance=True,
+    display_chromaticity=True,
+    display_octupole_intensity=True,
+    display_coupling=True,
+    display_filling_scheme=True,
+    display_tune=True,
+    display_luminosity_1=True,
+    display_luminosity_2=True,
+    display_luminosity_5=True,
+    display_luminosity_8=True,
+    display_PU_1=True,
+    display_PU_2=True,
+    display_PU_5=True,
+    display_PU_8=True,
+):
+    # Collect all the information to display
+    LHC_version_str = get_LHC_version_str(dataframe_data)
+    energy_str = get_energy_str(dataframe_data)
+    bunch_index_str = get_bunch_index_str(dataframe_data)
+    CC_crossing_str = get_CC_crossing_str(dataframe_data)
+    bunch_intensity_str = get_bunch_intensity_str(dataframe_data)
+    beta_str = get_beta_str(dataframe_data, betx_value, bety_value)
+    xing_IP1_str, xing_IP5_str = get_crossing_IP_1_5_str(dataframe_data, type_crossing)
+    xing_IP2_str, xing_IP8_str = get_crossing_IP_2_8_str(dataframe_data)
+    bunch_length_str = get_bunch_length_str(dataframe_data)
+    polarity_str = get_polarity_IP_2_8_str(dataframe_data)
+    emittance_str = get_normalized_emittance_str(dataframe_data)
+    chromaticity_str = get_chromaticity_str(dataframe_data)
+    octupole_intensity_str = get_octupole_intensity_str(dataframe_data)
+    coupling_str = get_linear_coupling_str(dataframe_data)
+    filling_scheme_str = get_filling_scheme_str(dataframe_data)
+    tune_str = get_tune_str(dataframe_data)
+
+    # Collect luminosity and PU strings at each IP
+    dic_lumi_PU_str = {
+        "with_beam_beam": {"lumi": {}, "PU": {}},
+        "without_beam_beam": {"lumi": {}, "PU": {}},
+    }
+    for beam_beam in ["with_beam_beam", "without_beam_beam"]:
+        for ip in [1, 2, 5, 8]:
+            dic_lumi_PU_str[beam_beam]["lumi"][ip] = get_luminosity_at_ip_str(
+                dataframe_data, ip, beam_beam=True
+            )
+            dic_lumi_PU_str[beam_beam]["PU"][ip] = get_PU_at_IP_str(
+                dataframe_data, ip, beam_beam=True
+            )
+
+    # Make the final title (order is the same as in the past)
+    title = ""
+    if display_LHC_version:
+        title += LHC_version_str + ". "
+    if display_energy:
+        title += energy_str + ". "
+    if display_CC_crossing:
+        title += CC_crossing_str + ". "
+    if display_bunch_intensity:
+        title += bunch_intensity_str + ". "
+    # Jump to the next line
+    title += "\n"
+    if display_luminosity_1:
+        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][1] + ". "
+    if display_PU_1:
+        title += dic_lumi_PU_str["with_beam_beam"]["PU"][1] + ". "
+    if display_luminosity_5:
+        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][5] + ". "
+    if display_PU_5:
+        title += dic_lumi_PU_str["with_beam_beam"]["PU"][5] + ". "
+    # Jump to the next line
+    title += "\n"
+    if display_luminosity_2:
+        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][2] + ". "
+    if display_PU_2:
+        title += dic_lumi_PU_str["with_beam_beam"]["PU"][2] + ". "
+    if display_luminosity_8:
+        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][8] + ". "
+    if display_PU_8:
+        title += dic_lumi_PU_str["with_beam_beam"]["PU"][8] + ". "
+    # Jump to the next line
+    title += "\n"
+    if display_beta:
+        title += beta_str + ". "
+    if display_polarity_IP_2_8:
+        title += polarity_str + ". "
+    if display_bunch_length:
+        title += bunch_length_str + ". "
+    # Jump to the next line
+    title += "\n"
+    if display_crossing_IP_1:
+        title += xing_IP1_str + ". "
+    if display_crossing_IP_5:
+        title += xing_IP5_str + ". "
+    if display_crossing_IP_2:
+        title += xing_IP2_str + ". "
+    if display_crossing_IP_8:
+        title += xing_IP8_str + ". "
+
+    # Jump to the next line
+    title += "\n"
+    if display_emittance:
+        title += emittance_str + ". "
+    if display_chromaticity:
+        title += chromaticity_str + ". "
+    if display_octupole_intensity:
+        title += octupole_intensity_str + ". "
+    if display_coupling:
+        title += coupling_str + ". "
+    if display_tune:
+        title += tune_str + ". "
+    # Jump to the next line
+    title += "\n"
+    if display_filling_scheme:
+        title += filling_scheme_str + ". "
+    if display_bunch_index:
+        title += bunch_index_str + ". "
+
     return title

@@ -198,7 +198,7 @@ def plot_heatmap(
     xlabel=None,
     ylabel=None,
     symmetric_missing=True,
-    mask_lower_triangle=True,
+    mask_lower_triangle=False,
     mask_upper_triangle=False,
     plot_diagonal_lines=True,
     shift_diagonal_lines=1,
@@ -239,15 +239,15 @@ def plot_heatmap(
         elif fill_missing_value_with == "interpolate":
             raise NotImplementedError("Interpolation of missing values is not implemented yet")
 
-    # Define colormap and set NaNs to white
-    cmap = matplotlib.colormaps.get_cmap(colormap)
-    cmap.set_bad("w")
-
     # Mask the lower or upper triangle
     if mask_lower_triangle or mask_upper_triangle:
         data_array_masked = _mask(mask_lower_triangle, mask_upper_triangle, data_array, k_masking)
     else:
         data_array_masked = data_array
+
+    # Define colormap and set NaNs to white
+    cmap = matplotlib.colormaps.get_cmap(colormap)
+    cmap.set_bad("w")
 
     # Build heatmap, with inverted y axis
     fig, ax = plt.subplots()

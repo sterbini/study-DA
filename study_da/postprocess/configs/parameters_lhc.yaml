@@ -91,6 +91,7 @@ Pile-up_ip2_with_beam_beam: ["config_collider", "config_beambeam", "Pile-up_ip2_
 Pile-up_ip5_without_beam_beam: ["config_collider", "config_beambeam", "Pile-up_ip5_without_beam_beam"]
 Pile-up_ip5_with_beam_beam: ["config_collider", "config_beambeam", "Pile-up_ip5_with_beam_beam"]
 Pile-up_ip8_without_beam_beam: ["config_collider", "config_beambeam", "Pile-up_ip8_without_beam_beam"]
+Pile-up_ip8_with_beam_beam: ["config_collider", "config_beambeam", "Pile-up_ip8_with_beam_beam"]
 
 # Config simulation
 beam: ["config_simulation", "beam"]
