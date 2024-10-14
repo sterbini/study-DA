@@ -531,7 +531,7 @@ class XsuiteCollider:
             self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
 
         # Do levelling in IP2 and IP8
-        xm.lhc.luminosity_leveling( # type: ignore
+        xm.lhc.luminosity_leveling(  # type: ignore
             collider,
             config_lumi_leveling=self.config_lumi_leveling,
             config_beambeam=self.config_beambeam,
@@ -778,7 +778,14 @@ class XsuiteCollider:
         """
         if self.save_final_collider:
             logging.info("Saving collider as json")
-            collider.metadata = copy.deepcopy(full_configuration)
+            if (
+                hasattr(collider, "metadata")
+                and collider.metadata is not None
+                and isinstance(collider.metadata, dict)
+            ):
+                collider.metadata.update(copy.deepcopy(full_configuration))
+            else:
+                collider.metadata = copy.deepcopy(full_configuration)
             collider.to_json(self.path_final_collider)
 
     @staticmethod

@@ -6,21 +6,33 @@ import yaml
 from scipy.ndimage.filters import gaussian_filter
 
 
-def apply_heatmap_style():
-    plt.style.use("ggplot")
-    matplotlib.rcParams["mathtext.fontset"] = "cm"
-    matplotlib.rcParams["font.family"] = "STIXGeneral"
-    # Not italized latex
-    matplotlib.rcParams["mathtext.default"] = "regular"
-    matplotlib.rcParams["font.weight"] = "light"
-    matplotlib_inline.backend_inline.set_matplotlib_formats("retina")
+def apply_heatmap_style(style="ggplot", latex=True, high_quality=True):
+    # Use the desired style
+    plt.style.use(style)
+
+    if latex:
+        # Latex font
+        matplotlib.rcParams["mathtext.fontset"] = "cm"
+        matplotlib.rcParams["font.family"] = "STIXGeneral"
+
+        # Make Latex font not italic
+        matplotlib.rcParams["mathtext.default"] = "regular"
+        matplotlib.rcParams["font.weight"] = "light"
+
+    if high_quality:
+        # Hight quality plots
+        matplotlib_inline.backend_inline.set_matplotlib_formats("retina")
 
 
 # Function to convert floats to scientific latex format
-def latex_float(f):
-    float_str = "{0:.3g}".format(f)
+def latex_float(f, precision=3):
+    float_str = "{0:.{1}g}".format(f, precision)
+
+    # In case the float is an integer, don't use scientific notation
     if "e" not in float_str:
         return float_str
+
+    # Otherwise, split the float into base and exponent
     base, exponent = float_str.split("e")
     return r"${0} \times 10^{{{1}}}$".format(base, int(exponent))
 
