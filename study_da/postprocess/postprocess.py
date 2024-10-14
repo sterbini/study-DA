@@ -5,7 +5,7 @@
 import inspect
 import logging
 import os
-from typing import Optional
+from typing import Dict, List, Optional
 
 # Third party imports
 import pandas as pd
@@ -20,21 +20,38 @@ from study_da.utils.configuration import load_dic_from_path
 # --- Functions to browse simulations folder and extract relevant observables
 # ==================================================================================================
 def get_particles_data(
-    dic_all_jobs,
-    absolute_path_study,
-    generation_of_interest=2,
-    name_output="output_particles.parquet",
-):
+    dic_all_jobs: Dict[str, Dict[str, List[str]]],
+    absolute_path_study: str,
+    generation_of_interest: int = 2,
+    name_output: str = "output_particles.parquet",
+) -> List[pd.DataFrame]:
+    """
+    Retrieves particle data from simulation output files.
+
+    Args:
+        dic_all_jobs (dict): Dictionary containing all jobs and their details.
+        absolute_path_study (str): The absolute path to the study directory.
+        generation_of_interest (int, optional): The generation of interest. Defaults to 2.
+        name_output (str, optional): The name of the output file. Defaults to "output_particles.parquet".
+
+    Returns:
+        list: A list of DataFrames containing the particle data.
+    """
+
+    # Loop over all jobs and extract the output data
     l_df_output = []
     for relative_path_job, dic_job in dic_all_jobs.items():
         if dic_job["gen"] != generation_of_interest:
             continue
-        absolute_path_job = f"{absolute_path_study}/{relative_path_job}"
+        absolute_path_job = os.path.join(absolute_path_study, relative_path_job)
         absolute_folder_job = os.path.dirname(absolute_path_job)
         try:
-            df_output = pd.read_parquet(f"{absolute_folder_job}/{name_output}")
+            df_output = pd.read_parquet(os.path.join(absolute_folder_job, name_output))
+        except FileNotFoundError as e:
+            logging.warning(f"File not found: {e}")
+            continue
         except Exception as e:
-            logging.warning(e)
+            logging.warning(f"Error reading parquet file: {e}")
             continue
 
         # Register path of the job
@@ -47,8 +64,24 @@ def get_particles_data(
 
 
 def add_parameters_from_config(
-    l_df_output, dic_parameters_of_interest, default_path_template_parameters=False
-):
+    l_df_output: List[pd.DataFrame],
+    dic_parameters_of_interest: Dict[str, List[str]],
+    default_path_template_parameters: bool = False,
+) -> List[pd.DataFrame]:
+    """
+    Adds parameters from the configuration to the output data.
+
+    Args:
+        l_df_output (list): List of DataFrames containing the output data.
+        dic_parameters_of_interest (dict): Dictionary of parameters of interest.
+        default_path_template_parameters (bool, optional): Flag to indicate if the default path
+            template parameters are used. If True, less caution is applied in the checking of the
+            parameters. Defaults to False.
+
+    Returns:
+        list: A list of DataFrames with added parameters.
+    """
+
     for df_output in l_df_output:
         # Get generation configurations as dictionnaries for parameter assignation
         dic_configuration = df_output.attrs["configuration"]
@@ -66,13 +99,26 @@ def add_parameters_from_config(
 
 
 def merge_and_group_by_parameters_of_interest(
-    df_all_sim,
-    l_group_by_parameters,
-    only_keep_lost_particles=True,
-    l_parameters_to_keep=None,
-):
+    l_df_output: List[pd.DataFrame],
+    l_group_by_parameters: List[str],
+    only_keep_lost_particles: bool = True,
+    l_parameters_to_keep: Optional[List[str]] = None,
+) -> pd.DataFrame:
+    """
+    Merges and groups the output data by parameters of interest.
+
+    Args:
+        l_df_output (list): List of DataFrames containing the output data.
+        l_group_by_parameters (list): List of parameters to group by.
+        only_keep_lost_particles (bool, optional): Flag to indicate if only lost particles should
+            be kept. Defaults to True.
+        l_parameters_to_keep (list, optional): List of parameters to keep. Defaults to None.
+
+    Returns:
+        pd.DataFrame: The merged and grouped DataFrame.
+    """
     # Merge all dataframes
-    df_all_sim = pd.concat(df_all_sim)
+    df_all_sim = pd.concat(l_df_output)
 
     # Handle mutable default arguments
     if l_parameters_to_keep is None:
@@ -81,7 +127,7 @@ def merge_and_group_by_parameters_of_interest(
 
     if only_keep_lost_particles:
         # Extract the particles that were lost for DA computation
-        df_all_sim = df_all_sim[df_all_sim["state"] != 1]  # Lost particles
+        df_all_sim = df_all_sim[df_all_sim["state"] != 1]
 
     # Check if the dataframe is empty
     if df_all_sim.empty:
@@ -99,71 +145,86 @@ def merge_and_group_by_parameters_of_interest(
 
 def aggregate_output_data(
     path_tree: str,
-    l_group_by_parameters: list[str],
-    generation_of_interest=2,
-    name_output="output_particles.parquet",
-    write_output=True,
-    path_output=None,
-    only_keep_lost_particles=True,
-    dic_parameters_of_interest=None,
-    l_parameters_to_keep: Optional[list[str]] = None,
-    name_template_parameters="parameters_lhc.yaml",
-    path_template_parameters=None,
-):
-    # Start of the script
+    l_group_by_parameters: List[str],
+    generation_of_interest: int = 2,
+    name_output: str = "output_particles.parquet",
+    write_output: bool = True,
+    path_output: Optional[str] = None,
+    only_keep_lost_particles: bool = True,
+    dic_parameters_of_interest: Optional[Dict[str, List[str]]] = None,
+    l_parameters_to_keep: Optional[List[str]] = None,
+    name_template_parameters: str = "parameters_lhc.yaml",
+    path_template_parameters: Optional[str] = None,
+) -> pd.DataFrame:
+    """
+    Aggregates output data from simulation files.
+
+    Args:
+        path_tree (str): The path to the tree file.
+        l_group_by_parameters (list): List of parameters to group by.
+        generation_of_interest (int, optional): The generation of interest. Defaults to 2.
+        name_output (str, optional): The name of the output file. Defaults to "output_particles.parquet".
+        write_output (bool, optional): Flag to indicate if the output should be written to a file.
+            Defaults to True.
+        path_output (str, optional): The path to the output file. If not provided, the default
+            output file will be in the study folder as 'da.parquet'. Defaults to None.
+        only_keep_lost_particles (bool, optional): Flag to indicate if only lost particles should be
+            kept. Defaults to True.
+        dic_parameters_of_interest (dict, optional): Dictionary of parameters of interest. Defaults
+            to None.
+        l_parameters_to_keep (list, optional): List of parameters to keep. Defaults to None.
+        name_template_parameters (str, optional): The name of the template parameters file
+            associating each parameter to a list of keys. Defaults to "parameters_lhc.yaml", which
+            is already contained in the study-da package, and includes the main usual parameters.
+        path_template_parameters (str, optional): The path to the template parameters file. Must
+            be provided if a no template already contained in study-da is provided through the
+            argument name_template_parameters. Defaults to None.
+
+    Returns:
+        pd.DataFrame: The final aggregated DataFrame.
+    """
     logging.info("Analysis of output simulation files started")
 
-    # Load the tree
     dic_tree, _ = load_dic_from_path(path_tree)
-
-    # Get absolute path of the study
     absolute_path_study = dic_tree["absolute_path"]
-
-    # Get all jobs
     dic_all_jobs = ConfigJobs(dic_tree).find_all_jobs()
 
-    # # Get particles data
     l_df_sim = get_particles_data(
         dic_all_jobs, absolute_path_study, generation_of_interest, name_output
     )
 
-    # Define parameters of interest
     default_path_template_parameters = False
     if dic_parameters_of_interest is None:
         if path_template_parameters is not None:
-            # Load dic_parameters_of_interest from the template configs
             logging.info("Loading parameters of interest from the provided configuration file")
         else:
             if name_template_parameters is None:
                 raise ValueError(
                     "No template configuration file provided for the parameters of interest"
                 )
-            # Load dic_parameters_of_interest from the template configs
             logging.info("Loading parameters of interest from the template configuration file")
-            path_template_parameters = (
-                f"{os.path.dirname(inspect.getfile(aggregate_output_data))}"
-                f"/configs/{name_template_parameters}"
+            path_template_parameters = os.path.join(
+                os.path.dirname(inspect.getfile(aggregate_output_data)),
+                "configs",
+                name_template_parameters,
             )
             default_path_template_parameters = True
         dic_parameters_of_interest, _ = load_dic_from_path(path_template_parameters)
 
-    # Add parameters from config to the output data
     l_df_output = add_parameters_from_config(
         l_df_sim, dic_parameters_of_interest, default_path_template_parameters
     )
 
-    # Merge and group by parameters of interest
     df_final = merge_and_group_by_parameters_of_interest(
         l_df_output, l_group_by_parameters, only_keep_lost_particles, l_parameters_to_keep
     )
 
-    # Save data
     if write_output:
         if path_output is None:
-            path_output = f"{absolute_path_study}/da.parquet"
+            path_output = os.path.join(absolute_path_study, "da.parquet")
         df_final.to_parquet(path_output)
     elif path_output is not None:
         logging.warning("Output path provided but write_output set to False, no output saved")
 
-    logging.info("Final dataframe for current set of simulations: ", df_final)
+    logging.info("Final dataframe for current set of simulations: %s", df_final)
     return df_final
