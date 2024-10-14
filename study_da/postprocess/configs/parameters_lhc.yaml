@@ -5,6 +5,9 @@ optics_file: ["config_mad", "optics_file"]
 beam_energy_tot_b1: ["config_mad", "beam_config", "lhcb1", "beam_energy_tot"]
 beam_energy_tot_b2: ["config_mad", "beam_config", "lhcb2", "beam_energy_tot"]
 ions: ["config_mad", "ions"]
+ver_hllhc_optics: ["config_mad", "ver_hllhc_optics"]
+ver_lhc_run: ["config_mad", "ver_lhc_run"]
+
 
 # Knobs
 qx_b1: ["config_collider", "config_knobs_and_tuning", "qx", "lhcb1"]
@@ -15,6 +18,8 @@ dqx_b1: ["config_collider", "config_knobs_and_tuning", "dqx", "lhcb1"]
 dqx_b2: ["config_collider", "config_knobs_and_tuning", "dqx", "lhcb2"]
 dqy_b1: ["config_collider", "config_knobs_and_tuning", "dqy", "lhcb1"]
 dqy_b2: ["config_collider", "config_knobs_and_tuning", "dqy", "lhcb1"]
+delta_cmr: ["config_collider", "config_knobs_and_tuning", "delta_cmr"]
+delta_cmi: ["config_collider", "config_knobs_and_tuning", "delta_cmi"]
 i_oct_b1: ["config_collider", "config_knobs_and_tuning", "knob_settings", "i_oct_b1"]
 i_oct_b2: ["config_collider", "config_knobs_and_tuning", "knob_settings", "i_oct_b2"]
 on_disp: ["config_collider", "config_knobs_and_tuning", "knob_settings", "on_disp"]
@@ -22,6 +27,7 @@ on_crab1: ["config_collider", "config_knobs_and_tuning", "knob_settings", "on_cr
 on_crab5: ["config_collider", "config_knobs_and_tuning", "knob_settings", "on_crab5"]
 on_alice_normalized: ["config_collider", "config_knobs_and_tuning", "knob_settings", "on_alice_normalized"]
 on_lhcb_normalized: ["config_collider", "config_knobs_and_tuning", "knob_settings", "on_lhcb_normalized"]
+
 
 # Knobs that might be optimized for levelling purposes 
 on_x1: ["config_collider", "config_knobs_and_tuning", "knob_settings", "on_x1"]
