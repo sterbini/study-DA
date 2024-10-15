@@ -9,6 +9,7 @@ from typing import Optional
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import qrcode
 from scipy.ndimage.filters import gaussian_filter
 
@@ -24,7 +25,15 @@ from .utils import (
 # ==================================================================================================
 # --- Functions to create study plots
 # ==================================================================================================
-def _set_style(style, latex_fonts, vectorize):
+def _set_style(style: str, latex_fonts: bool, vectorize: bool) -> None:
+    """
+    Sets the style for the plot.
+
+    Args:
+        style (str): The style to use for the plot.
+        latex_fonts (bool): Whether to use LaTeX fonts.
+        vectorize (bool): Whether to vectorize the plot.
+    """
     if latex_fonts:
         use_latex_fonts()
     else:
@@ -38,7 +47,22 @@ def _set_style(style, latex_fonts, vectorize):
     plt.style.use(style)
 
 
-def _add_text_annotation(df_to_plot, data_array, ax, vmin, vmax):
+def _add_text_annotation(
+    df_to_plot: pd.DataFrame, data_array: np.ndarray, ax: plt.Axes, vmin: float, vmax: float
+) -> plt.Axes:
+    """
+    Adds text annotations to the heatmap.
+
+    Args:
+        df_to_plot (pd.DataFrame): The dataframe to plot.
+        data_array (np.ndarray): The corresponding data array.
+        ax (plt.Axes): The axes to plot on.
+        vmin (float): The minimum value for the color scale.
+        vmax (float): The maximum value for the color scale.
+
+    Returns:
+        plt.Axes: The axes with text annotations.
+    """
     # Loop over data dimensions and create text annotations.
     for i in range(len(df_to_plot.index)):
         for j in range(len(df_to_plot.columns)):
@@ -53,7 +77,18 @@ def _add_text_annotation(df_to_plot, data_array, ax, vmin, vmax):
     return ax
 
 
-def _smooth(data_array, symmetric_missing):
+def _smooth(data_array: np.ndarray, symmetric_missing: bool) -> np.ndarray:
+    """
+    Smooths the data array.
+
+    Args:
+        data_array (np.ndarray): The data array to smooth.
+        symmetric_missing (bool): Whether to make the matrix symmetric by replacing the lower
+            triangle with the upper triangle (or conversely). Needed for clean smoothing.
+
+    Returns:
+        np.ndarray: The smoothed data array.
+    """
     # make the matrix symmetric by replacing the lower triangle with the upper triangle
     data_smoothed = np.copy(data_array)
     data_smoothed[np.isnan(data_array)] = 0
@@ -75,7 +110,21 @@ def _smooth(data_array, symmetric_missing):
     return data_smoothed
 
 
-def _mask(mask_lower_triangle, mask_upper_triangle, data_smoothed, k_masking):
+def _mask(
+    mask_lower_triangle: bool, mask_upper_triangle: bool, data_smoothed: np.ndarray, k_masking: int
+) -> np.ndarray:
+    """
+    Masks the lower or upper triangle of the data array.
+
+    Args:
+        mask_lower_triangle (bool): Whether to mask the lower triangle.
+        mask_upper_triangle (bool): Whether to mask the upper triangle.
+        data_smoothed (np.ndarray): The smoothed data array.
+        k_masking (int): The k parameter for masking (distance form the diagonal).
+
+    Returns:
+        np.ndarray: The masked data array.
+    """
     # You might need to adjust the k_masking parameter if the matrix you work with is not symmetric
     if mask_lower_triangle:
         mask = np.tri(data_smoothed.shape[0], k=k_masking)
@@ -87,7 +136,30 @@ def _mask(mask_lower_triangle, mask_upper_triangle, data_smoothed, k_masking):
         return data_smoothed
 
 
-def _add_contours(ax, data_array, mx, green_contour, min_level=1, max_level=15, delta_levels=0.5):
+def _add_contours(
+    ax: plt.Axes,
+    data_array: np.ndarray,
+    mx: np.ndarray,
+    green_contour: Optional[float],
+    min_level: float = 1,
+    max_level: float = 15,
+    delta_levels: float = 0.5,
+) -> plt.Axes:
+    """
+    Adds contour lines to the heatmap.
+
+    Args:
+        ax (plt.Axes): The axes to plot on.
+        data_array (np.ndarray): The data array.
+        mx (np.ndarray): The smoothed data array.
+        green_contour (Optional[float]): The value for the green contour line.
+        min_level (float, optional): The minimum level for the contours. Defaults to 1.
+        max_level (float, optional): The maximum level for the contours. Defaults to 15.
+        delta_levels (float, optional): The delta between contour levels. Defaults to 0.5.
+
+    Returns:
+        plt.Axes: The axes with contour lines.
+    """
     if green_contour is None:
         levels = list(np.arange(min_level, max_level, delta_levels))
     else:
@@ -107,14 +179,34 @@ def _add_contours(ax, data_array, mx, green_contour, min_level=1, max_level=15, 
     return ax
 
 
-def _add_diagonal_lines(ax, shift=1):
+def _add_diagonal_lines(ax: plt.Axes, shift: int = 1) -> plt.Axes:
+    """
+    Adds diagonal lines to the heatmap.
+
+    Args:
+        ax (plt.Axes): The axes to plot on.
+        shift (int, optional): The shift for the diagonal lines. Defaults to 1.
+
+    Returns:
+        plt.Axes: The axes with diagonal lines.
+    """
     ax.plot([0, 1000], [shift, 1000 + shift], color="tab:blue", linestyle="--", linewidth=1)
     ax.plot([0, 1000], [-10 + shift, 990 + shift], color="tab:blue", linestyle="--", linewidth=1)
     ax.plot([0, 1000], [-5 + shift, 995 + shift], color="black", linestyle="--", linewidth=1)
     return ax
 
 
-def add_QR_code(fig, link):
+def add_QR_code(fig: plt.Figure, link: str) -> plt.Figure:
+    """
+    Adds a QR code pointing to the given link to the figure.
+
+    Args:
+        fig (plt.Figure): The figure to add the QR code to.
+        link (str): The link to encode in the QR code.
+
+    Returns:
+        plt.Figure: The figure with the QR code.
+    """
     # Add QR code pointing to the github repository
     qr = qrcode.QRCode(
         # version=None,
@@ -149,15 +241,31 @@ def add_QR_code(fig, link):
 
 
 def _set_labels(
-    ax,
-    df_to_plot,
-    data_array,
-    horizontal_variable,
-    vertical_variable,
-    xlabel,
-    ylabel,
-    xaxis_ticks_on_top,
-):
+    ax: plt.Axes,
+    df_to_plot: pd.DataFrame,
+    data_array: np.ndarray,
+    horizontal_variable: str,
+    vertical_variable: str,
+    xlabel: Optional[str],
+    ylabel: Optional[str],
+    xaxis_ticks_on_top: bool,
+) -> plt.Axes:
+    """
+    Sets the labels for the heatmap.
+
+    Args:
+        ax (plt.Axes): The axes to plot on.
+        df_to_plot (pd.DataFrame): The dataframe to plot.
+        data_array (np.ndarray): The data array.
+        horizontal_variable (str): The horizontal variable.
+        vertical_variable (str): The vertical variable.
+        xlabel (Optional[str]): The label for the x-axis.
+        ylabel (Optional[str]): The label for the y-axis.
+        xaxis_ticks_on_top (bool): Whether to place the x-axis ticks on top.
+
+    Returns:
+        plt.Axes: The axes with labels set.
+    """
     # Filter out odd ticks and and label the rest with the respective list entries
     ax.set_xticks(np.arange(len(df_to_plot.columns))[::2], labels=df_to_plot.columns[::2])
     ax.set_yticks(np.arange(len(df_to_plot.index))[::2], labels=df_to_plot.index[::2])
@@ -189,38 +297,77 @@ def _set_labels(
 
 
 def plot_heatmap(
-    dataframe_data,
-    horizontal_variable,
-    vertical_variable,
-    color_variable,
-    link=None,
-    plot_contours=True,
-    xlabel=None,
-    ylabel=None,
-    symmetric_missing=True,
-    mask_lower_triangle=False,
-    mask_upper_triangle=False,
-    plot_diagonal_lines=True,
-    shift_diagonal_lines=1,
-    xaxis_ticks_on_top=True,
-    title="",
-    vmin=4.5,
-    vmax=7.5,
-    k_masking=-1,
+    dataframe_data: pd.DataFrame,
+    horizontal_variable: str,
+    vertical_variable: str,
+    color_variable: str,
+    link: Optional[str] = None,
+    plot_contours: bool = True,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    symmetric_missing: bool = True,
+    mask_lower_triangle: bool = False,
+    mask_upper_triangle: bool = False,
+    plot_diagonal_lines: bool = True,
+    shift_diagonal_lines: int = 1,
+    xaxis_ticks_on_top: bool = True,
+    title: str = "",
+    vmin: float = 4.5,
+    vmax: float = 7.5,
+    k_masking: int = -1,
     green_contour: Optional[float] = 6.0,
-    min_level_contours=1,
-    max_level_contours=15,
-    delta_levels_contours=0.5,
-    figsize=None,
-    label_cbar="Minimum DA (" + r"$\sigma$" + ")",
-    colormap="coolwarm_r",
-    style="ggplot",
-    output_path="output.pdf",
-    display_plot=True,
-    latex_fonts=True,
-    vectorize=False,
+    min_level_contours: float = 1,
+    max_level_contours: float = 15,
+    delta_levels_contours: float = 0.5,
+    figsize: Optional[tuple[float, float]] = None,
+    label_cbar: str = "Minimum DA (" + r"$\sigma$" + ")",
+    colormap: str = "coolwarm_r",
+    style: str = "ggplot",
+    output_path: str = "output.pdf",
+    display_plot: bool = True,
+    latex_fonts: bool = True,
+    vectorize: bool = False,
     fill_missing_value_with: Optional[str | float] = None,
-):
+) -> tuple[plt.Figure, plt.Axes]:
+    """
+    Plots a heatmap from the given dataframe.
+
+    Args:
+        dataframe_data (pd.DataFrame): The dataframe containing the data to plot.
+        horizontal_variable (str): The variable to plot on the horizontal axis.
+        vertical_variable (str): The variable to plot on the vertical axis.
+        color_variable (str): The variable to use for the color scale.
+        link (Optional[str], optional): A link to encode in a QR code. Defaults to None.
+        plot_contours (bool, optional): Whether to plot contours. Defaults to True.
+        xlabel (Optional[str], optional): The label for the x-axis. Defaults to None.
+        ylabel (Optional[str], optional): The label for the y-axis. Defaults to None.
+        symmetric_missing (bool, optional): Whether to make the matrix symmetric by replacing the lower triangle with the upper triangle. Defaults to True.
+        mask_lower_triangle (bool, optional): Whether to mask the lower triangle. Defaults to False.
+        mask_upper_triangle (bool, optional): Whether to mask the upper triangle. Defaults to False.
+        plot_diagonal_lines (bool, optional): Whether to plot diagonal lines. Defaults to True.
+        shift_diagonal_lines (int, optional): The shift for the diagonal lines. Defaults to 1.
+        xaxis_ticks_on_top (bool, optional): Whether to place the x-axis ticks on top. Defaults to True.
+        title (str, optional): The title of the plot. Defaults to "".
+        vmin (float, optional): The minimum value for the color scale. Defaults to 4.5.
+        vmax (float, optional): The maximum value for the color scale. Defaults to 7.5.
+        k_masking (int, optional): The k parameter for masking. Defaults to -1.
+        green_contour (Optional[float], optional): The value for the green contour line. Defaults to 6.0.
+        min_level_contours (float, optional): The minimum level for the contours. Defaults to 1.
+        max_level_contours (float, optional): The maximum level for the contours. Defaults to 15.
+        delta_levels_contours (float, optional): The delta between contour levels. Defaults to 0.5.
+        figsize (Optional[tuple[float, float]], optional): The size of the figure. Defaults to None.
+        label_cbar (str, optional): The label for the colorbar. Defaults to "Minimum DA ($\sigma$)".
+        colormap (str, optional): The colormap to use. Defaults to "coolwarm_r".
+        style (str, optional): The style to use for the plot. Defaults to "ggplot".
+        output_path (str, optional): The path to save the plot. Defaults to "output.pdf".
+        display_plot (bool, optional): Whether to display the plot. Defaults to True.
+        latex_fonts (bool, optional): Whether to use LaTeX fonts. Defaults to True.
+        vectorize (bool, optional): Whether to vectorize the plot. Defaults to False.
+        fill_missing_value_with (Optional[str | float], optional): The value to fill missing values with. Defaults to None.
+
+    Returns:
+        tuple[plt.Figure, plt.Axes]: The figure and axes of the plot.
+    """
     # Use the requested style
     _set_style(style, latex_fonts, vectorize)
 
