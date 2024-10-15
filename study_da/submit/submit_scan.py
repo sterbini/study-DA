@@ -122,9 +122,6 @@ class SubmitScan:
         self,
         force_configure: bool = False,
         dic_config_jobs: Optional[dict[str, dict[str, Any]]] = None,
-        dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
-        dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
-        name_config: str = "config.yaml",
     ) -> None:
         """
         Configures the jobs by modifying the tree structure and creating the run files for each job.
@@ -133,20 +130,7 @@ class SubmitScan:
             force_configure (bool, optional): Whether to force reconfiguration. Defaults to False.
             dic_config_jobs (Optional[dict[str, dict[str, Any]]], optional): A dictionary containing
                 the configuration of the jobs. Defaults to None.
-            dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
-                generation. Defaults to {}.
-            dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
-                Defaults to {}.
-            name_config (str, optional): The name of the configuration file.
-                Defaults to "config.yaml".
         """
-
-        # Handle the mutable default arguments
-        if dic_additional_commands_per_gen is None:
-            dic_additional_commands_per_gen = {}
-        if dic_dependencies_per_gen is None:
-            dic_dependencies_per_gen = {}
-
         # Lock since we are modifying the tree
         logging.info("Acquiring lock to configure jobs")
         with self.lock:
@@ -161,19 +145,11 @@ class SubmitScan:
             # Configure the jobs (add generation and job keys, set status to "To finish")
             dic_tree = ConfigJobs(dic_tree).find_and_configure_jobs(dic_config_jobs)
 
-            # Generate run files for the jobs to submit
-            dic_tree = self.generate_run_files(
-                dic_tree,
-                dic_additional_commands_per_gen,
-                dic_dependencies_per_gen,
-                name_config,
-            )
-
             # Add the python environment, container image and absolute path of the study to the tree
             dic_tree["python_environment"] = self.path_python_environment
             dic_tree["container_image"] = self.path_container_image
             dic_tree["absolute_path"] = self.abs_path
-            dic_tree["status"] = "To finish"
+            dic_tree["status"] = "to_finish"
             dic_tree["configured"] = True
 
             # Explicitly set the dic_tree property to force rewrite
@@ -196,16 +172,17 @@ class SubmitScan:
     def generate_run_files(
         self,
         dic_tree: dict,
-        dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
-        dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
-        name_config: str = "config.yaml",
+        l_jobs: list[str],
+        dic_additional_commands_per_gen: dict[int, str],
+        dic_dependencies_per_gen: dict[int, list[str]],
+        name_config: str,
     ) -> dict:
         """
         Generates run files for the specified jobs.
 
         Args:
             dic_tree (dict): The dictionary tree structure.
-            l_jobs_to_submit (list[str]): List of jobs to submit.
+            l_jobs (list[str]): List of jobs to submit.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation. Defaults to {}.
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
@@ -216,16 +193,11 @@ class SubmitScan:
         Returns:
             dict: The updated dictionary tree structure.
         """
-        # Handle the mutable default arguments
-        if dic_additional_commands_per_gen is None:
-            dic_additional_commands_per_gen = {}
-        if dic_dependencies_per_gen is None:
-            dic_dependencies_per_gen = {}
 
         logging.info("Generating run files for the jobs to submit")
         # Generate the run files for the jobs to submit
         dic_all_jobs = self.get_all_jobs()
-        for job in dic_all_jobs:
+        for job in l_jobs:
             l_keys = dic_all_jobs[job]["l_keys"]
             job_name = os.path.basename(job)
             relative_job_folder = os.path.dirname(job)
@@ -274,16 +246,16 @@ class SubmitScan:
 
         This method iterates through all jobs, checks if a ".finished" file exists in the job's folder,
         and updates the job's status accordingly. If at least one job is not finished, the overall
-        status is set to "To finish". If all jobs are finished, the overall status is set to "finished".
+        status is set to "to_finish". If all jobs are finished, the overall status is set to "finished".
 
         Returns:
             tuple[dict[str, Any], str]: A tuple containing:
             - A dictionary with all jobs and their updated statuses.
-            - A string representing the final status ("To finish" or "finished").
+            - A string representing the final status ("to_finish" or "finished").
         """
         dic_all_jobs = self.get_all_jobs()
         at_least_one_job_to_finish = False
-        final_status = "To finish"
+        final_status = "to_finish"
         with self.lock:
             # Get dic tree once to avoid reloading it for every job
             dic_tree = self.dic_tree
@@ -304,17 +276,35 @@ class SubmitScan:
 
         return dic_all_jobs, final_status
 
-    def submit(self, one_generation_at_a_time: bool = False) -> str:
+    def submit(
+        self,
+        one_generation_at_a_time: bool = False,
+        dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
+        dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
+        name_config: str = "config.yaml",
+    ) -> str:
         """
         Submits the jobs to the cluster.
 
         Args:
             one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
                 time. Defaults to False.
+            dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
+                generation. Defaults to None.
+            dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
+                Defaults to None.
+            name_config (str, optional): The name of the configuration file.
+                Defaults to "config.yaml".
 
         Returns:
             str: The final status of the jobs.
         """
+        # Handle mutable default arguments
+        if dic_additional_commands_per_gen is None:
+            dic_additional_commands_per_gen = {}
+        if dic_dependencies_per_gen is None:
+            dic_dependencies_per_gen = {}
+
         # Update the status of all jobs before submitting
         dic_all_jobs, final_status = self.check_and_update_all_jobs_status()
         if final_status == "finished":
@@ -327,14 +317,29 @@ class SubmitScan:
             dic_tree = self.dic_tree
 
             # Submit the jobs
-            self._submit(dic_tree, dic_all_jobs, one_generation_at_a_time)
+            self._submit(
+                dic_tree,
+                dic_all_jobs,
+                one_generation_at_a_time,
+                dic_additional_commands_per_gen,
+                dic_dependencies_per_gen,
+                name_config,
+            )
 
             # Update dic_tree from cluster_submission
             self.dic_tree = dic_tree
         logging.info("Jobs have been submitted. Lock released.")
         return final_status
 
-    def _submit(self, dic_tree: dict, dic_all_jobs: dict, one_generation_at_a_time: bool) -> None:
+    def _submit(
+        self,
+        dic_tree: dict,
+        dic_all_jobs: dict,
+        one_generation_at_a_time: bool,
+        dic_additional_commands_per_gen,
+        dic_dependencies_per_gen,
+        name_config: str,
+    ) -> None:
         """
         Submits the jobs to the cluster.
 
@@ -342,6 +347,10 @@ class SubmitScan:
             dic_tree (dict): The dictionary tree structure.
             dic_all_jobs (dict): A dictionary containing all jobs.
             one_generation_at_a_time (bool): Whether to submit one full generation at a time.
+            dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
+                generation.
+            dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
+            name_config (str, optional): The name of the configuration file.
         """
         # Collect dict of list of unfinished jobs for every tree branch and every gen
         dic_to_submit_by_gen = {}
@@ -372,6 +381,17 @@ class SubmitScan:
         # Convert dic_to_submit_by_gen to contain all requested information
         l_jobs_to_submit = [job for dic_gen in dic_to_submit_by_gen.values() for job in dic_gen]
 
+        # Generate run files for the jobs to submit
+        # ! Run files are generated at submit and not at configuration as the configuration
+        # ! files are created at the end of each generation
+        dic_tree = self.generate_run_files(
+            dic_tree,
+            l_jobs_to_submit,
+            dic_additional_commands_per_gen,
+            dic_dependencies_per_gen,
+            name_config,
+        )
+
         # Create the ClusterSubmission object
         path_submission_file = f"{self.abs_path}/{self.study_name}/submission/submission_file.sub"
         cluster_submission = ClusterSubmission(
@@ -396,6 +416,9 @@ class SubmitScan:
         self,
         one_generation_at_a_time: bool = False,
         wait_time: float = 30,
+        dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
+        dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
+        name_config: str = "config.yaml",
     ) -> None:
         """
         Keeps submitting jobs until all jobs are finished.
@@ -405,10 +428,22 @@ class SubmitScan:
                 time. Defaults to False.
             wait_time (float, optional): The wait time between submissions in minutes.
                 Defaults to 30.
+            dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
+                generation. Defaults to None.
+            dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
+                Defaults to None.
+            name_config (str, optional): The name of the configuration file.
+                Defaults to "config.yaml".
 
         Returns:
             None
         """
+        # Handle mutable default arguments
+        if dic_additional_commands_per_gen is None:
+            dic_additional_commands_per_gen = {}
+        if dic_dependencies_per_gen is None:
+            dic_dependencies_per_gen = {}
+
         if wait_time < 1 / 20:
             logging.warning("Wait time should be at least 10 seconds to prevent locking errors.")
             logging.warning("Setting wait time to 10 seconds.")
@@ -416,7 +451,15 @@ class SubmitScan:
 
         # I don't need to lock the tree here since the status cheking is read only and
         # the lock is acquired in the submit method for the submission
-        while self.submit(one_generation_at_a_time) != "finished":
+        while (
+            self.submit(
+                one_generation_at_a_time,
+                dic_additional_commands_per_gen,
+                dic_dependencies_per_gen,
+                name_config,
+            )
+            != "finished"
+        ):
             # Wait for a certain amount of time before checking again
             logging.info(f"Waiting {wait_time} minutes before checking again.")
             time.sleep(wait_time * 60)

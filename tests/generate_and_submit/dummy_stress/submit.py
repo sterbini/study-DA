@@ -14,11 +14,8 @@ study_sub = SubmitScan(
     path_python_environment="/afs/cern.ch/work/c/cdroin/private/study-DA/.venv",
 )
 
-# %%
-
-# study_sub.configure_jobs(dic_config_jobs = dic_config_jobs, force_configure = True)
 study_sub.configure_jobs(force_configure=True)
 
 # %%
 # study_sub.submit()
-study_sub.keep_submit_until_done(wait_time=1 / 20)
+study_sub.keep_submit_until_done(wait_time=1 / 20, name_config="custom_config.yaml")
