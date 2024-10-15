@@ -462,3 +462,100 @@ def plot_heatmap(
     if display_plot:
         plt.show()
     return fig, ax
+
+
+# This function is a prototype... Latex title seems buggy
+def plot_3D(
+    dataframe_data: pd.DataFrame,
+    x_variable: str,
+    y_variable: str,
+    z_variable: str,
+    color_variable: str,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    z_label: Optional[str] = None,
+    title: str = "",
+    vmin: float = 4.5,
+    vmax: float = 7.5,
+    surface_count: int = 30,
+    opacity: float = 0.2,
+    figsize: tuple[float, float] = (1000, 1000),
+    colormap: str = "RdBu",
+    output_path: str = "output.png",
+    output_path_html: str = "output.html",
+    display_plot: bool = True,
+) -> go.Figure:
+    """
+    Plots a 3D volume rendering from the given dataframe.
+
+    Args:
+        dataframe_data (pd.DataFrame): The dataframe containing the data to plot.
+        x_variable (str): The variable to plot on the x-axis.
+        y_variable (str): The variable to plot on the y-axis.
+        z_variable (str): The variable to plot on the z-axis.
+        color_variable (str): The variable to use for the color scale.
+        xlabel (Optional[str], optional): The label for the x-axis. Defaults to None.
+        ylabel (Optional[str], optional): The label for the y-axis. Defaults to None.
+        z_label (Optional[str], optional): The label for the z-axis. Defaults to None.
+        title (str, optional): The title of the plot. Defaults to "".
+        vmin (float, optional): The minimum value for the color scale. Defaults to 4.5.
+        vmax (float, optional): The maximum value for the color scale. Defaults to 7.5.
+        surface_count (int, optional): The number of surfaces for volume rendering. Defaults to 30.
+        opacity (float, optional): The opacity of the volume rendering. Defaults to 0.2.
+        figsize (tuple[float, float], optional): The size of the figure. Defaults to (1000, 1000).
+        colormap (str, optional): The colormap to use. Defaults to "RdBu".
+        output_path (str, optional): The path to save the plot image. Defaults to "output.png".
+        output_path_html (str, optional): The path to save the plot HTML. Defaults to "output.html".
+        display_plot (bool, optional): Whether to display the plot. Defaults to True.
+
+    Returns:
+        go.Figure: The plotly figure object.
+    """
+    # Check if plotly is installed
+    try:
+        import plotly.graph_objects as go
+    except ImportError as e:
+        raise ImportError("Please install plotly to use this function") from e
+
+    X = np.array(dataframe_data[x_variable])
+    Y = np.array(dataframe_data[y_variable])
+    Z = np.array(dataframe_data[z_variable])
+    values = np.array(dataframe_data[color_variable])
+    fig = go.Figure(
+        data=go.Volume(
+            x=X.flatten(),
+            y=Y.flatten(),
+            z=Z.flatten(),
+            value=values.flatten(),
+            isomin=vmin,
+            isomax=vmax,
+            opacity=opacity,  # needs to be small to see through all surfaces
+            surface_count=surface_count,  # needs to be a large number for good volume rendering
+            colorscale=colormap,
+        )
+    )
+
+    fig.update_layout(
+        scene_xaxis_title_text=xlabel,
+        scene_yaxis_title_text=ylabel,
+        scene_zaxis_title_text=z_label,
+        title=title,
+    )
+
+    # Center the title
+    fig.update_layout(title_x=0.5, title_y=0.9, title_xanchor="center", title_yanchor="top")
+
+    # Specify the width and height of the figure
+    fig.update_layout(width=figsize[0], height=figsize[1])
+
+    # Display/save/return the figure
+    if output_path is not None:
+        fig.write_image(output_path)
+
+    if output_path_html is not None:
+        fig.write_html(output_path_html)
+
+    if display_plot:
+        fig.show()
+
+    return fig

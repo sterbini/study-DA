@@ -2,7 +2,6 @@
 import logging
 
 from study_da import SubmitScan
-from study_da.utils import load_dic_from_path, write_dic_to_path
 
 # Set up the logger
 logger = logging.getLogger(__name__)
@@ -12,7 +11,7 @@ study_sub = SubmitScan(
     path_tree="example_tune_scan/tree.yaml",
     path_python_environment="/afs/cern.ch/work/c/cdroin/private/study-DA/.venv",
     path_python_environment_container="/usr/local/DA_study/miniforge_docker",
-    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:8768182e",
+    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:af320ce3",
 )
 
 # %%
