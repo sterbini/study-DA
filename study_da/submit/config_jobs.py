@@ -174,6 +174,9 @@ class ConfigJobs:
         # Flag set to True if self.find_all_jobs() has been called at least once
         self.all_jobs_found: bool = False
 
+        # Variables to store the jobs and their configuration
+        self.dic_all_jobs: dict[str, Any] = {}
+
     def _find_and_configure_jobs_recursion(
         self,
         dic_gen: dict[str, Any],
@@ -340,12 +343,8 @@ class ConfigJobs:
         """
         # Variables to store the jobs and their configuration
         self.dic_config_jobs = dic_config_jobs if dic_config_jobs is not None else {}
-        self.dic_all_jobs = {}
         self.skip_configured_jobs = None
-
-        logging.info("Finding and configuring jobs in the tree")
-        self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=False)
-
+        self._log_and_find("Finding and configuring jobs in the tree", False)
         return self.dic_tree
 
     def find_all_jobs(self) -> dict:
@@ -356,16 +355,13 @@ class ConfigJobs:
             dict: A dictionary containing all jobs and their details.
         """
         if not self.all_jobs_found:
-            # Variables to store the jobs and their configuration
-            self.dic_all_jobs = {}
-
-            # Find all jobs and associated generation
-            logging.info("Finding all jobs in the tree")
-            self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=True)
-
-            # Write the jobs as found
-            self.all_jobs_found = True
+            self._log_and_find("Finding all jobs in the tree", True)
         else:
             logging.info("All jobs have already been found. Returning the existing dictionary.")
 
         return self.dic_all_jobs
+
+    def _log_and_find(self, log_str, find_only):
+        logging.info(log_str)
+        self._find_and_configure_jobs_recursion(self.dic_tree, depth=-1, find_only=find_only)
+        self.all_jobs_found = True

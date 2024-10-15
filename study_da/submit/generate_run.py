@@ -13,26 +13,24 @@ from study_da.utils import find_item_in_dic
 # ==================================================================================================
 # --- Functions
 # ==================================================================================================
-def tag_str(tree_path: str, l_keys: list[str]) -> str:
+def tag_str(abs_job_folder: str) -> str:
     """ "
     Generates a shell script snippet to tag a job as finished if it was successful.
     Args:
-        tree_path (str): The path to the tree structure where the job is logged.
-        l_keys (list[str]): A list of keys to be included in the log.
+        abs_job_folder (str): The (absolute) folder where the job is located.
     Returns:
         str: A formatted string containing the shell script snippet.
     """
-    # Tag the job as finished with all keys from l_keys
     return f"""
 # Ensure job run was successful and tag as finished
 if [ $? -eq 0 ]; then
-    python -m study_da.submit.scripts.log_finish {tree_path} {' '.join(l_keys)}
+    touch {abs_job_folder}/.finished
 fi\n
 """
 
 
 def generate_run_file(
-    job_folder: str,
+    abs_job_folder: str,
     job_name: str,
     setup_env_script: str,
     generation_number: int,
@@ -47,7 +45,7 @@ def generate_run_file(
     Generates a run file for a job, either for local/Slurm or HTC environments.
 
     Args:
-        job_folder (str): The folder where the job is located.
+        abs_job_folder (str): The (absolute) folder where the job is located.
         job_name (str): The name of the job script.
         setup_env_script (str): The script to set up the environment.
         generation_number (int): The generation number.
@@ -66,7 +64,7 @@ def generate_run_file(
         if l_dependencies is None:
             l_dependencies = []
         return _generate_run_file_htc(
-            job_folder,
+            abs_job_folder,
             job_name,
             setup_env_script,
             generation_number,
@@ -79,7 +77,7 @@ def generate_run_file(
     # Local, or Slurm
     else:
         return _generate_run_file(
-            job_folder,
+            abs_job_folder,
             job_name,
             setup_env_script,
             tree_path,
@@ -118,7 +116,7 @@ def _generate_run_file(
         f"cd {job_folder}\n\n"
         f"python {job_name} > output_python.txt 2> error_python.txt\n"
         # Tag the job
-        f"{tag_str(tree_path, l_keys)}"
+        f"{tag_str(job_folder)}"
         f"# Store abs path as a variable in case it's needed for additional commands\n"
         f"path_job=$(pwd)\n"
         f"# Optional user defined command to run\n"
@@ -199,7 +197,7 @@ def _generate_run_file_htc(
         f"# Run the job\n"
         f"python {abs_path}/{job_name} > output_python.txt 2> error_python.txt\n\n"
         # Tag the job
-        f"{tag_str(tree_path, l_keys)}"
+        f"{tag_str(job_folder)}"
         f"# Delete the config file from the above directory, otherwise it will be copied back and overwrite the new config\n"
         f"rm ../{name_config}\n"
         f"# Copy back output, including the new config\n"
