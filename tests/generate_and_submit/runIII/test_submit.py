@@ -12,7 +12,7 @@ study_sub = SubmitScan(
     path_tree="example_tune_scan/tree.yaml",
     path_python_environment="/afs/cern.ch/work/c/cdroin/private/study-DA/.venv",
     path_python_environment_container="/usr/local/DA_study/miniforge_docker",
-    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:3bc45f16",
+    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:8768182e",
 )
 
 # %%
