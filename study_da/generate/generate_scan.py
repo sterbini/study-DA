@@ -639,13 +639,11 @@ class GenerateScan:
         # Remove existing study if force_overwrite
         if os.path.exists(self.config["name"]):
             if not force_overwrite:
-                answer = input(
-                    "The folder already exists. You might delete an existing study. "
-                    "Do you want to overwrite it? [y/n]"
+                logging.info(
+                    f"Study {self.config['name']} already exists. Set force_overwrite to True to "
+                    "overwrite. Continuing without overwriting."
                 )
-                if answer != "y":
-                    print("Aborting...")
-                    exit()
+                return
             shutil.rmtree(self.config["name"])
 
         # Browse through the generations

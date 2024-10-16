@@ -66,7 +66,7 @@ config_mad:
   # To make some specifics checks
   sanity_checks: true
 
-  # Path of the collider file to be saved
+  # Path of the collider file to be saved (usually at the end of the first generation)
   path_collider: collider.json
   compress: true # will compress the collider file, filename will end with .zip
 
@@ -239,12 +239,12 @@ config_collider:
         - corr_co_acbyvs5.r8b1
         - corr_co_acbyhs5.r8b1
 
-  # Save collider or not
+  # Save collider or not (usually at the end of the collider tuning)
   save_final_collider: false
   path_final_collider: collider_final.json
 
 config_simulation:
-  # Collider file
+  # Collider file to load for the tracking
   collider_file: ../collider.json.zip
 
   # Distribution in the normalized xy space

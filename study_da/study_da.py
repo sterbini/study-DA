@@ -6,7 +6,7 @@ import logging
 from typing import Any, Optional
 
 # Local imports
-from . import GenerateScan
+from . import GenerateScan, SubmitScan
 
 # ==================================================================================================
 # --- Main functions
@@ -102,3 +102,46 @@ def create_single_job(
         tree_file=tree_file,
         force_overwrite=force_overwrite,
     )
+
+
+def submit(
+    path_tree: str,
+    path_python_environment: str,
+    path_python_environment_container: str = "",
+    path_container_image: Optional[str] = None,
+    force_configure: bool = False,
+    dic_config_jobs: Optional[dict[str, dict[str, Any]]] = None,
+    dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
+    dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
+    name_config: str = "config.yaml",
+    one_generation_at_a_time: bool = False,
+    keep_submit_until_done: bool = False,
+    wait_time: float = 30,
+):
+    # Instantiate the study (does not affect already existing study)
+    study_sub = SubmitScan(
+        path_tree=path_tree,
+        path_python_environment=path_python_environment,
+        path_python_environment_container=path_python_environment_container,
+        path_container_image=path_container_image,
+    )
+
+    # Configure the jobs (will only configure if not already done)
+    study_sub.configure_jobs(force_configure=force_configure, dic_config_jobs=dic_config_jobs)
+
+    # Submit the jobs (only submit the jobs that are not already submitted or finished)
+    if keep_submit_until_done:
+        study_sub.keep_submit_until_done(
+            wait_time=wait_time,
+            dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+            dic_dependencies_per_gen=dic_dependencies_per_gen,
+            name_config=name_config,
+            one_generation_at_a_time=one_generation_at_a_time,
+        )
+    else:
+        study_sub.submit(
+            one_generation_at_a_time=one_generation_at_a_time,
+            dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+            dic_dependencies_per_gen=dic_dependencies_per_gen,
+            name_config=name_config,
+        )

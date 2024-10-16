@@ -66,7 +66,6 @@ from scipy.ndimage.filters import gaussian_filter
 # Local imports
 from .utils import (
     apply_high_quality,
-    apply_nicer_style,
     use_default_fonts,
     use_latex_fonts,
 )
