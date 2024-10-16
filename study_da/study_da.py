@@ -6,26 +6,25 @@ import logging
 from typing import Any, Optional
 
 # Local imports
-from . import GenerateScan, SubmitScan
-
+from .generate.generate_scan import GenerateScan
+from .submit.submit_scan import SubmitScan
 # ==================================================================================================
 # --- Main functions
 # ==================================================================================================
 
 
 def create(
-    path_config: str = "config_scan.yaml",
-    tree_file: bool = True,
-    force_overwrite: bool = True,
+    path_config_scan: str = "config_scan.yaml",
+    force_overwrite: bool = False,
     dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]] = None,
     dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]] = None,
-) -> None:
+) -> tuple[str, str]:
     """
     Create a study based on the configuration file.
 
     Args:
-        path_config (str, optional): Path to the configuration file. Defaults to "config_scan.yaml".
-        tree_file (bool, optional): Flag to create the tree file. Defaults to True.
+        path_config_scan (str, optional): Path to the configuration file for the scan.
+            Defaults to "config_scan.yaml".
         force_overwrite (bool, optional): Flag to force overwrite the study. Defaults to True.
         dic_parameter_all_gen (Optional[dict[str, dict[str, Any]]], optional): Dictionary of
             parameters for the scan, if not provided through the scan config. Defaults to None.
@@ -34,16 +33,21 @@ def create(
             config. Defaults to None.
 
     Returns:
-        None
+        tuple[str, str]: The path to the tree file and the name of the main configuration file.
     """
-    logging.info(f"Create study from configuration file: {path_config}")
-    study = GenerateScan(path_config=path_config)
+    logging.info(f"Create study from configuration file: {path_config_scan}")
+    study = GenerateScan(path_config=path_config_scan)
     study.create_study(
-        tree_file=tree_file,
         force_overwrite=force_overwrite,
         dic_parameter_all_gen=dic_parameter_all_gen,
         dic_parameter_all_gen_naming=dic_parameter_all_gen_naming,
     )
+
+    # Get variables of interest for the submission
+    path_tree = study.path_tree
+    name_main_configuration = study.config["dependencies"]["main_configuration"]
+
+    return path_tree, name_main_configuration
 
 
 def create_single_job(
@@ -52,27 +56,25 @@ def create_single_job(
     name_executable_generation_2: Optional[str] = None,
     name_executable_generation_3: Optional[str] = None,
     name_study: str = "single_job_study",
-    tree_file: bool = True,
-    force_overwrite: bool = True,
-):
+    force_overwrite: bool = False,
+) -> str:
     """
     Create a single job study (not a parametric scan) with the specified configuration and
     executables. Limited to three generations.
 
     Args:
-        name_main_configuration (str): The name of the main configuration file.
+        name_main_configuration (str): The name of the main configuration file for the study.
         name_executable_generation_1 (str): The name of the executable for the first generation.
         name_executable_generation_2 (Optional[str], optional): The name of the executable for the
             second generation. Defaults to None.
         name_executable_generation_3 (Optional[str], optional): The name of the executable for the
             third generation. Defaults to None.
         name_study (str, optional): The name of the study. Defaults to "single_job_study".
-        tree_file (bool, optional): Whether to create a tree file. Defaults to True.
         force_overwrite (bool, optional): Whether to force overwrite existing files.
             Defaults to True.
 
     Returns:
-        None
+        str: The path to the tree file.
     """
     # Generate the scan dictionnary
     dic_scan = {
@@ -99,9 +101,10 @@ def create_single_job(
     logging.info(f"Create single job study: {name_study}")
     study = GenerateScan(dic_scan=dic_scan)
     study.create_study(
-        tree_file=tree_file,
         force_overwrite=force_overwrite,
     )
+
+    return study.path_tree
 
 
 def submit(

@@ -81,7 +81,8 @@ class GenerateScan:
         Initialize the generation scan with a configuration file or dictionary.
 
         Args:
-            path_config (Optional[str]): Path to the configuration file. Default is None.
+            path_config (Optional[str]): Path to the configuration file for the scan.
+                Default is None.
             dic_scan (Optional[dict[str, Any]]): Dictionary containing the scan configuration.
                 Default is None.
 
@@ -105,6 +106,9 @@ class GenerateScan:
 
         # Parameters common across all generations (e.g. for parallelization)
         self.dic_common_parameters: dict[str, Any] = {}
+
+        # Path to the tree file
+        self.path_tree = self.config["name"] + "/" + "tree.yaml"
 
     def render(
         self,
@@ -556,7 +560,7 @@ class GenerateScan:
         """
         logging.info("Writing the tree structure to a YAML file.")
         ryaml = yaml.YAML()
-        with open(self.config["name"] + "/" + "tree.yaml", "w") as yaml_file:
+        with open(self.path_tree, "w") as yaml_file:
             ryaml.indent(sequence=4, offset=2)
             ryaml.dump(dictionary_tree, yaml_file)
 

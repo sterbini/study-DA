@@ -6,11 +6,9 @@
 import importlib.metadata
 
 # Local imports
-from .generate.generate_scan import GenerateScan
 from .plot import get_title_from_configuration, plot_3D, plot_heatmap
 from .postprocess import aggregate_output_data
-from .study_da import create, create_single_job, submit
-from .submit.submit_scan import SubmitScan
+from .study_da import GenerateScan, SubmitScan, create, create_single_job, submit
 
 # ==================================================================================================
 # --- Package version

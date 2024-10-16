@@ -180,7 +180,7 @@ def _generate_run_file_htc(
     local_path = abs_path.split("/")[-1]
 
     # Mutate all paths in config to be absolute
-    with open(f"{abs_path}/../{name_config}", "r") as f:
+    with open(f"{abs_path}/../{name_config.split('/')[-1]}", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     # Mutate paths to be absolute, if they're not already absolute
@@ -221,7 +221,7 @@ def _generate_run_file_htc(
         f"# Delete the config file from the above directory, otherwise it will be copied back and overwrite the new config\n"
         f"rm ../{name_config}\n"
         f"# Copy back output, including the new config\n"
-        f"cp -f *.txt *.parquet *.yaml {abs_path}\n\n"
+        f"cp -f *.txt *.parquet *.yaml *.json *.zip {abs_path}\n\n"
         f"# Store abs path as a variable in case it's needed for additional commands\n"
         f"path_job={abs_path}\n\n"
         f"# Optional user defined command to run\n"
