@@ -3,7 +3,7 @@
 # ==================================================================================================
 # Standard library imports
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 # Third party imports
 import matplotlib
@@ -196,7 +196,7 @@ def _add_diagonal_lines(ax: plt.Axes, shift: int = 1) -> plt.Axes:
     return ax
 
 
-def add_QR_code(fig: plt.Figure, link: str) -> plt.Figure:
+def add_QR_code(fig: plt.Figure, link: str, position_qr="top-right") -> plt.Figure:
     """
     Adds a QR code pointing to the given link to the figure.
 
@@ -216,7 +216,16 @@ def add_QR_code(fig: plt.Figure, link: str) -> plt.Figure:
     qr.add_data(link)
     qr.make(fit=False)
     im = qr.make_image(fill_color="black", back_color="transparent")
-    newax = fig.add_axes([0.9, 0.9, 0.05, 0.05], anchor="NE", zorder=1)
+    if position_qr == "top-right":
+        newax = fig.add_axes([0.9, 0.9, 0.05, 0.05], anchor="NE", zorder=1)
+    elif position_qr == "bottom-right":
+        newax = fig.add_axes([0.9, 0.1, 0.05, 0.05], anchor="SE", zorder=1)
+    elif position_qr == "bottom-left":
+        newax = fig.add_axes([0.1, 0.1, 0.05, 0.05], anchor="SW", zorder=1)
+    elif position_qr == "top-left":
+        newax = fig.add_axes([0.1, 0.9, 0.05, 0.05], anchor="NW", zorder=1)
+    else:
+        raise ValueError(f"Position {position_qr} not recognized")
     newax.imshow(im, resample=False, interpolation="none", filternorm=False)
     # Add link below qrcode
     newax.plot([0, 0], [0, 0], color="white", label="link")
@@ -302,6 +311,7 @@ def plot_heatmap(
     vertical_variable: str,
     color_variable: str,
     link: Optional[str] = None,
+    position_qr: Optional[str] = "top-right",
     plot_contours: bool = True,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
@@ -453,7 +463,7 @@ def plot_heatmap(
 
     # Add QR code with a link to the topright side (a bit experimental, might need adjustments)
     if link is not None:
-        fig = add_QR_code(fig, link)
+        fig = add_QR_code(fig, link, position_qr)
 
     # Save and potentially display the plot
     if output_path is not None:
@@ -465,6 +475,7 @@ def plot_heatmap(
 
 
 # This function is a prototype... Latex title seems buggy
+# Can't return a go.Figure, because this would require plotly as a dependency
 def plot_3D(
     dataframe_data: pd.DataFrame,
     x_variable: str,
@@ -484,7 +495,7 @@ def plot_3D(
     output_path: str = "output.png",
     output_path_html: str = "output.html",
     display_plot: bool = True,
-) -> go.Figure:
+) -> Any:
     """
     Plots a 3D volume rendering from the given dataframe.
 

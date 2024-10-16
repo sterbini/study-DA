@@ -3,6 +3,7 @@
 # ==================================================================================================
 # Standard library imports
 import logging
+from typing import Optional
 
 # Third party imports
 import numpy as np
@@ -36,6 +37,27 @@ def latex_float(f: float, precision: int = 3) -> str:
     return r"${0} \times 10^{{{1}}}$".format(base, int(exponent))
 
 
+def get_crossing_type(dataframe_data: pd.DataFrame) -> str:
+    """
+    Retrieves the crossing type from the dataframe.
+
+    Args:
+        dataframe_data (pd.DataFrame): The dataframe containing crossing type information.
+
+    Returns:
+        str: The crossing type string.
+    """
+    if "optics_file" in dataframe_data.columns:
+        optics_file = dataframe_data["optics_file"].unique()[0]
+        if "flatvh" in optics_file:
+            return "flatvh"
+        elif "flathv" in optics_file:
+            return "flathv"
+
+    logging.warning("Crossing type not found in the dataframe. Falling back to flathv.")
+    return "flathv"
+
+
 def get_LHC_version_str(dataframe_data: pd.DataFrame) -> str:
     """
     Retrieves the LHC version from the dataframe.
@@ -46,15 +68,25 @@ def get_LHC_version_str(dataframe_data: pd.DataFrame) -> str:
     Returns:
         str: The LHC version string.
     """
+    string_HL_LHC = None
+    string_LHC = None
     if "ver_hllhc_optics" in dataframe_data.columns:
-        LHC_version_value = dataframe_data["ver_hllhc_optics"].unique()[0]
-        return f"HL-LHC v{LHC_version_value}"
-    elif "ver_lhc_run" in dataframe_data.columns:
-        LHC_version_value = dataframe_data["ver_lhc_run"].unique()[0]
-        return f"LHC Run {LHC_version_value}"
-    else:
-        logging.warning("LHC version not found in the dataframe")
-        return ""
+        ver_hllhc_optics = dataframe_data["ver_hllhc_optics"].unique()[0]
+        if ver_hllhc_optics is not None and not np.isnan(ver_hllhc_optics):
+            string_HL_LHC = f"HL-LHC v{ver_hllhc_optics}"
+    if "ver_lhc_run" in dataframe_data.columns:
+        ver_lhc_run = dataframe_data["ver_lhc_run"].unique()[0]
+        if ver_lhc_run is not None and not np.isnan(ver_lhc_run):
+            string_LHC = f"LHC Run {int(ver_lhc_run)}"
+
+    if string_HL_LHC is not None and string_LHC is not None:
+        raise ValueError("Both HL-LHC and LHC Run versions found in the dataframe. Please check.")
+    elif string_HL_LHC is not None:
+        return string_HL_LHC
+    elif string_LHC is not None:
+        return string_LHC
+    logging.warning("LHC version not found in the dataframe")
+    return ""
 
 
 def get_energy_str(dataframe_data: pd.DataFrame) -> str:
@@ -169,22 +201,16 @@ def _get_plane_crossing_IP_1_5_str(
     Returns:
         tuple[str, str]: The plane crossing strings for IP1 and IP5.
     """
-    optics_file = dataframe_data["optics_file"].unique()[0]
-
-    if "flatvh" in optics_file or type_crossing == "flatvh":
+    if type_crossing == "flatvh":
         phi_1_str = r"$\Phi/2_{1(V)}$"
         phi_5_str = r"$\Phi/2_{5(H)}$"
 
     # Crossing angle at IP1/5
-    elif "flathv" in optics_file or type_crossing == "flathv":
+    elif type_crossing == "flathv":
         phi_1_str = r"$\Phi/2_{1(H)}$"
         phi_5_str = r"$\Phi/2_{5(V)}$"
     else:
-        logging.warning(
-            "Type of crossing not found in the dataframe and not provided. Using flathv."
-        )
-        phi_1_str = r"$\Phi/2_{1(H)}$"
-        phi_5_str = r"$\Phi/2_{5(V)}$"
+        raise ValueError(f"Unknown crossing type: {type_crossing}. Must be flathv or flatvh.")
 
     return phi_1_str, phi_5_str
 
@@ -481,14 +507,14 @@ def get_luminosity_at_ip_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=Tr
     if beam_beam:
         if f"luminosity_ip{ip}_with_beam_beam" in dataframe_data.columns:
             luminosity_value = dataframe_data[f"luminosity_ip{ip}_with_beam_beam"].unique()[0]
-            return f"$L_{{IP{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
+            return f"$L_{{{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
         else:
             logging.warning(f"Luminosity at IP{ip} with beam-beam not found in the dataframe")
             return ""
     else:
         if f"luminosity_ip{ip}_without_beam_beam" in dataframe_data.columns:
             luminosity_value = dataframe_data[f"luminosity_ip{ip}_without_beam_beam"].unique()[0]
-            return f"$L_{{IP{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
+            return f"$L_{{{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
         else:
             logging.warning(f"Luminosity at IP{ip} without beam-beam not found in the dataframe")
             return ""
@@ -510,14 +536,14 @@ def get_PU_at_IP_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=True) -> s
     if beam_beam:
         if f"Pile-up_ip{ip}_with_beam_beam" in dataframe_data.columns:
             PU_value = dataframe_data[f"Pile-up_ip{ip}_with_beam_beam"].unique()[0]
-            return f"$PU_{{IP{ip}}} \simeq ${latex_float(float(PU_value))}"
+            return f"$PU_{{{ip}}} \simeq ${latex_float(float(PU_value))}"
         else:
             logging.warning(f"Pile-up at IP{ip} with beam-beam not found in the dataframe")
             return ""
     else:
         if f"Pile-up_ip{ip}_without_beam_beam" in dataframe_data.columns:
             PU_value = dataframe_data[f"Pile-up_ip{ip}_without_beam_beam"].unique()[0]
-            return f"$PU_{{IP{ip}}} \simeq ${latex_float(float(PU_value))}"
+            return f"$PU_{{{ip}}} \simeq ${latex_float(float(PU_value))}"
         else:
             logging.warning(f"Pile-up at IP{ip} without beam-beam not found in the dataframe")
             return ""
@@ -527,7 +553,7 @@ def get_title_from_configuration(
     dataframe_data: pd.DataFrame,
     betx_value: float = np.nan,
     bety_value: float = np.nan,
-    type_crossing: str = "flathv",
+    crossing_type: Optional[str] = None,
     display_LHC_version: bool = True,
     display_energy: bool = True,
     display_bunch_index: bool = True,
@@ -607,6 +633,9 @@ def get_title_from_configuration(
     Returns:
         str: The generated title string.
     """
+    # Find out what is the crossing type
+    crossing_type = get_crossing_type(dataframe_data)
+
     # Collect all the information to display
     LHC_version_str = get_LHC_version_str(dataframe_data)
     energy_str = get_energy_str(dataframe_data)
@@ -614,7 +643,7 @@ def get_title_from_configuration(
     CC_crossing_str = get_CC_crossing_str(dataframe_data)
     bunch_intensity_str = get_bunch_intensity_str(dataframe_data)
     beta_str = get_beta_str(betx_value, bety_value)
-    xing_IP1_str, xing_IP5_str = get_crossing_IP_1_5_str(dataframe_data, type_crossing)
+    xing_IP1_str, xing_IP5_str = get_crossing_IP_1_5_str(dataframe_data, crossing_type)
     xing_IP2_str, xing_IP8_str = get_crossing_IP_2_8_str(dataframe_data)
     bunch_length_str = get_bunch_length_str(dataframe_data)
     polarity_str = get_polarity_IP_2_8_str(dataframe_data)
@@ -639,72 +668,84 @@ def get_title_from_configuration(
                 dataframe_data, ip, beam_beam=True
             )
 
+    def test_if_empty_and_add_period(string: str) -> str:
+        """
+        Test if a string is empty and add a period if not.
+
+        Args:
+            string (str): The string to test.
+
+        Returns:
+            str: The string with a period if not empty.
+        """
+        return f"{string}. " if string != "" else ""
+
     # Make the final title (order is the same as in the past)
     title = ""
     if display_LHC_version:
-        title += LHC_version_str + ". "
+        title += test_if_empty_and_add_period(LHC_version_str)
     if display_energy:
-        title += energy_str + ". "
+        title += test_if_empty_and_add_period(energy_str)
     if display_CC_crossing:
-        title += CC_crossing_str + ". "
+        title += test_if_empty_and_add_period(CC_crossing_str)
     if display_bunch_intensity:
-        title += bunch_intensity_str + ". "
+        title += test_if_empty_and_add_period(bunch_intensity_str)
     # Jump to the next line
     title += "\n"
     if display_luminosity_1:
-        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][1] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["lumi"][1])
     if display_PU_1:
-        title += dic_lumi_PU_str["with_beam_beam"]["PU"][1] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["PU"][1])
     if display_luminosity_5:
-        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][5] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["lumi"][5])
     if display_PU_5:
-        title += dic_lumi_PU_str["with_beam_beam"]["PU"][5] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["PU"][5])
     # Jump to the next line
     title += "\n"
     if display_luminosity_2:
-        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][2] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["lumi"][2])
     if display_PU_2:
-        title += dic_lumi_PU_str["with_beam_beam"]["PU"][2] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["PU"][2])
     if display_luminosity_8:
-        title += dic_lumi_PU_str["with_beam_beam"]["lumi"][8] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["lumi"][8])
     if display_PU_8:
-        title += dic_lumi_PU_str["with_beam_beam"]["PU"][8] + ". "
+        title += test_if_empty_and_add_period(dic_lumi_PU_str["with_beam_beam"]["PU"][8])
     # Jump to the next line
     title += "\n"
     if display_beta:
-        title += beta_str + ". "
+        title += test_if_empty_and_add_period(beta_str)
     if display_polarity_IP_2_8:
-        title += polarity_str + ". "
+        title += test_if_empty_and_add_period(polarity_str)
     if display_bunch_length:
-        title += bunch_length_str + ". "
+        title += test_if_empty_and_add_period(bunch_length_str)
     # Jump to the next line
     title += "\n"
     if display_crossing_IP_1:
-        title += xing_IP1_str + ". "
+        title += test_if_empty_and_add_period(xing_IP1_str)
     if display_crossing_IP_5:
-        title += xing_IP5_str + ". "
+        title += test_if_empty_and_add_period(xing_IP5_str)
     if display_crossing_IP_2:
-        title += xing_IP2_str + ". "
+        title += test_if_empty_and_add_period(xing_IP2_str)
     if display_crossing_IP_8:
-        title += xing_IP8_str + ". "
+        title += test_if_empty_and_add_period(xing_IP8_str)
 
     # Jump to the next line
     title += "\n"
     if display_emittance:
-        title += emittance_str + ". "
+        title += test_if_empty_and_add_period(emittance_str)
     if display_chromaticity:
-        title += chromaticity_str + ". "
+        title += test_if_empty_and_add_period(chromaticity_str)
     if display_octupole_intensity:
-        title += octupole_intensity_str + ". "
+        title += test_if_empty_and_add_period(octupole_intensity_str)
     if display_coupling:
-        title += coupling_str + ". "
+        title += test_if_empty_and_add_period(coupling_str)
     if display_tune:
-        title += tune_str + ". "
+        title += test_if_empty_and_add_period(tune_str)
     # Jump to the next line
     title += "\n"
     if display_filling_scheme:
-        title += filling_scheme_str + ". "
+        title += test_if_empty_and_add_period(filling_scheme_str)
     if display_bunch_index:
-        title += bunch_index_str + ". "
+        title += test_if_empty_and_add_period(bunch_index_str)
 
     return title

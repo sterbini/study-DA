@@ -39,10 +39,12 @@ dic_dependencies_per_gen = {1: ["acc-models-lhc"], 2: ["collider_file", "particl
 name_config = "config_runIII.yaml"
 
 # %%
-study_sub.submit(
-    one_generation_at_a_time=False,
-    dic_additional_commands_per_gen=dic_additional_commands_per_gen,
-    dic_dependencies_per_gen=dic_dependencies_per_gen,
-    name_config=name_config,
-)
+# study_sub.submit(
+#     one_generation_at_a_time=False,
+#     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+#     dic_dependencies_per_gen=dic_dependencies_per_gen,
+#     name_config=name_config,
+# )
 # study_sub.keep_submit_until_done(wait_time = 1)
+
+study_sub.check_and_update_all_jobs_status()

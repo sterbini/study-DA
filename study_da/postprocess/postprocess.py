@@ -154,6 +154,7 @@ def aggregate_output_data(
     l_parameters_to_keep: Optional[List[str]] = None,
     name_template_parameters: str = "parameters_lhc.yaml",
     path_template_parameters: Optional[str] = None,
+    force_overwrite: bool = False,
 ) -> pd.DataFrame:
     """
     Aggregates output data from simulation files.
@@ -178,14 +179,27 @@ def aggregate_output_data(
         path_template_parameters (str, optional): The path to the template parameters file. Must
             be provided if a no template already contained in study-da is provided through the
             argument name_template_parameters. Defaults to None.
+        force_overwrite (bool, optional): Flag to indicate if the output file should be overwritten
+            if it already exists. Defaults to False.
 
     Returns:
         pd.DataFrame: The final aggregated DataFrame.
     """
-    logging.info("Analysis of output simulation files started")
-
+    # Check it the output doesn't already exist and ask for confirmation to overwrite
     dic_tree, _ = load_dic_from_path(path_tree)
     absolute_path_study = dic_tree["absolute_path"]
+    if path_output is None:
+        path_output = os.path.join(absolute_path_study, "da.parquet")
+    if os.path.exists(path_output) and not force_overwrite:
+        input_user = input(
+            f"The output file {path_output} already exists. Do you want to overwrite it? (y/n) "
+        )
+        if input_user.lower() != "y":
+            logging.warning("Output file not overwritten")
+            return pd.read_parquet(path_output)
+
+    logging.info("Analysis of output simulation files started")
+
     dic_all_jobs = ConfigJobs(dic_tree).find_all_jobs()
 
     l_df_sim = get_particles_data(
@@ -218,12 +232,32 @@ def aggregate_output_data(
         l_df_output, l_group_by_parameters, only_keep_lost_particles, l_parameters_to_keep
     )
 
+    # Fix the LHC version type
+    df_final = fix_LHC_version(df_final)
+
     if write_output:
-        if path_output is None:
-            path_output = os.path.join(absolute_path_study, "da.parquet")
         df_final.to_parquet(path_output)
     elif path_output is not None:
         logging.warning("Output path provided but write_output set to False, no output saved")
 
     logging.info("Final dataframe for current set of simulations: %s", df_final)
     return df_final
+
+
+def fix_LHC_version(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fixes the LHC version type in the DataFrame.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to fix.
+
+    Returns:
+        pd.DataFrame: The fixed DataFrame.
+    """
+    # Fix the LHC version type
+    if "ver_lhc_run" in df.columns:
+        df["ver_lhc_run"] = df["ver_lhc_run"].astype("int32")
+    if "ver_hllhc_optics" in df.columns:
+        df["ver_hllhc_optics"] = df["ver_hllhc_optics"].astype("float32")
+
+    return df
