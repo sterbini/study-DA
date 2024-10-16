@@ -1,4 +1,29 @@
-"""This class provide various functions to manipulate dictionaries (e.g. configuration)."""
+"""
+This module provides utility functions for handling nested dictionaries and YAML files.
+
+Functions:
+    load_dic_from_path(path: str, ryaml: ruamel.yaml.YAML | None = None)
+        -> tuple[dict, ruamel.yaml.YAML]:
+        Load a dictionary from a YAML file.
+
+    write_dic_to_path(dic: dict, path: str, ryaml: ruamel.yaml.YAML | None = None) -> None:
+        Write a dictionary to a YAML file.
+
+    nested_get(dic: dict, keys: list) -> Any:
+        Get the value from a nested dictionary using a list of keys.
+
+    nested_set(dic: dict, keys: list, value: Any) -> None:
+        Set a value in a nested dictionary using a list of keys.
+
+    find_item_in_dic(obj: dict, key: str) -> Any:
+        Find an item in a nested dictionary.
+
+    set_item_in_dic(obj: dict, key: str, value: Any, found: bool = False) -> None:
+        Set an item in a nested dictionary.
+
+    clean_dic(o: Any) -> None:
+        Convert numpy types to standard types in a nested dictionary containing numbers and lists.
+"""
 
 # ==================================================================================================
 # --- Imports

@@ -1,3 +1,53 @@
+"""
+This module provides functions to create and customize study plots, including heatmaps and 3D
+volume renderings.
+
+Functions:
+    _set_style(style: str, latex_fonts: bool, vectorize: bool) -> None:
+
+    _add_text_annotation(df_to_plot: pd.DataFrame, data_array: np.ndarray, ax: plt.Axes,
+        vmin: float, vmax: float) -> plt.Axes:
+
+    _smooth(data_array: np.ndarray, symmetric_missing: bool) -> np.ndarray:
+
+    _mask(mask_lower_triangle: bool, mask_upper_triangle: bool, data_smoothed: np.ndarray,
+        k_masking: int) -> np.ndarray:
+
+    _add_contours(ax: plt.Axes, data_array: np.ndarray, mx: np.ndarray,
+        green_contour: Optional[float], min_level: float = 1, max_level: float = 15,
+        delta_levels: float = 0.5) -> plt.Axes:
+
+    _add_diagonal_lines(ax: plt.Axes, shift: int = 1) -> plt.Axes:
+
+    add_QR_code(fig: plt.Figure, link: str, position_qr="top-right") -> plt.Figure:
+
+    _set_labels(ax: plt.Axes, df_to_plot: pd.DataFrame, data_array: np.ndarray,
+        horizontal_variable: str, vertical_variable: str, xlabel: Optional[str],
+        ylabel: Optional[str], xaxis_ticks_on_top: bool) -> plt.Axes:
+
+    plot_heatmap(dataframe_data: pd.DataFrame, horizontal_variable: str, vertical_variable: str,
+        color_variable: str, link: Optional[str] = None, position_qr: Optional[str] = "top-right",
+        plot_contours: bool = True, xlabel: Optional[str] = None, ylabel: Optional[str] = None,
+        symmetric_missing: bool = True, mask_lower_triangle: bool = False,
+        mask_upper_triangle: bool = False, plot_diagonal_lines: bool = True,
+        shift_diagonal_lines: int = 1, xaxis_ticks_on_top: bool = True, title: str = "",
+        vmin: float = 4.5, vmax: float = 7.5, k_masking: int = -1,
+        green_contour: Optional[float] = 6.0, min_level_contours: float = 1,
+        max_level_contours: float = 15, delta_levels_contours: float = 0.5,
+        figsize: Optional[tuple[float, float]] = None,
+        label_cbar: str = "Minimum DA (" + r"$\sigma$" + ")", colormap: str = "coolwarm_r",
+        style: str = "ggplot", output_path: str = "output.pdf", display_plot: bool = True,
+        latex_fonts: bool = True, vectorize: bool = False,
+        fill_missing_value_with: Optional[str | float] = None) -> tuple[plt.Figure, plt.Axes]:
+
+    plot_3D(dataframe_data: pd.DataFrame, x_variable: str, y_variable: str, z_variable: str,
+        color_variable: str, xlabel: Optional[str] = None, ylabel: Optional[str] = None,
+        z_label: Optional[str] = None, title: str = "", vmin: float = 4.5, vmax: float = 7.5,
+        surface_count: int = 30, opacity: float = 0.2, figsize: tuple[float, float] = (1000, 1000),
+        colormap: str = "RdBu", output_path: str = "output.png",
+        output_path_html: str = "output.html", display_plot: bool = True) -> Any:
+"""
+
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================

@@ -1,4 +1,88 @@
-# ==================================================================================================
+"""This module provides functions to compute LaTeX strings for plot titles based on data from a
+pandas DataFrame. The functions extract various parameters such as crossing type, LHC version,
+energy, bunch index, crab cavity crossing angle, bunch intensity, beta functions, crossing angles
+at different interaction points (IPs), bunch length, polarity, normalized emittance, chromaticity,
+octupole intensity, linear coupling, filling scheme, tune, luminosity, and pile-up.
+
+Functions:
+    latex_float(f: float, precision: int = 3) -> str:
+
+    get_crossing_type(dataframe_data: pd.DataFrame) -> str:
+
+    get_LHC_version_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_energy_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_bunch_index_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_CC_crossing_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_bunch_intensity_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_beta_str(betx_value: float, bety_value: float) -> str:
+
+    _get_plane_crossing_IP_1_5_str(dataframe_data: pd.DataFrame, type_crossing: str) -> tuple[str, str]:
+
+    _get_crossing_value_IP_1_5(dataframe_data: pd.DataFrame, ip: int) -> float:
+
+    get_crossing_IP_1_5_str(dataframe_data: pd.DataFrame, type_crossing: str) -> tuple[str, str]:
+
+    get_crossing_IP_2_8_str(dataframe_data: pd.DataFrame) -> list[str]:
+
+    get_bunch_length_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_polarity_IP_2_8_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_normalized_emittance_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_chromaticity_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_octupole_intensity_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_linear_coupling_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_filling_scheme_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_tune_str(dataframe_data: pd.DataFrame) -> str:
+
+    get_luminosity_at_ip_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=True) -> str:
+
+    get_PU_at_IP_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=True) -> str:
+
+    get_title_from_configuration(
+        dataframe_data: pd.DataFrame,
+        betx_value: float = np.nan,
+        bety_value: float = np.nan,
+        crossing_type: Optional[str] = None,
+        display_LHC_version: bool = True,
+        display_energy: bool = True,
+        display_bunch_index: bool = True,
+        display_CC_crossing: bool = True,
+        display_bunch_intensity: bool = True,
+        display_beta: bool = True,
+        display_crossing_IP_1: bool = True,
+        display_crossing_IP_2: bool = True,
+        display_crossing_IP_5: bool = True,
+        display_crossing_IP_8: bool = True,
+        display_bunch_length: bool = True,
+        display_polarity_IP_2_8: bool = True,
+        display_emittance: bool = True,
+        display_chromaticity: bool = True,
+        display_octupole_intensity: bool = True,
+        display_coupling: bool = True,
+        display_filling_scheme: bool = True,
+        display_tune: bool = True,
+        display_luminosity_1: bool = True,
+        display_luminosity_2: bool = True,
+        display_luminosity_5: bool = True,
+        display_luminosity_8: bool = True,
+        display_PU_1: bool = True,
+        display_PU_2: bool = True,
+        display_PU_5: bool = True,
+        display_PU_8: bool = True,
+    ) -> str:
+"""
+
 # --- Imports
 # ==================================================================================================
 # Standard library imports

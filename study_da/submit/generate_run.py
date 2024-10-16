@@ -1,4 +1,24 @@
-"""This module contains functions to generate the run file for a job."""
+"""
+This module provides functions to generate run files for jobs in different environments
+(local/Slurm and HTCondor). It includes functions to create shell script snippets for tagging
+jobs as finished and generating run files with appropriate configurations.
+
+Functions:
+    tag_str(abs_job_folder: str) -> str:
+
+    generate_run_file(abs_job_folder: str, job_name: str, setup_env_script: str,
+        generation_number: int, tree_path: str, l_keys: list[str], htc: bool = False,
+        additionnal_command: str = "", l_dependencies: list[str] | None = None,
+        name_config: str = "config.yaml") -> str:
+
+    _generate_run_file(job_folder: str, job_name: str, setup_env_script: str, tree_path: str,
+        l_keys: list[str], additionnal_command: str = "") -> str:
+
+    _generate_run_file_htc(job_folder: str, job_name: str, setup_env_script: str,
+        generation_number: int, tree_path: str, l_keys: list[str], additionnal_command: str = "",
+        l_dependencies: list[str] | None = None, name_config: str = "config.yaml") -> str:
+
+"""
 
 # ==================================================================================================
 # --- Imports

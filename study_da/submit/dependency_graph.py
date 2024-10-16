@@ -1,4 +1,4 @@
-"""Dependency graph class to manage the dependencies between jobs"""
+"""This module contains the DependencyGraph class to manage the dependencies between jobs"""
 
 # ==================================================================================================
 # --- Imports

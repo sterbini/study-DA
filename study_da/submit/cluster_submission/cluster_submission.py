@@ -1,4 +1,4 @@
-"""Module for submitting jobs on a cluster (or locally)."""
+"""This module contains a class for submitting jobs on a cluster (or locally)."""
 
 # ==================================================================================================
 # --- Imports

@@ -1,5 +1,19 @@
-"""This module is used to handle parameter space generation from e.g. linspace, logspace, lists, etc."""
+"""
+This module provides functions to generate parameter spaces for studies.
 
+Functions:
+    convert_for_subvariables(l_subvariables: list[str], parameter_list: list) -> list:
+        Convert the parameter list to a list of dictionaries with subvariables as keys.
+
+    linspace(l_values_linspace: list) -> np.ndarray:
+        Generate a list of evenly spaced values over a specified interval.
+
+    logspace(l_values_logspace: list) -> np.ndarray:
+        Generate a list of values that are evenly spaced on a log scale.
+
+    list_values_path(l_values_path_list: list[str], dic_common_parameters: dict[str, Any]) -> list[str]:
+        Generate a list of path names from an initial path name.
+"""
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
