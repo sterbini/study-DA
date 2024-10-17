@@ -35,6 +35,13 @@ dic_dependencies_per_gen = {
     3: ["path_collider_for_tracking", "particle_folder"],
 }
 
+# Dic copy_back_per_gen
+dic_copy_back_per_gen = {
+    1: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
+    2: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
+    3: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
+}
+
 # Preconfigure submission to HTC
 dic_config_jobs = {
     "generation_1" + ".py": {
@@ -65,4 +72,5 @@ submit(
     dic_dependencies_per_gen=dic_dependencies_per_gen,
     name_config=name_main_config,
     dic_config_jobs=dic_config_jobs,
+    dic_copy_back_per_gen=dic_copy_back_per_gen,
 )

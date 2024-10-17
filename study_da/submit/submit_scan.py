@@ -175,6 +175,7 @@ class SubmitScan:
         l_jobs: list[str],
         dic_additional_commands_per_gen: dict[int, str],
         dic_dependencies_per_gen: dict[int, list[str]],
+        dic_copy_back_per_gen: dict[int, dict[str, bool]],
         name_config: str,
     ) -> dict:
         """
@@ -186,9 +187,11 @@ class SubmitScan:
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation. Defaults to {}.
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
-                Defaults to {}.
-            name_config (str, optional): The name of the configuration file.
-                Defaults to "config.yaml".
+                Only used when doing a HTC submission.
+            dic_copy_back_per_gen (Optional[dict[int, dict[str, bool]]], optional): A dictionary
+                containing the files to copy back per generation. Accepted keys are "parquet",
+                "yaml", "txt", "json", "zip" and "all".
+            name_config (str, optional): The name of the configuration file for the study.
 
         Returns:
             dict: The updated dictionary tree structure.
@@ -218,17 +221,28 @@ class SubmitScan:
                     logging.info(f"Run file already exists for job {job}. Skipping.")
                     continue
 
+            # Build l_dependencies and add to the kwargs
+            l_dependencies = dic_dependencies_per_gen.get(generation_number, [])
+
+            # Get arguments of current generation
+            dic_args = dic_copy_back_per_gen.get(generation_number, {})
+
+            # Mutate the keys
+            dic_args = {f"copy_back_{key}": value for key, value in dic_args.items()}
+
+            # Build kwargs for the run file
+            kwargs_htc = {
+                "l_dependencies": l_dependencies,
+                "name_config": name_config,
+            } | dic_args
+
             run_str = generate_run_file(
                 absolute_job_folder,
                 job_name,
                 path_python_environment,
-                generation_number,
-                self.abs_path_tree,
-                l_keys,
                 htc="htc" in submission_type,
                 additionnal_command=dic_additional_commands_per_gen.get(generation_number, ""),
-                l_dependencies=dic_dependencies_per_gen.get(generation_number, []),
-                name_config=name_config,
+                **kwargs_htc,
             )
             # Write the run file
             path_run_job = f"{absolute_job_folder}/run.sh"
@@ -281,19 +295,28 @@ class SubmitScan:
         one_generation_at_a_time: bool = False,
         dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
         dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
+        dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
         name_config: str = "config.yaml",
     ) -> str:
         """
-        Submits the jobs to the cluster.
+        Submits the jobs to the cluster. Note that copying back large files (e.g. json colliders)
+        can trigger a throttling mechanism in AFS.
 
         Args:
             one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
                 time. Defaults to False.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation. Defaults to None.
+
+            The following arguments are only used for HTC jobs submission:
+
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
-                Defaults to None.
-            name_config (str, optional): The name of the configuration file.
+                Only used when doing a HTC submission. Defaults to None.
+            dic_copy_back_per_gen (Optional[dict[int, dict[str, bool]]], optional): A dictionary
+                containing the files to copy back per generation. Accepted keys are "parquet",
+                "yaml", "txt", "json", "zip" and "all". Defaults to None, corresponding to copying
+                back only "light" files, i.e. parquet, yaml and txt.
+            name_config (str, optional): The name of the configuration file for the study.
                 Defaults to "config.yaml".
 
         Returns:
@@ -304,6 +327,8 @@ class SubmitScan:
             dic_additional_commands_per_gen = {}
         if dic_dependencies_per_gen is None:
             dic_dependencies_per_gen = {}
+        if dic_copy_back_per_gen is None:
+            dic_copy_back_per_gen = {}
 
         # Update the status of all jobs before submitting
         dic_all_jobs, final_status = self.check_and_update_all_jobs_status()
@@ -323,6 +348,7 @@ class SubmitScan:
                 one_generation_at_a_time,
                 dic_additional_commands_per_gen,
                 dic_dependencies_per_gen,
+                dic_copy_back_per_gen,
                 name_config,
             )
 
@@ -336,8 +362,9 @@ class SubmitScan:
         dic_tree: dict,
         dic_all_jobs: dict,
         one_generation_at_a_time: bool,
-        dic_additional_commands_per_gen,
-        dic_dependencies_per_gen,
+        dic_additional_commands_per_gen: dict[int, str],
+        dic_dependencies_per_gen: dict[int, list[str]],
+        dic_copy_back_per_gen: dict[int, dict[str, bool]],
         name_config: str,
     ) -> None:
         """
@@ -349,8 +376,14 @@ class SubmitScan:
             one_generation_at_a_time (bool): Whether to submit one full generation at a time.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation.
+
+            The following arguments are only used for HTC jobs submission:
+
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
-            name_config (str, optional): The name of the configuration file.
+                Only used when doing a HTC submission. Defaults to None.
+            dic_copy_back_per_gen (Optional[dict[int, dict[str, bool]]], optional): A dictionary
+                containing the files to copy back per generation.
+            name_config (str, optional): The name of the configuration file for the study.
         """
         # Collect dict of list of unfinished jobs for every tree branch and every gen
         dic_to_submit_by_gen = {}
@@ -388,8 +421,9 @@ class SubmitScan:
             dic_tree,
             l_jobs_to_submit,
             dic_additional_commands_per_gen,
-            dic_dependencies_per_gen,
-            name_config,
+            dic_dependencies_per_gen=dic_dependencies_per_gen,
+            dic_copy_back_per_gen=dic_copy_back_per_gen,
+            name_config=name_config,
         )
 
         # Create the ClusterSubmission object
@@ -418,6 +452,7 @@ class SubmitScan:
         wait_time: float = 30,
         dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
         dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
+        dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
         name_config: str = "config.yaml",
     ) -> None:
         """
@@ -430,10 +465,18 @@ class SubmitScan:
                 Defaults to 30.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation. Defaults to None.
+
+            The following arguments are only used for HTC jobs submission:
+
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
-                Defaults to None.
-            name_config (str, optional): The name of the configuration file.
+                Only used when doing a HTC submission. Defaults to None.
+            dic_copy_back_per_gen (Optional[dict[int, dict[str, bool]]], optional): A dictionary
+                containing the files to copy back per generation. Accepted keys are "parquet",
+                "yaml", "txt", "json", "zip" and "all". Defaults to None, corresponding to copying
+                back only "light" files, i.e. parquet, yaml and txt.
+            name_config (str, optional): The name of the configuration file for the study.
                 Defaults to "config.yaml".
+
 
         Returns:
             None
@@ -456,6 +499,7 @@ class SubmitScan:
                 one_generation_at_a_time,
                 dic_additional_commands_per_gen,
                 dic_dependencies_per_gen,
+                dic_copy_back_per_gen,
                 name_config,
             )
             != "finished"

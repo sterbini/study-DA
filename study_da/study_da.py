@@ -8,6 +8,7 @@ from typing import Any, Optional
 # Local imports
 from .generate.generate_scan import GenerateScan
 from .submit.submit_scan import SubmitScan
+
 # ==================================================================================================
 # --- Main functions
 # ==================================================================================================
@@ -114,13 +115,50 @@ def submit(
     path_container_image: Optional[str] = None,
     force_configure: bool = False,
     dic_config_jobs: Optional[dict[str, dict[str, Any]]] = None,
-    dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
-    dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
-    name_config: str = "config.yaml",
     one_generation_at_a_time: bool = False,
     keep_submit_until_done: bool = False,
     wait_time: float = 30,
-):
+    dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
+    dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
+    dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
+    name_config: str = "config.yaml",
+) -> None:
+    """
+    Submits the jobs to the cluster. Note that copying back large files (e.g. json colliders)
+    can trigger a throttling mechanism in AFS.
+
+    Args:
+        path_tree (str): The path to the tree file.
+        path_python_environment (str): The path to the python environment.
+        path_python_environment_container (str): The path to the python environment in the
+            container.
+        path_container_image (Optional[str], optional): The path to the container image.
+            Defaults to None.
+        force_configure (bool, optional): Whether to force reconfiguration. Defaults to False.
+        dic_config_jobs (Optional[dict[str, dict[str, Any]]], optional): A dictionary containing
+            the configuration of the jobs. Defaults to None.
+        one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
+            time. Defaults to False.
+        keep_submit_until_done (bool, optional): Whether to keep submitting jobs until all jobs
+            are finished. Defaults to False.
+        wait_time (float, optional): The wait time between submissions in minutes. Defaults to 30.
+
+        The following arguments are only used for HTC jobs submission:
+
+        dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
+            generation. Defaults to None.
+        dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
+            Only used when doing a HTC submission. Defaults to None.
+        dic_copy_back_per_gen (Optional[dict[int, dict[str, bool]]], optional): A dictionary
+            containing the files to copy back per generation. Accepted keys are "parquet",
+            "yaml", "txt", "json", "zip" and "all". Defaults to None, corresponding to copying
+            back only "light" files, i.e. parquet, yaml and txt.
+        name_config (str, optional): The name of the configuration file for the study.
+            Defaults to "config.yaml".
+
+    Returns:
+        None
+    """
     # Instantiate the study (does not affect already existing study)
     study_sub = SubmitScan(
         path_tree=path_tree,
@@ -136,15 +174,17 @@ def submit(
     if keep_submit_until_done:
         study_sub.keep_submit_until_done(
             wait_time=wait_time,
+            one_generation_at_a_time=one_generation_at_a_time,
             dic_additional_commands_per_gen=dic_additional_commands_per_gen,
             dic_dependencies_per_gen=dic_dependencies_per_gen,
+            dic_copy_back_per_gen=dic_copy_back_per_gen,
             name_config=name_config,
-            one_generation_at_a_time=one_generation_at_a_time,
         )
     else:
         study_sub.submit(
             one_generation_at_a_time=one_generation_at_a_time,
             dic_additional_commands_per_gen=dic_additional_commands_per_gen,
             dic_dependencies_per_gen=dic_dependencies_per_gen,
+            dic_copy_back_per_gen=dic_copy_back_per_gen,
             name_config=name_config,
         )

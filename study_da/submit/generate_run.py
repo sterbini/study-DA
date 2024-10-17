@@ -23,6 +23,9 @@ Functions:
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
+# Standard library imports
+import os
+
 # Third party imports
 import yaml
 
@@ -53,13 +56,9 @@ def generate_run_file(
     abs_job_folder: str,
     job_name: str,
     setup_env_script: str,
-    generation_number: int,
-    tree_path: str,
-    l_keys: list[str],
     htc: bool = False,
     additionnal_command: str = "",
-    l_dependencies: list[str] | None = None,
-    name_config: str = "config.yaml",
+    **kwargs_htc_run_files,
 ) -> str:
     """
     Generates a run file for a job, either for local/Slurm or HTC environments.
@@ -68,50 +67,36 @@ def generate_run_file(
         abs_job_folder (str): The (absolute) folder where the job is located.
         job_name (str): The name of the job script.
         setup_env_script (str): The script to set up the environment.
-        generation_number (int): The generation number.
-        tree_path (str): The path to the tree structure.
-        l_keys (list[str]): A list of keys to access the job in the tree.
         htc (bool, optional): Whether the job shoud be run on HTCondor. Defaults to False.
         additionnal_command (str, optional): Additional command to run. Defaults to "".
-        l_dependencies (list[str] | None, optional): List of dependencies (only for HTC jobs).
-            Defaults to None.
-        name_config (str, optional): The name of the configuration file. Defaults to "config.yaml".
+        **kwargs_htc_run_files: Additional keyword arguments for the generate_run_files method
+                when submitting HTC jobs.
 
     Returns:
         str: The generated run file content.
     """
-    if htc:
-        if l_dependencies is None:
-            l_dependencies = []
-        return _generate_run_file_htc(
-            abs_job_folder,
-            job_name,
-            setup_env_script,
-            generation_number,
-            tree_path,
-            l_keys,
-            additionnal_command,
-            l_dependencies,
-            name_config,
-        )
-    # Local, or Slurm
-    else:
+    if not htc:
         return _generate_run_file(
             abs_job_folder,
             job_name,
             setup_env_script,
-            tree_path,
-            l_keys,
             additionnal_command,
         )
+    if kwargs_htc_run_files["l_dependencies"] is None:
+        kwargs_htc_run_files["l_dependencies"] = []
+    return _generate_run_file_htc(
+        abs_job_folder,
+        job_name,
+        setup_env_script,
+        additionnal_command,
+        **kwargs_htc_run_files,
+    )
 
 
 def _generate_run_file(
     job_folder: str,
     job_name: str,
     setup_env_script: str,
-    tree_path: str,
-    l_keys: list[str],
     additionnal_command: str = "",
 ) -> str:
     """
@@ -121,8 +106,6 @@ def _generate_run_file(
         job_folder (str): The folder where the job is located.
         job_name (str): The name of the job script.
         setup_env_script (str): The script to set up the environment.
-        tree_path (str): The path to the tree structure.
-        l_keys (list[str]): A list of keys to access the job in the tree.
         additionnal_command (str, optional): Additional command to run. Defaults to "".
 
     Returns:
@@ -132,10 +115,10 @@ def _generate_run_file(
         "#!/bin/bash\n"
         f"# Load the environment\n"
         f"source {setup_env_script}\n\n"
-        f"# Move into the job folder and run it\n"
+        f"# Move into the job folder\n"
         f"cd {job_folder}\n\n"
+        f"# Run the job and tag\n"
         f"python {job_name} > output_python.txt 2> error_python.txt\n"
-        # Tag the job
         f"{tag_str(job_folder)}"
         f"# Store abs path as a variable in case it's needed for additional commands\n"
         f"path_job=$(pwd)\n"
@@ -148,27 +131,35 @@ def _generate_run_file_htc(
     job_folder: str,
     job_name: str,
     setup_env_script: str,
-    generation_number: int,
-    tree_path: str,
-    l_keys: list[str],
     additionnal_command: str = "",
     l_dependencies: list[str] | None = None,
     name_config: str = "config.yaml",
+    copy_back_parquet: bool = True,
+    copy_back_yaml: bool = True,
+    copy_back_txt: bool = True,
+    copy_back_json: bool = False,
+    copy_back_zip: bool = False,
+    copy_back_all: bool = False,
 ) -> str:
     """
-    Generates a run file for HTC environments.
+    Generates a run file for HTC environments. This function also copies back the output files
+    (parquet, yaml, txt, json, zip) to the job folder if requested. Note that copying back large
+    files can trigger a throttling mechanism in AFS.
 
     Args:
         job_folder (str): The folder where the job is located.
         job_name (str): The name of the job script.
         setup_env_script (str): The script to set up the environment.
-        generation_number (int): The generation number.
-        tree_path (str): The path to the tree structure.
-        l_keys (list[str]): A list of keys to access the job in the tree.
         additionnal_command (str, optional): Additional command to run. Defaults to "".
         l_dependencies (list[str] | None, optional): List of dependencies (only for HTC jobs).
             Defaults to None.
         name_config (str, optional): The name of the configuration file. Defaults to "config.yaml".
+        copy_back_parquet (bool, optional): Whether to copy back parquet files. Defaults to True.
+        copy_back_yaml (bool, optional): Whether to copy back yaml files. Defaults to True.
+        copy_back_txt (bool, optional): Whether to copy back txt files. Defaults to True.
+        copy_back_json (bool, optional): Whether to copy back json files. Defaults to False.
+        copy_back_zip (bool, optional): Whether to copy back zip files. Defaults to False.
+        copy_back_all (bool, optional): Whether to copy back all files. Defaults to False.
 
     Returns:
         str: The generated run file content.
@@ -179,11 +170,14 @@ def _generate_run_file_htc(
     abs_path = job_folder
     local_path = abs_path.split("/")[-1]
 
+    # Ensure that the name config corresponds to the name and not the path
+    name_config = os.path.basename(name_config)
+
     # Mutate all paths in config to be absolute
-    with open(f"{abs_path}/../{name_config.split('/')[-1]}", "r") as f:
+    with open(f"{abs_path}/../{name_config}", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
-    # Mutate paths to be absolute, if they're not already absolute
+    # Mutate paths dependencies to be absolute, if they're not already absolute
     dic_to_mutate = {}
     for dependency in l_dependencies:
         # Check if dependency exist, otherwise throw an error
@@ -202,6 +196,25 @@ def _generate_run_file_htc(
         new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")  # type: ignore
         sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}\n'
 
+    # Prepare the copy back commands
+    copy_back_commands = "cp -f"
+    if copy_back_parquet:
+        copy_back_commands += " *.parquet"
+    if copy_back_yaml:
+        copy_back_commands += " *.yaml"
+    if copy_back_txt:
+        copy_back_commands += " *.txt"
+    if copy_back_json:
+        copy_back_commands += " *.json"
+    if copy_back_zip:
+        copy_back_commands += " *.zip"
+    if copy_back_all:
+        copy_back_commands += " *"
+    if copy_back_commands == "cp -f":
+        copy_back_commands = ""
+    else:
+        copy_back_commands += f" {abs_path}\n"
+
     # Return final run script
     return (
         f"#!/bin/bash\n"
@@ -214,14 +227,13 @@ def _generate_run_file_htc(
         f"cd {local_path}\n\n"
         f"# Mutate the paths in config to be absolute\n"
         f"{sed_commands}\n"
-        f"# Run the job\n"
+        f"# Run the job and tag\n"
         f"python {abs_path}/{job_name} > output_python.txt 2> error_python.txt\n\n"
-        # Tag the job
         f"{tag_str(job_folder)}"
         f"# Delete the config file from the above directory, otherwise it will be copied back and overwrite the new config\n"
         f"rm ../{name_config}\n"
         f"# Copy back output, including the new config\n"
-        f"cp -f *.txt *.parquet *.yaml *.json *.zip {abs_path}\n\n"
+        f"{copy_back_commands}\n"
         f"# Store abs path as a variable in case it's needed for additional commands\n"
         f"path_job={abs_path}\n\n"
         f"# Optional user defined command to run\n"
