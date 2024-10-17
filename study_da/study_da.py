@@ -140,7 +140,7 @@ def submit(
         one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
             time. Defaults to False.
         keep_submit_until_done (bool, optional): Whether to keep submitting jobs until all jobs
-            are finished. Defaults to False.
+            are finished or failed. Defaults to False.
         wait_time (float, optional): The wait time between submissions in minutes. Defaults to 30.
 
         The following arguments are only used for HTC jobs submission:

@@ -45,9 +45,11 @@ def tag_str(abs_job_folder: str) -> str:
         str: A formatted string containing the shell script snippet.
     """
     return f"""
-# Ensure job run was successful and tag as finished
+# Ensure job run was successful and tag as finished, or as failed otherwise
 if [ $? -eq 0 ]; then
     touch {abs_job_folder}/.finished
+else
+    touch {abs_job_folder}/.failed
 fi\n
 """
 

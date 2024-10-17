@@ -86,5 +86,31 @@ class DependencyGraph:
         return [
             dep
             for dep, l_keys in zip(l_dependencies, ll_keys)
-            if nested_get(self.dic_tree, l_keys + ["status"]) != "finished"
+            if nested_get(self.dic_tree, l_keys + ["status"]) not in ["finished", "failed"]
+        ]
+
+    def get_failed_dependency(self, job: str) -> list:
+        """
+        Gets the list of failed dependencies for a given job.
+
+        Args:
+            job (str): The name of the job.
+
+        Returns:
+            list: The list of failed dependencies.
+        """
+        # Ensure the dependency graph is built
+        if self.dependency_graph == {}:
+            self.build_full_dependency_graph()
+
+        # Get the list of dependencies
+        l_dependencies = self.dependency_graph[job]
+
+        # Get the corresponding list of l_keys
+        ll_keys = [self.dic_all_jobs[dep]["l_keys"] for dep in l_dependencies]
+
+        return [
+            dep
+            for dep, l_keys in zip(l_dependencies, ll_keys)
+            if nested_get(self.dic_tree, l_keys + ["status"]) == "failed"
         ]

@@ -290,8 +290,13 @@ class ClusterSubmission:
         # Test if job is completed
         l_keys = self.dic_all_jobs[job]["l_keys"]
         completed = nested_get(self.dic_tree, l_keys + ["status"]) == "finished"
+        failed = nested_get(self.dic_tree, l_keys + ["status"]) == "failed"
         if completed:
             logging.info(f"{path_job} is already completed.")
+
+        # Test if job has failed
+        if failed:
+            logging.info(f"{path_job} has failed.")
 
         # Test if job is running
         elif path_job in running_jobs:

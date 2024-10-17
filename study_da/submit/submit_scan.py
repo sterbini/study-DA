@@ -258,9 +258,10 @@ class SubmitScan:
         """
         Checks the status of all jobs and updates their status in the job dictionary.
 
-        This method iterates through all jobs, checks if a ".finished" file exists in the job's folder,
-        and updates the job's status accordingly. If at least one job is not finished, the overall
-        status is set to "to_finish". If all jobs are finished, the overall status is set to "finished".
+        This method iterates through all jobs, checks if a ".finished" or a ".failed" file exists in
+        the job's folder, and updates the job's status accordingly. If at least one job is not
+        finished or failed, the overall status is set to "to_finish". If all jobs are finished or
+        failed, the overall status is set to "finished".
 
         Returns:
             tuple[dict[str, Any], str]: A tuple containing:
@@ -279,6 +280,9 @@ class SubmitScan:
                 # Check if the file .finished exists
                 if os.path.exists(f"{absolute_job_folder}/.finished"):
                     nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "finished")
+                # Check if the job failed otherwise (not to resubmit it again)
+                elif os.path.exists(f"{absolute_job_folder}/.failed"):
+                    nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "failed")
                 else:
                     at_least_one_job_to_finish = True
 
@@ -395,23 +399,35 @@ class SubmitScan:
                 dic_to_submit_by_gen[gen] = []
                 dic_summary_by_gen[gen] = {
                     "finished": 0,
+                    "failed": 0,
+                    "dependency_failed": 0,
                     "running_or_queuing": 0,
                     "submitted_now": 0,
                     "to_submit_later": 0,
                 }
             logging.info(f"Checking job {job} dependencies and status in tree")
             l_dep = dependency_graph.get_unfinished_dependency(job)
+            l_dep_failed = dependency_graph.get_failed_dependency(job)
+
+            if len(l_dep_failed) > 0:
+                logging.warning(
+                    f"Job {job} has failed dependencies: {l_dep_failed}, it won't be submitted."
+                )
+                dic_summary_by_gen[gen]["dependency_failed"] += 1
+
             # If job parents are finished and job is not finished, submit it
             if (
                 len(l_dep) == 0
                 and nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "finished"
+                and nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "failed"
             ):
                 logging.info(f"Job {job} is added for submission.")
                 dic_to_submit_by_gen[gen].append(job)
-                # ! TODO NEXT
                 # We'll determine which jobs actually have to be submitted and which jobs
                 # are running at the end of the function, after querying the cluster or the local pc
 
+            elif nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) == "failed":
+                dic_summary_by_gen[gen]["failed"] += 1
             # Otherwise the job will have to be submitted later, when dependencies are finished
             elif len(l_dep) > 0:
                 dic_summary_by_gen[gen]["to_submit_later"] += 1
@@ -468,6 +484,10 @@ class SubmitScan:
             logging.info(f"Jobs running or queuing: {dic_summary['running_or_queuing']}")
             logging.info(f"Jobs submitted now: {dic_summary['submitted_now']}")
             logging.info(f"Jobs finished: {dic_summary['finished']}")
+            logging.info(f"Jobs failed: {dic_summary['failed']}")
+            logging.info(
+                f"Jobs on hold due to failed dependencies: {dic_summary['dependency_failed']}"
+            )
             logging.info("********************************")
 
         for submission_type, (
@@ -486,7 +506,7 @@ class SubmitScan:
         name_config: str = "config.yaml",
     ) -> None:
         """
-        Keeps submitting jobs until all jobs are finished.
+        Keeps submitting jobs until all jobs are finished or failed.
 
         Args:
             one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
