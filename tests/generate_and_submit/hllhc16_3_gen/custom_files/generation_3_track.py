@@ -17,7 +17,7 @@ import pandas as pd
 import xtrack as xt
 
 # Import user-defined modules
-from study_da.generate import XsuiteTracking
+from study_da.generate import XsuiteCollider, XsuiteTracking
 from study_da.utils import (
     load_dic_from_path,
     set_item_in_dic,
@@ -33,8 +33,9 @@ from study_da.utils import (
 
 
 def load_collider(full_configuration):
-    collider_filepath = full_configuration["config_simulation"]["path_collider_for_tracking"]
-    collider = xt.Multiline.from_json(collider_filepath)
+    collider = XsuiteCollider._load_collider(
+        full_configuration["config_simulation"]["path_collider_file_for_tracking_as_input"]
+    )
     collider.build_trackers()
     return collider
 
@@ -72,7 +73,9 @@ def track_particles(full_configuration, collider):
     particles_df.attrs["date"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     # Save output
-    particles_df.to_parquet(full_configuration["config_simulation"]["path_output_particles"])
+    particles_df.to_parquet(
+        full_configuration["config_simulation"]["path_distribution_file_output"]
+    )
 
 
 # ==================================================================================================
@@ -99,7 +102,8 @@ if __name__ == "__main__":
     collider = load_collider(full_configuration)
 
     # Drop updated configuration
-    write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
+    name_configuration = os.path.basename(path_configuration)
+    write_dic_to_path(full_configuration, name_configuration, ryaml)
 
     # Track particles and save to disk
     track_particles(full_configuration, collider)

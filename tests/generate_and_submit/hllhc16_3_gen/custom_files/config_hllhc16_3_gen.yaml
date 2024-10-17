@@ -4,7 +4,7 @@ config_particles:
   n_r: 256
   n_angles: 5
   n_split: 5
-  path_distribution_folder: particles
+  path_distribution_folder_output: particles
 
 config_mad:
   # Links to be made for tools and scripts
@@ -67,11 +67,13 @@ config_mad:
   sanity_checks: true
 
   # Path of the collider file to be saved (usually at the end of the first generation)
-  path_collider: collider.json
+  path_collider_file_for_configuration_as_output: collider_file_for_configuration.json
   compress: true # will compress the collider file, filename will end with .zip
 
 # Configuration for tuning of the collider
 config_collider:
+  # Even though the file doesn't end with .zip, scrip will first try to load it as a zip file
+  path_collider_file_for_configuration_as_input: ../collider_file_for_configuration.json
   config_knobs_and_tuning:
     knob_settings:
       # Orbit knobs
@@ -240,20 +242,20 @@ config_collider:
         - corr_co_acbyhs5.r8b1
 
   # Save collider or not (usually at the end of the collider tuning)
-  path_base_collider: ../collider.json.zip
-  save_final_collider: true
-  path_final_collider: collider_final.json
+  save_output_collider: false
+  path_collider_file_for_tracking_as_output: collider_file_for_tracking.json
+  compress: true # will compress the collider file, filename will end with .zip
 
 config_simulation:
   # Collider file to load for the tracking
-  path_collider_for_tracking: ../collider_final.json
+  path_collider_file_for_tracking_as_input: ../collider_file_for_tracking.json
 
   # Distribution in the normalized xy space
-  particle_folder: ../../particles
-  particle_file: 00.parquet
+  path_distribution_folder_input: ../../particles
+  distribution_file: 00.parquet
 
   # Output particle file
-  path_output_particles: output_particles.parquet
+  path_distribution_file_output: output_particles.parquet
 
   # Initial off-momentum
   delta_max: 27.e-5

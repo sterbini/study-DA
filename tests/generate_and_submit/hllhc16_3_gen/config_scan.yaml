@@ -16,18 +16,18 @@ structure:
     common_parameters:
       # Needs to be redeclared as it's used for parallelization
       # And re-used ine the second generation
-      n_split: 2
+      n_split: 1
 
   # Second generation depends on the config from the first generation
   generation_2:
     executable: custom_files/generation_2_configure.py
     scans:
-      particle_file:
+      distribution_file:
         # Number of paths is set by n_split in the main config
         path_list: ["____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
-        linspace: [62.31, 62.32, 2]
+        linspace: [62.31, 62.32, 1]
 
   # Third generation depends on the config from the second generation
   generation_3:

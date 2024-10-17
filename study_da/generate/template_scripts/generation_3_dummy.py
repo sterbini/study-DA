@@ -7,9 +7,9 @@ particle distribution and a collider from a MAD-X model."""
 
 # Import standard library modules
 import logging
+import os
 
 # Import third-party modules
-import numpy as np
 import pandas as pd
 
 # Import user-defined modules
@@ -27,7 +27,9 @@ from study_da.utils import (
 # ==================================================================================================
 def reupdate_particles_distribution(full_configuration):
     # Get configuration
-    file_particles = "../" + full_configuration["config_simulation"]["path_output_particles"]
+    file_particles = (
+        "../" + full_configuration["config_simulation"]["path_distribution_file_output"]
+    )
 
     # Load particle distribution
     particle_df = pd.read_parquet(file_particles)
@@ -37,7 +39,7 @@ def reupdate_particles_distribution(full_configuration):
 
     # Save output (although the path is the same, location will be one level lower than the previous
     # generation, since the file is being called from a child directory)
-    particle_df.to_parquet(full_configuration["config_simulation"]["path_output_particles"])
+    particle_df.to_parquet(full_configuration["config_simulation"]["path_distribution_file_output"])
 
 
 # ==================================================================================================
@@ -64,6 +66,7 @@ if __name__ == "__main__":
     reupdate_particles_distribution(full_configuration)
 
     # Drop updated configuration
-    write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
+    name_configuration = os.path.basename(path_configuration)
+    write_dic_to_path(full_configuration, name_configuration, ryaml)
 
     logging.info("Script finished")

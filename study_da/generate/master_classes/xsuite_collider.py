@@ -11,7 +11,7 @@ import logging
 import os
 import pathlib
 from typing import Any
-from zipfile import ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile
 
 # Import third-party modules
 import numpy as np
@@ -47,7 +47,7 @@ class XsuiteCollider:
     as well as to perform luminosity leveling and beam-beam interaction setup.
 
     Attributes:
-        collider_filepath (str): Path to the collider file.
+        path_collider_file_for_configuration_as_input (str): Path to the collider file to load.
         config_beambeam (dict): Configuration for beam-beam interactions.
         config_knobs_and_tuning (dict): Configuration for knobs and tuning.
         config_lumi_leveling (dict): Configuration for luminosity leveling.
@@ -58,8 +58,8 @@ class XsuiteCollider:
         ions (bool): Flag indicating if ions are used.
         _dict_orbit_correction (dict or None): Dictionary for orbit correction.
         _crab (bool or None): Flag indicating if crab cavities are used.
-        save_final_collider (bool): Flag indicating if the final collider should be saved.
-        path_final_collider (str): Path to save the final collider.
+        save_output_collider (bool): Flag indicating if the final collider should be saved.
+        path_collider_file_for_tracking_as_output (str): Path to save the final collider.
 
     Methods:
         dict_orbit_correction: Property to get the dictionary for orbit correction.
@@ -85,7 +85,7 @@ class XsuiteCollider:
     def __init__(
         self,
         configuration: dict,
-        collider_filepath: str,
+        path_collider_file_for_configuration_as_input: str,
         ver_hllhc_optics: float,
         ver_lhc_run: float,
         ions: bool,
@@ -98,17 +98,19 @@ class XsuiteCollider:
                 - config_beambeam (dict): Configuration for beam-beam interactions.
                 - config_knobs_and_tuning (dict): Configuration for knobs and tuning.
                 - config_lumi_leveling (dict): Configuration for luminosity leveling.
-                - save_final_collider (bool): Flag to save the final collider to disk.
-                - path_final_collider (str): Path to save the final collider.
+                - save_output_collider (bool): Flag to save the final collider to disk.
+                - path_collider_file_for_tracking_as_output (str): Path to save the final collider.
                 - config_lumi_leveling_ip1_5 (optional): Configuration for luminosity leveling at
                     IP1 and IP5.
-            collider_filepath (str): Path to the collider file.
+            path_collider_file_for_configuration_as_input (str): Path to the collider file.
             ver_hllhc_optics (float): Version of the HL-LHC optics.
             ver_lhc_run (float): Version of the LHC run.
             ions (bool): Flag indicating if ions are used.
         """
         # Collider file path
-        self.collider_filepath = collider_filepath
+        self.path_collider_file_for_configuration_as_input = (
+            path_collider_file_for_configuration_as_input
+        )
 
         # Configuration variables
         self.config_beambeam: dict[str, Any] = configuration["config_beambeam"]
@@ -128,8 +130,11 @@ class XsuiteCollider:
         self._crab: bool | None = None
 
         # Save collider to disk
-        self.save_final_collider = configuration["save_final_collider"]
-        self.path_final_collider = configuration["path_final_collider"]
+        self.save_output_collider = configuration["save_output_collider"]
+        self.path_collider_file_for_tracking_as_output = configuration[
+            "path_collider_file_for_tracking_as_output"
+        ]
+        self.compress = configuration["compress"]
 
     @property
     def dict_orbit_correction(self) -> dict:
@@ -170,6 +175,34 @@ class XsuiteCollider:
 
         return self._dict_orbit_correction
 
+    @staticmethod
+    def _load_collider(path_collider) -> xt.Multiline:
+        """
+        Load a collider configuration from a file using an external path.
+
+        If the file path ends with ".zip", the file is uncompressed locally
+        and the collider configuration is loaded from the uncompressed file.
+        Otherwise, the collider configuration is loaded directly from the file.
+
+        Returns:
+            xt.Multiline: The loaded collider configuration.
+        """
+
+        # Correct collider file path if it is a zip file
+        if os.path.exists(f"{path_collider}.zip") and not path_collider.endswith(".zip"):
+            path_collider += ".zip"
+
+        # Load as a json if not zip
+        if not path_collider.endswith(".zip"):
+            return xt.Multiline.from_json(path_collider)
+
+        # Uncompress file locally
+        logging.info(f"Unzipping {path_collider}")
+        with ZipFile(path_collider, "r") as zip_ref:
+            zip_ref.extractall()
+        final_path = os.path.basename(path_collider).replace(".zip", "")
+        return xt.Multiline.from_json(final_path)
+
     def load_collider(self) -> xt.Multiline:
         """
         Load a collider configuration from a file.
@@ -181,14 +214,7 @@ class XsuiteCollider:
         Returns:
             xt.Multiline: The loaded collider configuration.
         """
-        if not self.collider_filepath.endswith(".zip"):
-            return xt.Multiline.from_json(self.collider_filepath)
-
-        # Uncompress file locally
-        logging.info(f"Unzipping {self.collider_filepath}")
-        with ZipFile(self.collider_filepath, "r") as zip_ref:
-            zip_ref.extractall()
-        return xt.Multiline.from_json(self.collider_filepath.split("/")[-1].replace(".zip", ""))
+        return self._load_collider(self.path_collider_file_for_configuration_as_input)
 
     def install_beam_beam_wrapper(self, collider: xt.Multiline) -> None:
         """
@@ -766,7 +792,7 @@ class XsuiteCollider:
 
     def write_collider_to_disk(self, collider, full_configuration):
         """
-        Writes the collider object to disk in JSON format if the save_final_collider flag is set.
+        Writes the collider object to disk in JSON format if the save_output_collider flag is set.
 
         Args:
             collider (Collider): The collider object to be saved.
@@ -776,7 +802,7 @@ class XsuiteCollider:
         Returns:
             None
         """
-        if self.save_final_collider:
+        if self.save_output_collider:
             logging.info("Saving collider as json")
             if (
                 hasattr(collider, "metadata")
@@ -786,7 +812,17 @@ class XsuiteCollider:
                 collider.metadata.update(copy.deepcopy(full_configuration))
             else:
                 collider.metadata = copy.deepcopy(full_configuration)
-            collider.to_json(self.path_final_collider)
+            collider.to_json(self.path_collider_file_for_tracking_as_output)
+
+            # Compress the collider file to zip to ease the load on afs
+            if self.compress:
+                with ZipFile(
+                    f"{self.path_collider_file_for_tracking_as_output}.zip",
+                    "w",
+                    ZIP_DEFLATED,
+                    compresslevel=9,
+                ) as zipf:
+                    zipf.write(self.path_collider_file_for_tracking_as_output)
 
     @staticmethod
     def update_configuration_knob(

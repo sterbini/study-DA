@@ -30,7 +30,7 @@ class ParticlesDistribution:
         n_r (int): Number of radial points.
         n_angles (int): Number of angular points.
         n_split (int): Number of splits for parallelization.
-        path_distribution_folder (str): Path to the folder where distributions will be saved.
+        path_distribution_folder_output (str): Path to the folder where distributions will be saved.
 
     Methods:
         __init__(configuration: dict):
@@ -64,7 +64,7 @@ class ParticlesDistribution:
                 - n_r (int): Number of radius points.
                 - n_angles (int): Number of angle points.
                 - n_split (int): Number of splits for parallelization.
-                - path_distribution_folder (str): Path to the folder where the distribution will be
+                - path_distribution_folder_output (str): Path to the folder where the distribution will be
                     saved.
         """
         # Variables used to define the distribution
@@ -77,7 +77,7 @@ class ParticlesDistribution:
         self.n_split: int = configuration["n_split"]
 
         # Variable to write the distribution to disk
-        self.path_distribution_folder: str = configuration["path_distribution_folder"]
+        self.path_distribution_folder_output: str = configuration["path_distribution_folder_output"]
 
     def get_radial_list(
         self, lower_crop: float | None = None, upper_crop: float | None = None
@@ -169,18 +169,18 @@ class ParticlesDistribution:
             list[str]: A list of file paths where the particle distributions
             have been saved.
 
-        The method creates a directory specified by `self.path_distribution_folder`
+        The method creates a directory specified by `self.path_distribution_folder_output`
         if it does not already exist. Each particle distribution is saved as a
         Parquet file in this directory. The files are named sequentially using
         a zero-padded index (e.g., '00.parquet', '01.parquet', etc.).
         """
         # Define folder to store the distributions
-        os.makedirs(self.path_distribution_folder, exist_ok=True)
+        os.makedirs(self.path_distribution_folder_output, exist_ok=True)
 
         # Write the distribution to disk
         l_path_files = []
         for idx_chunk, l_particles in enumerate(ll_particles):
-            path_file = f"{self.path_distribution_folder}/{idx_chunk:02}.parquet"
+            path_file = f"{self.path_distribution_folder_output}/{idx_chunk:02}.parquet"
             pd.DataFrame(
                 l_particles,
                 columns=[

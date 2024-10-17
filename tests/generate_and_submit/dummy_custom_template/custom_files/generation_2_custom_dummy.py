@@ -55,6 +55,7 @@ if __name__ == "__main__":
     multiply_and_dump(full_configuration)
 
     # Dump configuration
-    write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
+    name_configuration = os.path.basename(path_configuration)
+    write_dic_to_path(full_configuration, name_configuration, ryaml)
 
     logging.info("Script finished")

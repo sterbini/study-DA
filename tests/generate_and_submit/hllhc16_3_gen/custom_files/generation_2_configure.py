@@ -31,7 +31,9 @@ def configure_collider(full_configuration):
     ver_hllhc_optics = full_configuration["config_mad"]["ver_hllhc_optics"]
     ver_lhc_run = full_configuration["config_mad"]["ver_lhc_run"]
     ions = full_configuration["config_mad"]["ions"]
-    collider_filepath = full_configuration["config_collider"]["path_base_collider"]
+    collider_filepath = full_configuration["config_collider"][
+        "path_collider_file_for_configuration_as_input"
+    ]
 
     # Build object for configuring collider
     xc = XsuiteCollider(config_collider, collider_filepath, ver_hllhc_optics, ver_lhc_run, ions)
@@ -131,7 +133,8 @@ if __name__ == "__main__":
     collider, fingerprint = configure_collider(full_configuration)
 
     # Drop updated configuration
-    write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
+    name_configuration = os.path.basename(path_configuration)
+    write_dic_to_path(full_configuration, name_configuration, ryaml)
 
     # Clean temporary files
     clean()

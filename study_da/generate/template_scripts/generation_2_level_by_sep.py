@@ -35,7 +35,9 @@ def configure_collider(full_configuration):
     ver_hllhc_optics = full_configuration["config_mad"]["ver_hllhc_optics"]
     ver_lhc_run = full_configuration["config_mad"]["ver_lhc_run"]
     ions = full_configuration["config_mad"]["ions"]
-    collider_filepath = full_configuration["config_simulation"]["collider_file"]
+    collider_filepath = full_configuration["config_collider"][
+        "path_collider_file_for_configuration_as_input"
+    ]
 
     # Build object for configuring collider
     xc = XsuiteCollider(config_collider, collider_filepath, ver_hllhc_optics, ver_lhc_run, ions)
@@ -140,7 +142,9 @@ def track_particles(full_configuration, collider, fingerprint):
     particles_df.attrs["date"] = time.strftime("%Y-%m-%d %H:%M:%S")
 
     # Save output
-    particles_df.to_parquet(full_configuration["config_simulation"]["path_output_particles"])
+    particles_df.to_parquet(
+        full_configuration["config_simulation"]["path_distribution_file_output"]
+    )
 
 
 def clean():
@@ -174,7 +178,8 @@ if __name__ == "__main__":
     collider, fingerprint = configure_collider(full_configuration)
 
     # Drop updated configuration
-    write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
+    name_configuration = os.path.basename(path_configuration)
+    write_dic_to_path(full_configuration, name_configuration, ryaml)
 
     # Track particles and save to disk
     track_particles(full_configuration, collider, fingerprint)

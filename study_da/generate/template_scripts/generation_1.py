@@ -7,6 +7,7 @@ particle distribution and a collider from a MAD-X model."""
 
 # Import standard library modules
 import logging
+import os
 
 # Import third-party modules
 # Import user-defined modules
@@ -75,7 +76,8 @@ if __name__ == "__main__":
         set_item_in_dic(full_configuration, key, value)
 
     # Dump configuration
-    write_dic_to_path(full_configuration, path_configuration.split("/")[-1], ryaml)
+    name_configuration = os.path.basename(path_configuration)
+    write_dic_to_path(full_configuration, name_configuration, ryaml)
 
     # Build and save particle distribution
     build_distribution(full_configuration["config_particles"])

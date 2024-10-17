@@ -25,7 +25,7 @@ structure:
   generation_2:
     executable: generation_2_level_by_nb.py
     scans:
-      # particle_file:
+      # distribution_file:
       #   # Number of paths is set by n_split in the main config
       #   path_list: ["____.parquet", n_split]
       # qx:

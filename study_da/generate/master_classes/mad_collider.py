@@ -31,7 +31,8 @@ from ..version_specific_files.runIII_ions import (
 
 class MadCollider:
     """
-    MadCollider class is responsible for setting up and managing the collider environment using MAD-X and xsuite.
+    MadCollider class is responsible for setting up and managing the collider environment using
+    MAD-X and xsuite.
 
     Attributes:
         sanity_checks (bool): Flag to enable or disable sanity checks.
@@ -46,7 +47,7 @@ class MadCollider:
         ver_hllhc_optics (float | None): Version of HL-LHC optics.
         ions (bool): Flag to indicate if ions are used.
         phasing (dict): Phasing configuration.
-        path_collider (str): Path to save the collider.
+        path_collider_file_for_configuration_as_output (str): Path to save the collider.
         compress (bool): Flag to enable or disable compression of collider file.
 
     Methods:
@@ -55,7 +56,8 @@ class MadCollider:
         build_collider(mad_b1b2: Madx, mad_b4: Madx) -> xt.Multiline: Builds the xsuite collider.
         activate_RF_and_twiss(collider: xt.Multiline) -> None: Activates RF and performs twiss analysis.
         check_xsuite_lattices(line: xt.Line) -> None: Checks the xsuite lattices.
-        write_collider_to_disk(collider: xt.Multiline) -> None: Writes the collider to disk and optionally compresses it.
+        write_collider_to_disk(collider: xt.Multiline) -> None: Writes the collider to disk and
+            optionally compresses it.
         clean_temporary_files() -> None: Cleans up temporary files created during the process.
     """
 
@@ -71,13 +73,14 @@ class MadCollider:
                 - optics_file (str): Path to the optics file.
                 - enable_imperfections (bool): Flag to enable or disable imperfections.
                 - enable_knob_synthesis (bool): Flag to enable or disable knob synthesis.
-                - rename_coupling_knobs (bool): Flag to enable or disable renaming of coupling knobs.
+                - rename_coupling_knobs (bool): Flag to enable or disable renaming of coupling
+                    knobs.
                 - pars_for_imperfections (dict): Parameters for imperfections.
                 - ver_lhc_run (float | None): Version of the LHC run, if applicable.
                 - ver_hllhc_optics (float | None): Version of the HL-LHC optics, if applicable.
                 - ions (bool): Flag to indicate if ions are used.
                 - phasing (dict): Configuration for phasing.
-                - path_collider (str): Path to the collider.
+                - path_collider_file_for_configuration_as_output (str): Path to the collider.
                 - compress (bool): Flag to enable or disable compression.
         """
         # Configuration variables
@@ -98,7 +101,9 @@ class MadCollider:
         self._ost = None
 
         # Path to disk and compression
-        self.path_collider = configuration["path_collider"]
+        self.path_collider_file_for_configuration_as_output = configuration[
+            "path_collider_file_for_configuration_as_output"
+        ]
         self.compress = configuration["compress"]
 
     @property
@@ -145,9 +150,11 @@ class MadCollider:
         2. Initializes MAD-X instances for beam 1/2 and beam 4 with respective command logs.
         3. Builds the sequences for both beams using the provided beam configuration.
         4. Applies the specified optics to the beam 1/2 sequence.
-        5. Optionally performs sanity checks on the beam 1/2 sequence by running TWISS and checking the MAD-X lattices.
+        5. Optionally performs sanity checks on the beam 1/2 sequence by running TWISS and checking
+            the MAD-X lattices.
         6. Applies the specified optics to the beam 4 sequence.
-        7. Optionally performs sanity checks on the beam 4 sequence by running TWISS and checking the MAD-X lattices.
+        7. Optionally performs sanity checks on the beam 4 sequence by running TWISS and checking
+            the MAD-X lattices.
 
         Returns:
             tuple[Madx, Madx]: A tuple containing the MAD-X instances for beam 1/2 and beam 4.
@@ -278,7 +285,8 @@ class MadCollider:
 
     def write_collider_to_disk(self, collider: xt.Multiline) -> None:
         """
-        Writes the collider object to disk in JSON format and optionally compresses it into a ZIP file.
+        Writes the collider object to disk in JSON format and optionally compresses it into a ZIP
+        file.
 
         Args:
             collider (xt.Multiline): The collider object to be saved.
@@ -290,18 +298,25 @@ class MadCollider:
             OSError: If there is an issue creating the directory or writing the file.
 
         Notes:
-            - The method ensures that the directory specified in `self.path_collider` exists.
-            - If `self.compress` is True, the JSON file is compressed into a ZIP file to reduce storage usage.
+            - The method ensures that the directory specified in
+                `self.path_collider_file_for_configuration_as_output` exists.
+            - If `self.compress` is True, the JSON file is compressed into a ZIP file to reduce
+                storage usage.
         """
         # Save collider to json, creating the folder if it does not exist
-        if "/" in self.path_collider:
-            os.makedirs(self.path_collider, exist_ok=True)
-        collider.to_json(self.path_collider)
+        if "/" in self.path_collider_file_for_configuration_as_output:
+            os.makedirs(self.path_collider_file_for_configuration_as_output, exist_ok=True)
+        collider.to_json(self.path_collider_file_for_configuration_as_output)
 
         # Compress the collider file to zip to ease the load on afs
         if self.compress:
-            with ZipFile(f"{self.path_collider}.zip", "w", ZIP_DEFLATED, compresslevel=9) as zipf:
-                zipf.write(self.path_collider)
+            with ZipFile(
+                f"{self.path_collider_file_for_configuration_as_output}.zip",
+                "w",
+                ZIP_DEFLATED,
+                compresslevel=9,
+            ) as zipf:
+                zipf.write(self.path_collider_file_for_configuration_as_output)
 
     @staticmethod
     def clean_temporary_files() -> None:

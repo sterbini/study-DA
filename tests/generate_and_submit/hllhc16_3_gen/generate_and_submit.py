@@ -32,31 +32,34 @@ force_configure = False
 dic_dependencies_per_gen = {
     1: ["acc-models-lhc"],
     2: ["path_base_collider"],
-    3: ["path_collider_for_tracking", "particle_folder"],
+    3: [
+        "path_collider_file_for_configuration_as_output_for_tracking",
+        "path_distribution_folder_input",
+    ],
 }
 
 # Dic copy_back_per_gen
 dic_copy_back_per_gen = {
     1: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
     2: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
-    3: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
+    3: {"parquet": True, "yaml": True, "txt": True, "json": False, "zip": False},
 }
 
 # Preconfigure submission to HTC
 dic_config_jobs = {
     "generation_1" + ".py": {
         "context": "cpu",
-        "submission_type": "htc",
+        "submission_type": "local",
         "htc_flavor": "microcentury",
     },
     "generation_2" + ".py": {
         "context": "cpu",
-        "submission_type": "htc",
+        "submission_type": "local",
         "htc_flavor": "microcentury",
     },
     "generation_3" + ".py": {
         "context": "cpu",
-        "submission_type": "htc",
+        "submission_type": "local",
         "htc_flavor": "espresso",
     },
 }

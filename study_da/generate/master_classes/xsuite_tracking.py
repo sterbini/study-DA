@@ -30,7 +30,7 @@ class XsuiteTracking:
         device_number (int): The device number for GPU contexts.
         _context (xo.Context): The context object for the simulation.
         beam (str): The beam configuration.
-        particle_file (str): The file path to the particle data.
+        distribution_file (str): The file path to the particle data.
         delta_max (float): The maximum delta value for particles.
         n_turns (int): The number of turns for the simulation.
         nemitt_x (float): The normalized emittance in the x direction.
@@ -52,7 +52,7 @@ class XsuiteTracking:
                 - "context": str, context string for the simulation.
                 - "device_number": int, device number for the simulation.
                 - "beam": str, beam type for the simulation.
-                - "particle_file": str, path to the particle file.
+                - "distribution_file": str, path to the particle file.
                 - "delta_max": float, maximum delta value for the simulation.
                 - "n_turns": int, number of turns for the simulation.
             nemitt_x (float): Normalized emittance in the x-plane.
@@ -65,9 +65,9 @@ class XsuiteTracking:
 
         # Simulation parameters
         self.beam: str = configuration["beam"]
-        self.particle_file: str = configuration["particle_file"]
-        self.particle_folder: str = configuration["particle_folder"]
-        self.particle_path: str = f"{self.particle_folder}/{self.particle_file}"
+        self.distribution_file: str = configuration["distribution_file"]
+        self.path_distribution_folder_input: str = configuration["path_distribution_folder_input"]
+        self.particle_path: str = f"{self.path_distribution_folder_input}/{self.distribution_file}"
         self.delta_max: float = configuration["delta_max"]
         self.n_turns: int = configuration["n_turns"]
 
