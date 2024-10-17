@@ -16,7 +16,7 @@ structure:
     common_parameters:
       # Needs to be redeclared as it's used for parallelization
       # And re-used ine the second generation
-      n_split: 1
+      n_split: 2
 
   # Second generation depends on the config from the first generation
   generation_2:
@@ -27,7 +27,7 @@ structure:
         path_list: ["____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
-        linspace: [62.31, 62.32, 1]
+        linspace: [62.31, 62.32, 2]
 
   # Third generation depends on the config from the second generation
   generation_3:

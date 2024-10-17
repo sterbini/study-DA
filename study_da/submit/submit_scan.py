@@ -388,7 +388,17 @@ class SubmitScan:
         # Collect dict of list of unfinished jobs for every tree branch and every gen
         dic_to_submit_by_gen = {}
         dependency_graph = DependencyGraph(dic_tree, dic_all_jobs)
+        dic_summary_by_gen = {}
         for job in dic_all_jobs:
+            gen = dic_all_jobs[job]["gen"]
+            if gen not in dic_to_submit_by_gen:
+                dic_to_submit_by_gen[gen] = []
+                dic_summary_by_gen[gen] = {
+                    "finished": 0,
+                    "running_or_queuing": 0,
+                    "submitted_now": 0,
+                    "to_submit_later": 0,
+                }
             logging.info(f"Checking job {job} dependencies and status in tree")
             l_dep = dependency_graph.get_unfinished_dependency(job)
             # If job parents are finished and job is not finished, submit it
@@ -396,11 +406,19 @@ class SubmitScan:
                 len(l_dep) == 0
                 and nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "finished"
             ):
-                gen = dic_all_jobs[job]["gen"]
-                if gen not in dic_to_submit_by_gen:
-                    dic_to_submit_by_gen[gen] = []
                 logging.info(f"Job {job} is added for submission.")
                 dic_to_submit_by_gen[gen].append(job)
+                # ! TODO NEXT
+                # We'll determine which jobs actually have to be submitted and which jobs
+                # are running at the end of the function, after querying the cluster or the local pc
+
+            # Otherwise the job will have to be submitted later, when dependencies are finished
+            elif len(l_dep) > 0:
+                dic_summary_by_gen[gen]["to_submit_later"] += 1
+
+            # Keep track of the number of finished jobs
+            if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) == "finished":
+                dic_summary_by_gen[gen]["finished"] += 1
 
         # Only keep the topmost generation if one_generation_at_a_time is True
         if one_generation_at_a_time:
@@ -439,7 +457,19 @@ class SubmitScan:
 
         # Write and submit the submission files
         logging.info("Writing and submitting submission files")
-        dic_submission_files = cluster_submission.write_sub_files()
+        dic_submission_files = cluster_submission.write_sub_files(dic_summary_by_gen)
+
+        # Print the state of the jobs
+        logging.info("State of the jobs:")
+        for gen, dic_summary in dic_summary_by_gen.items():
+            logging.info("********************************")
+            logging.info(f"Generation {gen}")
+            logging.info(f"Jobs left to submit later: {dic_summary['to_submit_later']}")
+            logging.info(f"Jobs running or queuing: {dic_summary['running_or_queuing']}")
+            logging.info(f"Jobs submitted now: {dic_summary['submitted_now']}")
+            logging.info(f"Jobs finished: {dic_summary['finished']}")
+            logging.info("********************************")
+
         for submission_type, (
             list_of_jobs,
             l_submission_filenames,

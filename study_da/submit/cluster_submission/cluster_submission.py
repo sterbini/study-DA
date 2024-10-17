@@ -4,10 +4,12 @@
 # --- Imports
 # ==================================================================================================
 # Standard library imports
+import copy
 import logging
 import os
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 import psutil
 
@@ -561,7 +563,9 @@ class ClusterSubmission:
                 submission_type,
             )
 
-    def write_sub_files(self) -> dict:
+    def write_sub_files(
+        self, dic_summary_by_gen: Optional[dict[int, dict[str, int]]] = None
+    ) -> dict:
         """
         Generates and writes submission files for jobs based on their submission type.
 
@@ -594,7 +598,7 @@ class ClusterSubmission:
                     self.path_submission_file,
                     running_jobs,
                     queuing_jobs,
-                    list_of_jobs,
+                    copy.copy(list_of_jobs),
                     submission_type,
                 )
 
@@ -603,6 +607,15 @@ class ClusterSubmission:
                     list_of_jobs_updated,
                     l_submission_filenames,
                 )
+
+                # Update dic_summary_by_gen inplace
+                if dic_summary_by_gen is not None:
+                    for job in list_of_jobs:
+                        gen = self.dic_all_jobs[job]["gen"]
+                        if job in list_of_jobs_updated:
+                            dic_summary_by_gen[gen]["submitted_now"] += 1
+                        else:
+                            dic_summary_by_gen[gen]["running_or_queuing"] += 1
 
         return dic_submission_files
 

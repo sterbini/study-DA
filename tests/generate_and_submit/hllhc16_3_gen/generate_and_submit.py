@@ -49,17 +49,17 @@ dic_copy_back_per_gen = {
 dic_config_jobs = {
     "generation_1" + ".py": {
         "context": "cpu",
-        "submission_type": "local",
+        "submission_type": "htc",
         "htc_flavor": "microcentury",
     },
     "generation_2" + ".py": {
         "context": "cpu",
-        "submission_type": "local",
+        "submission_type": "htc",
         "htc_flavor": "microcentury",
     },
     "generation_3" + ".py": {
         "context": "cpu",
-        "submission_type": "local",
+        "submission_type": "htc",
         "htc_flavor": "espresso",
     },
 }
