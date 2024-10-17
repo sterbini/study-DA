@@ -31,9 +31,9 @@ force_configure = False
 # Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
 dic_dependencies_per_gen = {
     1: ["acc-models-lhc"],
-    2: ["path_base_collider"],
+    2: ["path_collider_file_for_configuration_as_input"],
     3: [
-        "path_collider_file_for_configuration_as_output_for_tracking",
+        "path_collider_file_for_tracking_as_input",
         "path_distribution_folder_input",
     ],
 }
