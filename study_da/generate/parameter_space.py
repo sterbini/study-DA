@@ -36,7 +36,7 @@ def convert_for_subvariables(l_subvariables: list[str], parameter_list: list) ->
     """Convert the parameter list to a list of dictionaries with subvariables as keys.
 
     Args:
-        subvariables (list[str]): List of subvariables.
+        l_subvariables (list[str]): List of subvariables.
         parameter_list (list): List with the parameter values.
 
     Returns:

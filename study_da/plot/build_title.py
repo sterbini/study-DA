@@ -49,38 +49,7 @@ Functions:
 
     get_PU_at_IP_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=True) -> str:
 
-    get_title_from_configuration(
-        dataframe_data: pd.DataFrame,
-        betx_value: float = np.nan,
-        bety_value: float = np.nan,
-        crossing_type: Optional[str] = None,
-        display_LHC_version: bool = True,
-        display_energy: bool = True,
-        display_bunch_index: bool = True,
-        display_CC_crossing: bool = True,
-        display_bunch_intensity: bool = True,
-        display_beta: bool = True,
-        display_crossing_IP_1: bool = True,
-        display_crossing_IP_2: bool = True,
-        display_crossing_IP_5: bool = True,
-        display_crossing_IP_8: bool = True,
-        display_bunch_length: bool = True,
-        display_polarity_IP_2_8: bool = True,
-        display_emittance: bool = True,
-        display_chromaticity: bool = True,
-        display_octupole_intensity: bool = True,
-        display_coupling: bool = True,
-        display_filling_scheme: bool = True,
-        display_tune: bool = True,
-        display_luminosity_1: bool = True,
-        display_luminosity_2: bool = True,
-        display_luminosity_5: bool = True,
-        display_luminosity_8: bool = True,
-        display_PU_1: bool = True,
-        display_PU_2: bool = True,
-        display_PU_5: bool = True,
-        display_PU_8: bool = True,
-    ) -> str:
+    get_title_from_configuration( # See function docstring below for arguments) -> str:
 """
 
 # --- Imports
@@ -259,7 +228,6 @@ def get_beta_str(betx_value: float, bety_value: float) -> str:
     Retrieves the beta functions from the dataframe.
 
     Args:
-        dataframe_data (pd.DataFrame): The dataframe containing beta function information.
         betx_value (float): The value of the horizontal beta function.
         bety_value (float): The value of the vertical beta function.
 

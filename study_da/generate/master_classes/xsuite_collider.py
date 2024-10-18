@@ -414,7 +414,7 @@ class XsuiteCollider:
         return int(n_collisions_ip1_and_5), int(n_collisions_ip2), int(n_collisions_ip8)
 
     @property
-    def crab(self):
+    def crab(self) -> bool:
         """
         This method checks the configuration settings for the presence and value of the
         "on_crab1" knob. If the knob is present and its value is non-zero, it sets the
@@ -790,7 +790,7 @@ class XsuiteCollider:
             self.config_beambeam[f"luminosity_{ip}_with_beam_beam"] = float(L)
             self.config_beambeam[f"Pile-up_{ip}_with_beam_beam"] = float(PU)
 
-    def write_collider_to_disk(self, collider, full_configuration):
+    def write_collider_to_disk(self, collider, full_configuration) -> None:
         """
         Writes the collider object to disk in JSON format if the save_output_collider flag is set.
 
@@ -843,7 +843,7 @@ class XsuiteCollider:
             dictionnary[f"final_{knob_name}"] = float(collider.vars[knob_name]._value)
 
     @staticmethod
-    def return_fingerprint(collider, line_name="lhcb1"):
+    def return_fingerprint(collider, line_name="lhcb1") -> str:
         """
         Generate a detailed fingerprint of the specified collider line. Useful to compare two
         colliders.

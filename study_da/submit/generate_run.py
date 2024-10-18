@@ -25,6 +25,7 @@ Functions:
 # ==================================================================================================
 # Standard library imports
 import os
+from typing import Any
 
 # Third party imports
 import yaml
@@ -60,7 +61,7 @@ def generate_run_file(
     setup_env_script: str,
     htc: bool = False,
     additionnal_command: str = "",
-    **kwargs_htc_run_files,
+    **kwargs_htc_run_files: Any,
 ) -> str:
     """
     Generates a run file for a job, either for local/Slurm or HTC environments.
@@ -71,7 +72,7 @@ def generate_run_file(
         setup_env_script (str): The script to set up the environment.
         htc (bool, optional): Whether the job shoud be run on HTCondor. Defaults to False.
         additionnal_command (str, optional): Additional command to run. Defaults to "".
-        **kwargs_htc_run_files: Additional keyword arguments for the generate_run_files method
+        **kwargs_htc_run_files (Any): Additional keyword arguments for the generate_run_files method
                 when submitting HTC jobs.
 
     Returns:

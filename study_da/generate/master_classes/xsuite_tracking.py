@@ -114,7 +114,7 @@ class XsuiteTracking:
 
     # ? I removed type hints for the output as I get an unclear linting error
     # TODO: Check the proper type hints for the output
-    def prepare_particle_distribution_for_tracking(self, collider: xt.Multiline):
+    def prepare_particle_distribution_for_tracking(self, collider: xt.Multiline) -> tuple:
         """
         Prepare a particle distribution for tracking in the collider.
 

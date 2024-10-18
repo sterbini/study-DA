@@ -45,33 +45,22 @@ class GenerateScan:
         dic_common_parameters (dict): Dictionary of common parameters across generations.
 
     Methods:
-        __init__(path_config=None, dic_scan=None): Initializes the generation scan with a
-            configuration file or dictionary.
-        render(str_parameters, template_path, dependencies=None): Renders the study file using a
-            template.
-        write(study_str, file_path, format_with_black=True): Writes the study file to disk.
-        generate_render_write(gen_name, study_path, template_path, dic_mutated_parameters={}):
-            Generates, renders, and writes the study file.
-        get_dic_parametric_scans(generation): Retrieves dictionaries of parametric scan values.
-        parse_parameter_space(parameter, dic_curr_parameter, dic_parameter_lists,
-            dic_parameter_lists_for_naming): Parses the parameter space for a given parameter.
-        browse_and_collect_parameter_space(generation): Browses and collects the parameter space
-            for a given generation.
-        postprocess_parameter_lists(dic_parameter_lists, dic_parameter_lists_for_naming,
-            dic_subvariables): Postprocesses the parameter lists.
-        create_scans(generation, generation_path, template_path, dic_parameter_lists=None,
-            dic_parameter_lists_for_naming=None): Creates study files for parametric scans.
-        complete_tree(dictionary_tree, l_study_path_next_gen, gen): Completes the tree structure of
-            the study dictionary.
-        write_tree(dictionary_tree): Writes the study tree structure to a YAML file.
-        create_study_for_current_gen(generation, study_path, dic_parameter_lists=None,
-            dic_parameter_lists_for_naming=None): Creates study files for the current generation.
-        create_study(tree_file=True, force_overwrite=False, dic_parameter_all_gen=None,
-            dic_parameter_all_gen_naming=None): Creates study files for the entire study.
-        eval_conditions(l_condition, dic_parameter_lists): Evaluates the conditions to filter out
-            some parameter values.
-        filter_for_concomitant_parameters(array_conditions, ll_concomitant_parameters,
-            dic_dimension_indices): Filters the conditions for concomitant parameters.
+        __init__(): Initializes the generation scan with a configuration file or dictionary.
+        render(): Renders the study file using a template.
+        write(): Writes the study file to disk.
+        generate_render_write(): Generates, renders, and writes the study file.
+        get_dic_parametric_scans(): Retrieves dictionaries of parametric scan values.
+        parse_parameter_space(): Parses the parameter space for a given parameter.
+        browse_and_collect_parameter_space(): Browses and collects the parameter space for a given
+            generation.
+        postprocess_parameter_lists(): Postprocesses the parameter lists.
+        create_scans(): Creates study files for parametric scans.
+        complete_tree(): Completes the tree structure of the study dictionary.
+        write_tree(): Writes the study tree structure to a YAML file.
+        create_study_for_current_gen(): Creates study files for the current generation.
+        create_study(): Creates study files for the entire study.
+        eval_conditions(): Evaluates the conditions to filter out some parameter values.
+        filter_for_concomitant_parameters(): Filters the conditions for concomitant parameters.
     """
 
     def __init__(

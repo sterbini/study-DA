@@ -147,7 +147,6 @@ class ConfigJobs:
 
         Args:
             job_name (str): The name of the job to be configured.
-            dic_gen (dict[str, str]): The dictionary containing job configuration.
 
         Returns:
             dict: The updated job configuration.

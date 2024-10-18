@@ -8,6 +8,7 @@
 import logging
 import os
 import shutil
+from typing import Any
 from zipfile import ZIP_DEFLATED, ZipFile
 
 # Import third-party modules
@@ -107,7 +108,7 @@ class MadCollider:
         self.compress = configuration["compress"]
 
     @property
-    def ost(self):
+    def ost(self) -> Any:
         """
         Determines and returns the appropriate optics-specific tools (OST) based on the
         version of HLLHC optics or LHC run configuration.
@@ -117,7 +118,7 @@ class MadCollider:
             ValueError: If no optics-specific tools are available for the given configuration.
 
         Returns:
-            The appropriate OST module based on the configuration.
+            Any: The appropriate OST module based on the configuration.
         """
         if self._ost is None:
             # Check that version is well defined

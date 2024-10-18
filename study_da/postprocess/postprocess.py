@@ -2,22 +2,15 @@
 This module provides functions to process and analyze simulation output data.
 
 Functions:
-    get_particles_data(dic_all_jobs, absolute_path_study, generation_of_interest=2,
-        name_output="output_particles.parquet") -> List[pd.DataFrame]:
+    get_particles_data() -> List[pd.DataFrame]:
 
-    add_parameters_from_config(l_df_output, dic_parameters_of_interest,
-        default_path_template_parameters=False) -> List[pd.DataFrame]:
+    add_parameters_from_config() -> List[pd.DataFrame]:
 
-    merge_and_group_by_parameters_of_interest(l_df_output, l_group_by_parameters,
-        only_keep_lost_particles=True, l_parameters_to_keep=None) -> pd.DataFrame:
+    merge_and_group_by_parameters_of_interest() -> pd.DataFrame:
 
-    aggregate_output_data(path_tree, l_group_by_parameters, generation_of_interest=2,
-        name_output="output_particles.parquet", write_output=True, path_output=None,
-        only_keep_lost_particles=True, dic_parameters_of_interest=None, l_parameters_to_keep=None,
-        name_template_parameters="parameters_lhc.yaml", path_template_parameters=None,
-        force_overwrite=False) -> pd.DataFrame:
+    aggregate_output_data() -> pd.DataFrame:
 
-    fix_LHC_version(df) -> pd.DataFrame:
+    fix_LHC_version() -> pd.DataFrame:
 """
 
 # ==================================================================================================
@@ -53,7 +46,8 @@ def get_particles_data(
         dic_all_jobs (dict): Dictionary containing all jobs and their details.
         absolute_path_study (str): The absolute path to the study directory.
         generation_of_interest (int, optional): The generation of interest. Defaults to 2.
-        name_output (str, optional): The name of the output file. Defaults to "output_particles.parquet".
+        name_output (str, optional): The name of the output file.
+            Defaults to "output_particles.parquet".
 
     Returns:
         list: A list of DataFrames containing the particle data.

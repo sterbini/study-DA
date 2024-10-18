@@ -16,7 +16,9 @@ from scipy.optimize import minimize_scalar
 # ==================================================================================================
 # --- Functions used for leveling
 # ==================================================================================================
-def compute_PU(luminosity: float, num_colliding_bunches: int, T_rev0: float, cross_section: float):
+def compute_PU(
+    luminosity: float, num_colliding_bunches: int, T_rev0: float, cross_section: float
+) -> float:
     """
     Compute the Pile-Up (PU) value.
 
@@ -38,7 +40,7 @@ def luminosity_leveling_ip1_5(
     config_beambeam: dict[str, Any],
     crab: bool = False,
     cross_section: float = 81e-27,
-):
+) -> float:
     """
     Perform luminosity leveling for interaction points IP1 and IP5.
 

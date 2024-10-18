@@ -131,7 +131,7 @@ def apply_optics(mad: Madx, optics_file: str) -> None:
     mad.input("on_lhcb := on_lhcb_normalized * 7000./nrj;")
 
 
-def my_slice(mad: Madx, slice_factor: int = 2):
+def my_slice(mad: Madx, slice_factor: int = 2) -> None:
     """Redefine the macro myslice for the LHC, to make a sequence thin.
 
     Args:

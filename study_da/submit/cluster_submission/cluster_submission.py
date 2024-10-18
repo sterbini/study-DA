@@ -133,9 +133,6 @@ class ClusterSubmission:
         where the keys are job IDs and the values are the absolute paths to the jobs.
         If no job IDs are found, the method returns None.
 
-        Args:
-            None
-
         Returns:
             dict | None: A dictionary mapping job IDs to job paths, or None if no job IDs are found.
         """
@@ -577,9 +574,6 @@ class ClusterSubmission:
         This method categorizes jobs to be submitted by their submission type, writes the
         corresponding submission files, and returns a dictionary containing the submission
         files and their associated job contexts.
-
-        Args:
-            None
 
         Returns:
             dict: A dictionary where keys are submission types and values are tuples containing

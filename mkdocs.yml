@@ -2,11 +2,14 @@ site_name: Study-DA documentation
 
 nav:
   - Study-DA documentation: index.md
-  - Case studies: case-studies.md
+  - Case studies: 
+    - case_studies/index.md
+    - A simple collider: case_studies/simple_collider.md
   - Code Reference: reference/
 
 plugins:
   - search
+  - offline
   - gen-files:
       scripts:
         - scripts/gen_ref_pages.py
@@ -14,18 +17,60 @@ plugins:
       nav_file: SUMMARY.md
   - section-index
   - mkdocstrings
+  - git-revision-date-localized:
+      enable_creation_date: true
+      enabled: true
+      type: date
+      enable_creation_date: true
+      fallback_to_build_date: true
+  - git-authors
 
 theme:
   name: material
+  language: en
+  icon:
+    logo: material/file-tree
+    repo: material/github
+  features:
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - search.share
+    - navigation.footer
+    - content.action.edit
+    - content.code.copy
   palette:
-    # Palette toggle for light mode
-    - scheme: default
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-
     # Palette toggle for dark mode
     - scheme: slate
       toggle:
-        icon: material/brightness-4
+        icon: material/toggle-switch
         name: Switch to light mode
+      primary: black
+      accent: lime
+
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+      primary: teal
+      accent: lime
+copyright: Copyright &copy; 2024 Colas Droin for CERN
+repo_url: https://github.com/ColasDroin/study-DA
+repo_name: study-DA
+edit_uri: edit/main/docs/
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

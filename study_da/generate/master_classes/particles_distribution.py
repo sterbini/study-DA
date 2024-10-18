@@ -101,7 +101,7 @@ class ParticlesDistribution:
             radial_list = radial_list[radial_list >= 2.5]
         return radial_list
 
-    def get_angular_list(self):
+    def get_angular_list(self) -> np.ndarray:
         """
         Generate a list of angular values.
 
@@ -163,7 +163,7 @@ class ParticlesDistribution:
 
         Args:
             ll_particles (list[list[np.ndarray]]): A list of particle distributions,
-            where each distribution is a list containing particle data.
+                where each distribution is a list containing particle data.
 
         Returns:
             list[str]: A list of file paths where the particle distributions
