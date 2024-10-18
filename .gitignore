@@ -163,3 +163,4 @@ cython_debug/
 
 # Folders produced by test
 tests/**/example*
+tests/**/generation_*

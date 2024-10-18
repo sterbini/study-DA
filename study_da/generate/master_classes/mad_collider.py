@@ -319,6 +319,9 @@ class MadCollider:
             ) as zipf:
                 zipf.write(self.path_collider_file_for_configuration_as_output)
 
+        # Remove the uncompressed file
+        os.remove(self.path_collider_file_for_configuration_as_output)
+
     @staticmethod
     def clean_temporary_files() -> None:
         """

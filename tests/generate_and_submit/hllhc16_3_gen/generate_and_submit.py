@@ -28,7 +28,7 @@ path_container_image = (
 )
 force_configure = False
 
-# Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
+# Dependencies for the executable of each generation. Only needed if one uses HTC.
 dic_dependencies_per_gen = {
     1: ["acc-models-lhc"],
     2: ["path_collider_file_for_configuration_as_input"],
@@ -38,7 +38,7 @@ dic_dependencies_per_gen = {
     ],
 }
 
-# Dic copy_back_per_gen
+# Dic copy_back_per_gen (only for HTC)
 dic_copy_back_per_gen = {
     1: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
     2: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
