@@ -672,7 +672,7 @@ def get_title_from_configuration(
         dataframe_data (pd.DataFrame): The dataframe containing configuration data.
         betx_value (float, optional): The value of the horizontal beta function. Defaults to np.nan.
         bety_value (float, optional): The value of the vertical beta function. Defaults to np.nan.
-        type_crossing (str, optional): The type of crossing. Defaults to "flathv".
+        crossing_type (str, optional): The type of crossing. Defaults to "flathv".
         display_LHC_version (bool, optional): Whether to display the LHC version. Defaults to True.
         display_energy (bool, optional): Whether to display the energy. Defaults to True.
         display_bunch_index (bool, optional): Whether to display the bunch index. Defaults to True.

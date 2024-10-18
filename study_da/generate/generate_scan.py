@@ -349,11 +349,10 @@ class GenerateScan:
 
         Args:
             generation (str): The generation name.
-            ll_concomitant_parameters (list[list[str]]): The list of concomitant parameters.
-            l_conditions (list[str]): The list of conditions to filter out some parameter values.
 
         Returns:
-            tuple[dict[str, Any], dict[str, Any], dict[str, Any], list[list[str]]]: The updated dictionaries of parameter lists.
+            tuple[dict[str, Any], dict[str, Any], dict[str, Any], list[list[str]]]: The updated
+                dictionaries of parameter lists.
         """
 
         l_conditions = []
@@ -577,7 +576,6 @@ class GenerateScan:
         Args:
             generation (str): The name of the current generation.
             study_path (str): The path to the study folder.
-            dictionary_tree (dict): The dictionary representing the study tree structure.
 
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.

@@ -306,14 +306,17 @@ class SubmitScan:
         Submits the jobs to the cluster. Note that copying back large files (e.g. json colliders)
         can trigger a throttling mechanism in AFS.
 
+        The following arguments are only used for HTC jobs submission:
+        - dic_additional_commands_per_gen
+        - dic_dependencies_per_gen
+        - dic_copy_back_per_gen
+        - name_config
+
         Args:
             one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
                 time. Defaults to False.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation. Defaults to None.
-
-            The following arguments are only used for HTC jobs submission:
-
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
                 Only used when doing a HTC submission. Defaults to None.
             dic_copy_back_per_gen (Optional[dict[int, dict[str, bool]]], optional): A dictionary
@@ -567,6 +570,12 @@ class SubmitScan:
         """
         Keeps submitting jobs until all jobs are finished or failed.
 
+        The following arguments are only used for HTC jobs submission:
+        - dic_additional_commands_per_gen
+        - dic_dependencies_per_gen
+        - dic_copy_back_per_gen
+        - name_config
+
         Args:
             one_generation_at_a_time (bool, optional): Whether to submit one full generation at a
                 time. Defaults to False.
@@ -574,9 +583,6 @@ class SubmitScan:
                 Defaults to 30.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation. Defaults to None.
-
-            The following arguments are only used for HTC jobs submission:
-
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
                 Only used when doing a HTC submission. Defaults to None.
             dic_copy_back_per_gen (Optional[dict[int, dict[str, bool]]], optional): A dictionary

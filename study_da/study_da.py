@@ -127,6 +127,12 @@ def submit(
     Submits the jobs to the cluster. Note that copying back large files (e.g. json colliders)
     can trigger a throttling mechanism in AFS.
 
+    The following arguments are only used for HTC jobs submission:
+    - dic_additional_commands_per_gen
+    - dic_dependencies_per_gen
+    - dic_copy_back_per_gen
+    - name_config
+
     Args:
         path_tree (str): The path to the tree file.
         path_python_environment (str): The path to the python environment.
@@ -142,9 +148,6 @@ def submit(
         keep_submit_until_done (bool, optional): Whether to keep submitting jobs until all jobs
             are finished or failed. Defaults to False.
         wait_time (float, optional): The wait time between submissions in minutes. Defaults to 30.
-
-        The following arguments are only used for HTC jobs submission:
-
         dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
             generation. Defaults to None.
         dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
