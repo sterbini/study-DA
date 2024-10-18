@@ -11,7 +11,7 @@ import logging
 import os
 import pathlib
 from typing import Any
-from zipfile import ZIP_DEFLATED, ZipFile
+from zipfile import ZipFile
 
 # Import third-party modules
 import numpy as np
@@ -33,6 +33,7 @@ from ..version_specific_files.runIII_ions import (
     generate_orbit_correction_setup as gen_corr_runIII_ions,
 )
 from .scheme_utils import get_worst_bunch, load_and_check_filling_scheme
+from .utils import compress_and_write
 from .xsuite_leveling import compute_PU, luminosity_leveling_ip1_5
 
 # ==================================================================================================
@@ -816,13 +817,7 @@ class XsuiteCollider:
 
             # Compress the collider file to zip to ease the load on afs
             if self.compress:
-                with ZipFile(
-                    f"{self.path_collider_file_for_tracking_as_output}.zip",
-                    "w",
-                    ZIP_DEFLATED,
-                    compresslevel=9,
-                ) as zipf:
-                    zipf.write(self.path_collider_file_for_tracking_as_output)
+                compress_and_write(self.path_collider_file_for_tracking_as_output)
 
     @staticmethod
     def update_configuration_knob(

@@ -9,7 +9,6 @@ import logging
 import os
 import shutil
 from typing import Any
-from zipfile import ZIP_DEFLATED, ZipFile
 
 # Import third-party modules
 import xmask as xm
@@ -24,6 +23,7 @@ from ..version_specific_files.runIII import optics_specific_tools as ost_runIII
 from ..version_specific_files.runIII_ions import (
     optics_specific_tools as ost_runIII_ions,
 )
+from .utils import compress_and_write
 
 # ==================================================================================================
 # --- Class definition
@@ -311,16 +311,7 @@ class MadCollider:
 
         # Compress the collider file to zip to ease the load on afs
         if self.compress:
-            with ZipFile(
-                f"{self.path_collider_file_for_configuration_as_output}.zip",
-                "w",
-                ZIP_DEFLATED,
-                compresslevel=9,
-            ) as zipf:
-                zipf.write(self.path_collider_file_for_configuration_as_output)
-
-        # Remove the uncompressed file
-        os.remove(self.path_collider_file_for_configuration_as_output)
+            compress_and_write(self.path_collider_file_for_configuration_as_output)
 
     @staticmethod
     def clean_temporary_files() -> None:
