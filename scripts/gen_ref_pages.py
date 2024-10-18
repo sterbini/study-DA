@@ -33,7 +33,10 @@ for path in sorted(src.rglob("*.py")):
 
     mkdocs_gen_files.set_edit_path(full_doc_path, Path("../") / path)
 
-    print(full_doc_path, Path("../") / path)
-
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())
+
+# Display the generated nav
+# with mkdocs_gen_files.open("reference/SUMMARY.md", "r") as nav_file:
+#     for line in nav_file:
+#         print(line, end="")
