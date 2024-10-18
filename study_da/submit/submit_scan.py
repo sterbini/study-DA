@@ -171,7 +171,7 @@ class SubmitScan:
 
     def generate_run_files(
         self,
-        dic_tree: dict,
+        dic_tree: dict[str, Any],
         l_jobs: list[str],
         dic_additional_commands_per_gen: dict[int, str],
         dic_dependencies_per_gen: dict[int, list[str]],
@@ -363,8 +363,8 @@ class SubmitScan:
 
     def _submit(
         self,
-        dic_tree: dict,
-        dic_all_jobs: dict,
+        dic_tree: dict[str, Any],
+        dic_all_jobs: dict[str, dict[str, Any]],
         one_generation_at_a_time: bool,
         dic_additional_commands_per_gen: dict[int, str],
         dic_dependencies_per_gen: dict[int, list[str]],
@@ -375,8 +375,8 @@ class SubmitScan:
         Submits the jobs to the cluster.
 
         Args:
-            dic_tree (dict): The dictionary tree structure.
-            dic_all_jobs (dict): A dictionary containing all jobs.
+            dic_tree (dict[str, Any]): The dictionary tree structure.
+            dic_all_jobs (dict[str, dict[str,Any]]): A dictionary containing all jobs.
             one_generation_at_a_time (bool): Whether to submit one full generation at a time.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation.
@@ -391,50 +391,17 @@ class SubmitScan:
         """
         # Collect dict of list of unfinished jobs for every tree branch and every gen
         dic_to_submit_by_gen = {}
-        dependency_graph = DependencyGraph(dic_tree, dic_all_jobs)
         dic_summary_by_gen = {}
+        dependency_graph = DependencyGraph(dic_tree, dic_all_jobs)
         for job in dic_all_jobs:
-            gen = dic_all_jobs[job]["gen"]
-            if gen not in dic_to_submit_by_gen:
-                dic_to_submit_by_gen[gen] = []
-                dic_summary_by_gen[gen] = {
-                    "finished": 0,
-                    "failed": 0,
-                    "dependency_failed": 0,
-                    "running_or_queuing": 0,
-                    "submitted_now": 0,
-                    "to_submit_later": 0,
-                }
-            logging.info(f"Checking job {job} dependencies and status in tree")
-            l_dep = dependency_graph.get_unfinished_dependency(job)
-            l_dep_failed = dependency_graph.get_failed_dependency(job)
-
-            if len(l_dep_failed) > 0:
-                logging.warning(
-                    f"Job {job} has failed dependencies: {l_dep_failed}, it won't be submitted."
-                )
-                dic_summary_by_gen[gen]["dependency_failed"] += 1
-
-            # If job parents are finished and job is not finished, submit it
-            if (
-                len(l_dep) == 0
-                and nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "finished"
-                and nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "failed"
-            ):
-                logging.info(f"Job {job} is added for submission.")
-                dic_to_submit_by_gen[gen].append(job)
-                # We'll determine which jobs actually have to be submitted and which jobs
-                # are running at the end of the function, after querying the cluster or the local pc
-
-            elif nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) == "failed":
-                dic_summary_by_gen[gen]["failed"] += 1
-            # Otherwise the job will have to be submitted later, when dependencies are finished
-            elif len(l_dep) > 0:
-                dic_summary_by_gen[gen]["to_submit_later"] += 1
-
-            # Keep track of the number of finished jobs
-            if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) == "finished":
-                dic_summary_by_gen[gen]["finished"] += 1
+            dic_to_submit_by_gen, dic_summary_by_gen = self._check_job_submit_status(
+                job,
+                dic_tree,
+                dic_all_jobs,
+                dic_to_submit_by_gen,
+                dic_summary_by_gen,
+                dependency_graph,
+            )
 
         # Only keep the topmost generation if one_generation_at_a_time is True
         if one_generation_at_a_time:
@@ -475,7 +442,33 @@ class SubmitScan:
         logging.info("Writing and submitting submission files")
         dic_submission_files = cluster_submission.write_sub_files(dic_summary_by_gen)
 
-        # Print the state of the jobs
+        # Log the state of the jobs
+        self.log_jobs_state(dic_summary_by_gen)
+        for submission_type, (
+            list_of_jobs,
+            l_submission_filenames,
+        ) in dic_submission_files.items():
+            cluster_submission.submit(list_of_jobs, l_submission_filenames, submission_type)
+
+    @staticmethod
+    def log_jobs_state(dic_summary_by_gen: dict[int, dict[str, int]]) -> None:
+        """
+        Logs the state of jobs for each generation.
+
+        Args:
+            dic_summary_by_gen (dict): A dictionary where the keys are generation numbers
+                and the values are dictionaries summarizing job states.
+                Each summary dictionary should contain the following keys:
+                - 'to_submit_later': int, number of jobs left to submit later
+                - 'running_or_queuing': int, number of jobs running or queuing
+                - 'submitted_now': int, number of jobs submitted now
+                - 'finished': int, number of jobs finished
+                - 'failed': int, number of jobs failed
+                - 'dependency_failed': int, number of jobs on hold due to failed dependencies
+
+        Returns:
+            None
+        """
         logging.info("State of the jobs:")
         for gen, dic_summary in dic_summary_by_gen.items():
             logging.info("********************************")
@@ -490,11 +483,77 @@ class SubmitScan:
             )
             logging.info("********************************")
 
-        for submission_type, (
-            list_of_jobs,
-            l_submission_filenames,
-        ) in dic_submission_files.items():
-            cluster_submission.submit(list_of_jobs, l_submission_filenames, submission_type)
+    @staticmethod
+    def _check_job_submit_status(
+        job: str,
+        dic_tree: dict[str, Any],
+        dic_all_jobs: dict[str, dict[str, Any]],
+        dic_to_submit_by_gen: dict[int, list[str]],
+        dic_summary_by_gen: dict[int, dict[str, int]],
+        dependency_graph: DependencyGraph,
+    ) -> tuple[dict[int, list[str]], dict[int, dict[str, int]]]:
+        """
+        Checks the status and dependencies of a job and updates the submission and summary
+        dictionaries.
+
+        Args:
+            job (str): The job identifier.
+            dic_tree (dict[str, Any]): The dictionary tree structure.
+            dic_all_jobs (dict[str, dict[str,Any]]): A dictionary containing all jobs.
+            dic_to_submit_by_gen (dict[int, list[str]]): A dictionary where keys are generation
+                numbers and values are lists of jobs to submit for each generation.
+            dic_summary_by_gen (dict[int, dict[str, int]]): A dictionary where keys are generation
+                numbers and values are dictionaries summarizing job states.
+            dependency_graph (DependencyGraph): An object to check job dependencies.
+
+        Returns:
+            tuple[dict[int, list[str]], dict[int, dict[str, int]]]: Updated dictionaries for jobs to
+                submit and job summaries.
+        """
+        gen = dic_all_jobs[job]["gen"]
+        if gen not in dic_to_submit_by_gen:
+            dic_to_submit_by_gen[gen] = []
+            dic_summary_by_gen[gen] = {
+                "finished": 0,
+                "failed": 0,
+                "dependency_failed": 0,
+                "running_or_queuing": 0,
+                "submitted_now": 0,
+                "to_submit_later": 0,
+            }
+        logging.info(f"Checking job {job} dependencies and status in tree")
+        l_dep = dependency_graph.get_unfinished_dependency(job)
+        l_dep_failed = dependency_graph.get_failed_dependency(job)
+
+        # Job will be on hold as it has failed dependencies
+        if len(l_dep_failed) > 0:
+            logging.warning(
+                f"Job {job} has failed dependencies: {l_dep_failed}, it won't be submitted."
+            )
+            dic_summary_by_gen[gen]["dependency_failed"] += 1
+
+        # Jobs is waiting for dependencies to finish
+        elif len(l_dep) > 0:
+            dic_summary_by_gen[gen]["to_submit_later"] += 1
+
+        # Job dependencies are ok
+        elif len(l_dep) == 0:
+            # But job has failed already
+            if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) == "failed":
+                dic_summary_by_gen[gen]["failed"] += 1
+
+            # Or job has finished already
+            elif nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) == "finished":
+                dic_summary_by_gen[gen]["finished"] += 1
+
+            # Else everything is ok, added to the submit dict
+            else:
+                logging.info(f"Job {job} is added for submission.")
+                dic_to_submit_by_gen[gen].append(job)
+                # We'll determine which jobs actually have to be submitted and which jobs
+                # are running at the end of the function, after querying the cluster or the local pc
+
+        return dic_to_submit_by_gen, dic_summary_by_gen
 
     def keep_submit_until_done(
         self,
