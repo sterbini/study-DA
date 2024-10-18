@@ -1,5 +1,13 @@
 site_name: Study-DA documentation
 
+nav:
+  - Study-DA documentation: index.md
+  - Case studies: case-studies.md
+  - References: references.md
+
+plugins:
+  - mkdocstrings
+
 theme:
   name: material
   palette:
