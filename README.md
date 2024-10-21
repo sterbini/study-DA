@@ -1,8 +1,10 @@
 # Dynamics Aperture Study Package
 
-This package consists of a collection of tools to study the dynamics aperture of a particle accelerator with [Xsuite](https://github.com/xsuite/xsuite). The package is divided into four main parts:
+This package consists of a collection of tools to study the dynamics aperture of a particle accelerator with [Xsuite](https://github.com/xsuite/xsuite). In a sense, it is a replacement of the [DA study template](https://github.com/xsuite/DA_study_template), but much more advanced. It also allows to configure colliders and do tracking without necessarily running parametric scans.
 
-- **Study Generation**: Provides functions to generate, from template scripts and a configuration file, the dynamics aperture study as a multi-generational tree representing the various layers of the corresponding parametric scan.
+ The package is divided into four main parts:
+
+- **Study Generation**: Provides functions to generate, from template scripts and a configuration file, the dynamics aperture study as a multi-generational tree representing the various layers of the corresponding parametric scan. Alternatively, one can generate a single job from configuring a collider and running some tracking (or any other type of job), without doing a scan.
 - **Study Submission**: Allows seamless submission of the generated study locally and/or to computing clusters (mainly HTCondor), and the automatic retrieval of the results.
 - **Study Postprocessing**: Provides functions to postprocess the raw results (usually `.parquet` files from tracking) and aggregate them into a Pandas `DataFrame`.
 - **Study Plotting**: Provides functions to visualize the postprocessed results as 2D and 3D heatmaps.
