@@ -1,7 +1,7 @@
 # Test
 
-```py title="coucou.py" linenums="1"
-print('coucou')
+```py title="file.py" linenums="1"
+print('test')
 ```
 
 Your directory structure must be identical to the provided templates one:
