@@ -45,6 +45,13 @@ dic_copy_back_per_gen = {
     3: {"parquet": True, "yaml": True, "txt": True, "json": False, "zip": False},
 }
 
+# To bring back the "particles" folder from gen 1
+dic_additional_commands_per_gen = {
+    1: "cp -r particles $path_job/particles \n",
+    2: "",
+}
+
+
 # Preconfigure submission to HTC
 dic_config_jobs = {
     "generation_1" + ".py": {
@@ -76,6 +83,7 @@ submit(
     name_config=name_main_config,
     dic_config_jobs=dic_config_jobs,
     dic_copy_back_per_gen=dic_copy_back_per_gen,
+    dic_additional_commands_per_gen=dic_additional_commands_per_gen,
     keep_submit_until_done=True,
     wait_time=15,
 )
