@@ -7,7 +7,7 @@ This package consists of a collection of tools to study the dynamics aperture of
 - **Study Postprocessing**: Provides functions to postprocess the raw tracking results.
 - **Study Plotting**: Provides functions to visualize the postprocessed results.
 
-A full documentation is available at 
+A full documentation is available at [here](colasdroin.github.io/study-DA).
 
 This package is still experimental and under development. Consequently, this README is bound to evolve a lot in the near future.
 
