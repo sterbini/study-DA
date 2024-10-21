@@ -76,4 +76,6 @@ submit(
     name_config=name_main_config,
     dic_config_jobs=dic_config_jobs,
     dic_copy_back_per_gen=dic_copy_back_per_gen,
+    keep_submit_until_done=True,
+    wait_time=15,
 )
