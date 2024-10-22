@@ -78,7 +78,7 @@ The tree will be generated in the specified folder, with the requested structure
 You can submit the generated study to a computing cluster using the ```submit``` function. 
 
 ```python
-from dynamics_aperture.study_submission import SubmitScan
+from from study_da import submit
 submit(
     path_tree=path_tree,
     path_python_environment='.venv/bin/python',
