@@ -10,6 +10,10 @@ from .dic_utils import (
     set_item_in_dic,
     write_dic_to_path,
 )
+from .template_utils import (
+    load_template_configuration_as_dic,
+    load_template_script_as_str,
+)
 
 __all__ = [
     "load_dic_from_path",
@@ -19,4 +23,6 @@ __all__ = [
     "nested_get",
     "nested_set",
     "clean_dic",
+    "load_template_configuration_as_dic",
+    "load_template_script_as_str",
 ]
