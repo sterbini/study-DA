@@ -37,6 +37,6 @@ with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())
 
 # Display the generated nav
-# with mkdocs_gen_files.open("reference/SUMMARY.md", "r") as nav_file:
-#     for line in nav_file:
-#         print(line, end="")
+with mkdocs_gen_files.open("reference/SUMMARY.md", "r") as nav_file:
+    for line in nav_file:
+        print(line, end="")

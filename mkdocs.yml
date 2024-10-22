@@ -55,7 +55,7 @@ theme:
     - navigation.sections
     - navigation.expand
     - navigation.path
-    - navigation.indexes
+    # - navigation.indexes # Does not play well with generated technical documentation
     - search.suggest
     - search.highlight
     - search.share
@@ -78,7 +78,7 @@ theme:
         name: Switch to dark mode
       primary: teal
       accent: lime
-copyright: Copyright &copy; 2024 Colas Droin for CERN
+copyright: Copyright &copy; 2024 CERN
 repo_url: https://github.com/ColasDroin/study-DA
 repo_name: study-DA
 edit_uri: edit/main/docs/
