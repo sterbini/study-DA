@@ -676,6 +676,17 @@ class GenerateScan:
         # Add dependencies to the study
         if "dependencies" in self.config:
             for dependency, path in self.config["dependencies"].items():
+                # Check if the dependency exists as a file
+                if not os.path.isfile(path):
+                    # Check if the dependency exists as a file in the template folder
+                    path_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_configurations/{path}"
+                    if not os.path.isfile(path_template):
+                        raise FileNotFoundError(
+                            f"Dependency file {path} not found locally nor in the study-da "
+                            "template folder."
+                        )
+                    else:
+                        path = path_template
                 shutil.copy2(path, self.config["name"])
 
         if tree_file:

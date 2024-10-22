@@ -24,6 +24,10 @@ nav:
     - A 3D scan: case_studies/4_3D_scan.md
     - A 1-generational scan: case_studies/5_1_generational_scan.md
     - A 3 generational scan: case_studies/6_3_generational_scan.md
+  - Templates:
+    - templates/index.md
+    - Configurations:
+      - HL-LHC v1.6: templates/configurations/hllhc16.md
   - Code Reference: reference/
 
 plugins:
