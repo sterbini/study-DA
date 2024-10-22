@@ -21,6 +21,25 @@ for filename, header in zip(
         ryaml.dump(dic, fid)
         fid.write("""```\n""")
 
+##### Then update scripts
+for filename, header in zip(
+    ["generation_1", "generation_2_level_by_nb", "generation_2_level_by_sep"],
+    [
+        "Generation 1 (generate xsuite collider from mad sequence) template script",
+        "Generation 2 (configure and level by bunch intensity, track) template script",
+        "Generation 2 (configure and level by separation, track) template script",
+    ],
+):
+    path = f"study_da/generate/template_scripts/{filename}.py"
+    with open(path, "r") as f:
+        content = f.read()
+
+    with open(f"docs/template_files/scripts/{filename}.md", "w") as f:
+        f.write(f"# {header}\n\n")
+        f.write(f"""```py title="{filename}.py"\n""")
+        f.write(content)
+        f.write("""```\n""")
+
 
 ##### Then generate technical documentation
 nav = mkdocs_gen_files.Nav()
