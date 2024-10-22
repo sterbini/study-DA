@@ -35,7 +35,7 @@ poetry install # or pip install -r requirements.txt -e .
 
 ## Usage
 
-A very brief overview of the main functionalities is given below. However, only a few functions are presented here, with only a small portion of their arguments. For more details, please refer to the [full documentation](https://colasdroin.github.io/study-DA/).
+A very brief overview of the main functionalities is given below. However, just a few functions are presented here, with only a small portion of their arguments. For more details, please refer to the [full documentation](https://colasdroin.github.io/study-DA/).
 
 ### Study Generation
 
