@@ -14,6 +14,8 @@ nav:
       - tutorials/configuration_tracking/index.md
       - Understanding template files: tutorials/configuration_tracking/template_description.md
       - A concrete example: tutorials/configuration_tracking/practical_example.md
+    - Using GPUs:
+      - tutorials/using_GPUs/index.md
   - Case studies: 
     - case_studies/index.md
     - A simple collider: case_studies/1_simple_collider.md
