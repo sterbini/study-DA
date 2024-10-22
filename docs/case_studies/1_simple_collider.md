@@ -2,7 +2,7 @@
 
 The special function ```create_single_job()``` can be used to build and configure a collider without having to manually configure an irrelevant scan.
 
-Assuming you'd like to work with the template [`hllhc16` configuration](../template_files/configurations/config_hllhc16.md), but save the collider from the 2nd generation and only track for 1000 turns, you could proceed as follows:
+Assuming you'd like to work with the template [`hllhc16` configuration](../template_files/configurations/config_hllhc16.md), along with the template scripts [`generation_1.py`](../template_files/scripts/generation_1.py) and [`generation_2_level_by_nb.py`](../template_files/scripts/generation_2_level_by_nb.py), saving the collider before tracking and only track for 1000 turns, you could proceed as follows:
 
 ```py title="single_collider.py"
 # ==================================================================================================
@@ -44,7 +44,6 @@ path_tree = create_single_job(
     name_executable_generation_1="generation_1.py",
     name_executable_generation_2="generation_2_level_by_nb.py",
     name_study="single_job_study_hllhc16",
-    force_overwrite=True,
 )
 
 # Delete the configuration file (it's copied in the study folder anyway)
@@ -115,7 +114,7 @@ submit(
 
 This will complete the tree with the submission settings, generate the run files to launch the jobs, and the study will be executed in the local environment. Everytime a generation job is launched, the configuration file is mutated copied from the above generation folder, before being mutated at the end of the generation job, with the requested parameters (in this case, none, since no scan is being performed).
 
-after running the jobs, the directory should therefore looks like something like this (ignoring the intermediate and temporary files):
+After running the jobs, the directory should therefore looks like something like this (ignoring the intermediate and temporary files):
 
 ```bash
 📁 single_job_study_hllhc16/

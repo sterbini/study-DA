@@ -17,6 +17,7 @@ from study_da.utils import (
 # Set up the logger
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 # ==================================================================================================
 # --- Script to generate a study
 # ==================================================================================================
@@ -52,6 +53,11 @@ path_tree = create_single_job(
 
 # Delete the configuration file (it's copied in the study folder anyway)
 os.remove(local_config_name)
+
+
+# ==================================================================================================
+# --- Script to submit the study
+# ==================================================================================================
 
 # Define the variables of interest for the submission
 path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"

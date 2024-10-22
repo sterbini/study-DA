@@ -27,7 +27,7 @@ structure:
         path_list: ["____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
-        linspace: [62.31, 62.32, 11]
+        linspace: [62.31, 62.32, 2]
       qy:
         subvariables: [lhcb1, lhcb2]
-        linspace: [60.31, 60.32, 11]
+        linspace: [60.31, 60.32, 2]

@@ -472,19 +472,17 @@ class SubmitScan:
         Returns:
             None
         """
-        logging.info("State of the jobs:")
+        print("State of the jobs:")
         for gen, dic_summary in dic_summary_by_gen.items():
-            logging.info("********************************")
-            logging.info(f"Generation {gen}")
-            logging.info(f"Jobs left to submit later: {dic_summary['to_submit_later']}")
-            logging.info(f"Jobs running or queuing: {dic_summary['running_or_queuing']}")
-            logging.info(f"Jobs submitted now: {dic_summary['submitted_now']}")
-            logging.info(f"Jobs finished: {dic_summary['finished']}")
-            logging.info(f"Jobs failed: {dic_summary['failed']}")
-            logging.info(
-                f"Jobs on hold due to failed dependencies: {dic_summary['dependency_failed']}"
-            )
-            logging.info("********************************")
+            print("********************************")
+            print(f"Generation {gen}")
+            print(f"Jobs left to submit later: {dic_summary['to_submit_later']}")
+            print(f"Jobs running or queuing: {dic_summary['running_or_queuing']}")
+            print(f"Jobs submitted now: {dic_summary['submitted_now']}")
+            print(f"Jobs finished: {dic_summary['finished']}")
+            print(f"Jobs failed: {dic_summary['failed']}")
+            print(f"Jobs on hold due to failed dependencies: {dic_summary['dependency_failed']}")
+            print("********************************")
 
     @staticmethod
     def _check_job_submit_status(
