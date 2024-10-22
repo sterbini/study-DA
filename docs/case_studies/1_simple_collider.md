@@ -2,7 +2,7 @@
 
 The special function ```create_single_job()``` can be used to build and configure a collider without having to manually configure an irrelevant scan.
 
-Assuming you'd like to work with the template [`hllhc16` configuration](../template_files/configurations/config_hllhc16.md), along with the template scripts [`generation_1.py`](../template_files/scripts/generation_1.py) and [`generation_2_level_by_nb.py`](../template_files/scripts/generation_2_level_by_nb.py), saving the collider before tracking and only track for 1000 turns, you could proceed as follows:
+Assuming you'd like to work with the template [`hllhc16` configuration](../template_files/configurations/config_hllhc16.md), along with the template scripts [`generation_1.py`](../template_files/scripts/generation_1.md) and [`generation_2_level_by_nb.py`](../template_files/scripts/generation_2_level_by_nb.md), saving the collider before tracking and only track for 1000 turns, you could proceed as follows:
 
 ```py title="single_collider.py"
 # ==================================================================================================

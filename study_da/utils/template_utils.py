@@ -24,7 +24,7 @@ def load_template_configuration_as_dic(
     """Load a template configuration as a dictionary.
 
     Args:
-        template_name (str): The name of the template configuration.
+        template_configuration_name (str): The name of the template configuration.
 
     Returns:
         dict: The template dictionary.
