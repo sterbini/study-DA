@@ -56,7 +56,6 @@ We can now write the script to generate the study:
 # Import standard library modules
 import os
 
-# Import third-party modules
 # Import user-defined modules
 from study_da import create
 from study_da.utils import write_dic_to_path, load_template_configuration_as_dic
@@ -76,15 +75,15 @@ config["config_mad"]["links"]["acc-models-lhc"] = "path/to/acc-models-lhc"
 config["config_simulation"]["n_turns"] = 200000
 
 # Drop the configuration locally
-write_dic_to_path(config, "config_hllhc16.yaml", ryaml)
+write_dic_to_path(config, name_template_config, ryaml)
 
 # Now generate the study in the local directory
-path_tree, name_main_config = create(path_config_scan="config_scan.yaml", force_overwrite=True)
+path_tree, name_main_config = create(path_config_scan="config_scan.yaml")
 
 # Delete the configuration
-os.remove("config_hllhc16.yaml")
+os.remove(name_template_config)
 ```
 
 At this point, the directory with all the jobs should be created, along with the corresponding tree file.
 
-We can now submit the jobs. Ideally, we would like to submit the first generation 
+We can now submit the jobs. Ideally, we would like to submit the first generation as a local job (since there's only job, no need to queue on a cluster), and the second generation on a cluster. However, this time, we're going to be lazy and not configure in advance the submission of the jobs. Therefore, ```study-da``` will ask you how you want to submit the jobs when you try to submit them. This is all in the following script:
