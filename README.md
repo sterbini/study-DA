@@ -61,7 +61,7 @@ structure:
         linspace: [60.31, 60.32, 11]
 ```
 
-You can check the template scripts in the `study-da/generate/template_scripts` folder.
+You can check the template scripts `generation_1.py`and `generation_2_level_by_nb.py` in the `study-da/generate/template_scripts` folder.
 
 After creating the configuration file, you can generate the study using the following code:
 
