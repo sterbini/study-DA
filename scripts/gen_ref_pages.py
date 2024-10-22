@@ -3,7 +3,26 @@
 from pathlib import Path
 
 import mkdocs_gen_files
+import ruamel.yaml
 
+##### First update configurations
+for filename, header in zip(
+    ["config_hllhc16", "config_hllhc13", "config_runIII", "config_runIII_ions"],
+    ["HL-LHC v1.6", "HL-LHC v1.3", "Run III", "Run III ions"],
+):
+    path = f"study_da/generate/template_configurations/{filename}.yaml"
+    ryaml = ruamel.yaml.YAML()
+    with open(path, "r") as fid:
+        dic = ryaml.load(fid)
+
+    with open(f"docs/template_files/configurations/{filename}.md", "w") as fid:
+        fid.write(f"# {header} configuration\n\n")
+        fid.write(f"""```yaml title="{filename}.yaml"\n""")
+        ryaml.dump(dic, fid)
+        fid.write("""```\n""")
+
+
+##### Then generate technical documentation
 nav = mkdocs_gen_files.Nav()
 
 root = Path(__file__).parent.parent
