@@ -10,7 +10,7 @@ import os
 import ruamel.yaml
 
 # Import user-defined modules
-from study_da import GenerateScan
+from study_da.generate.generate_scan import GenerateScan
 
 from .dic_utils import load_dic_from_path
 
