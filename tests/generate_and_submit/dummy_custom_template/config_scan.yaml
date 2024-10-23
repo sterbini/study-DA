@@ -1,25 +1,25 @@
 # ==================================================================================================
 # --- Structure of the study ---
 # ==================================================================================================
-name: example_with_custom_template_and_configuration
+name: example_dummy
 
 # List all useful files that will be used by executable in generations below
 # These files are placed at the root of the study
 dependencies:
-  main_configuration: custom_files/custom_config.yaml
+  main_configuration: custom_files/config_dummy.yaml
 
 structure:
   # First generation is always at the root of the study
   # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
   generation_1:
-    executable: custom_files/generation_1_custom_dummy.py
+    executable: custom_files/generation_1_dummy.py
     scans:
       x:
         list: [1, 2]
 
   # Second generation depends on the config from the first generation
   generation_2:
-    executable: custom_files/generation_2_custom_dummy.py
+    executable: custom_files/generation_2_dummy.py
     scans:
       y:
         # Number of paths is set by n_split in the main config

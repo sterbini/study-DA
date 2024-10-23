@@ -26,7 +26,7 @@ def create(
     Args:
         path_config_scan (str, optional): Path to the configuration file for the scan.
             Defaults to "config_scan.yaml".
-        force_overwrite (bool, optional): Flag to force overwrite the study. Defaults to True.
+        force_overwrite (bool, optional): Flag to force overwrite the study. Defaults to False.
         dic_parameter_all_gen (Optional[dict[str, dict[str, Any]]], optional): Dictionary of
             parameters for the scan, if not provided through the scan config. Defaults to None.
         dic_parameter_all_gen_naming (Optional[dict[str, dict[str, Any]]], optional): Dictionary of
@@ -72,7 +72,7 @@ def create_single_job(
             third generation. Defaults to None.
         name_study (str, optional): The name of the study. Defaults to "single_job_study".
         force_overwrite (bool, optional): Whether to force overwrite existing files.
-            Defaults to True.
+            Defaults to False.
 
     Returns:
         str: The path to the tree file.

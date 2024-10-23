@@ -53,6 +53,12 @@ dic_dependencies_per_gen = {
     2: ["path_collider_file_for_configuration_as_input", "path_distribution_folder_input"],
 }
 
+# Dic copy_back_per_gen (only for HTC)
+dic_copy_back_per_gen = {
+    1: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
+    2: {"parquet": True, "yaml": True, "txt": True, "json": False, "zip": False},
+}
+
 # Submit the study
 submit(
     path_tree=path_tree,
@@ -62,4 +68,5 @@ submit(
     dic_dependencies_per_gen=dic_dependencies_per_gen,
     name_config=name_main_config,
     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+    dic_copy_back_per_gen=dic_copy_back_per_gen,
 )
