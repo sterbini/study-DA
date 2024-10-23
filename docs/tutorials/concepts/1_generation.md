@@ -159,7 +159,7 @@ if __name__ == "__main__":
     logging.info("Script finished")
 ```
 
-As you can see, this script multiplies the result of the previous script (stored in the configuration, in the above generation) by a new parameter `y`, and writes the result to a file.
+As you can see, this script multiplies the result of the previous script (stored in the configuration, in the above generation) by a new parameter `y`, and writes the result to a text file.
 
 ## Template configuration
 
@@ -206,6 +206,13 @@ structure:
 ```
 
 Let's exlain the different fields in the scan configuration:
-# TODO: explain all the possible types of parameters, and the corresponding keywords. Also explain that the template scripts and/or generation can be taken directly from the package
+
+- name: the name of the study, which will also correspond to the name of the rood folder of the study
+- dependencies: a list of files that are needed by the executable scripts. These files will be copied to the root of the study, so that they can be accessed by the scripts. Note that some configuration files are already provided by the package, and can be used directly (see e.g. [1_simple_collider](../../case_studies/1_simple_collider.md) and [2_tune_scan](../../case_studies/2_tune_scan.md) for examples)
+- structure: the structure of the study, with the different generations:
+  - Each generation has an `executable` field, which is the path to the script that will be executed. These paths can correspond to local files (as in here), or to predefined templates (as, for instance, in the [case studies](../../case_studies/2_tune_scan.md), in which case just the name of the template is enough)
+  - The `scans` field is a dictionary of parameters that will be scanned, and the values they will take. The values can be given as a list, a linspace or a logspace. Other possibilities (e.g. scanning generated string names, using nested variables) will be explained in the section [Configuration and Tracking](../configuration_tracking/practical_example.md).
 
 By default (if no specific keyword is provided), the cartesian product of all the parameter values will be considered to generate the jobs. This means that the number of jobs will be the product of the number of values for each parameter. In the example above, the number of jobs will be 6 (2 values for `x` and 3 values for `y`).
+
+Conversely, one can decide to scan two parameters at the same time (useful, for instance, when scanning the tune diagonal in a collider) using the `concomitant` keyword. This is also used in tune scan [case studie](../../case_studies/2_tune_scan.md).

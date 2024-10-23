@@ -27,7 +27,7 @@ lof of drawbacks, such as:
 
 This package aims at solving all these issues, and more. It is more user-friendly and easily flexible  while being more standardized. It is also more robust, since it is tested with a CI pipeline, and more easily maintainable, since all the common code is now centralized in a given set of classes and functions.
 
-??? info Standardizing has a cost
+!!! info "Standardizing has a cost"
 
     The user has to follow the package's conventions, which might be a bit more restrictive than the DA study template. In addition, since all the functions to configure/track/submit/postprocess/plot are now centralized as part of the package, they are not openly exposed as they used to, and are therefore not as easy to modify.
 
@@ -37,9 +37,9 @@ This being said, the user should still be able (and is encouraged) to implement 
 
 You can simply `pip install` the package:
 
-    ```bash
-    pip install study-da
-    ```
+```bash
+pip install study-da
+```
 
 And then move to the [tutorials](tutorials/index.md) to get started with the package, or directly to the [case studies](case_studies/index.md) to see some actual useful examples of what can be done with the package.
 

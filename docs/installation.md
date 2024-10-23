@@ -20,7 +20,7 @@ rm -f Miniforge3-Linux-x86_64.sh
 source miniforge/bin/activate
 ```
 
-??? warning Be careful where Python is installed
+!!! warning "Be careful where Python is installed"
 
     Note that, if you're from CERN and intend to submit job to HTCondor without using a CVMFS environment or Docker environment, your environment must be available on AFS (i.e. must be installed on AFS).
 
@@ -60,7 +60,7 @@ For easier submission later, impose the virtual environment to be created in the
 poetry config virtualenvs.in-project true
 ```
 
-??? warning Still be careful where Python is installed
+!!! warning "Still be careful where Python is installed"
 
     If you're from CERN and intend to submit jobs to HTCondor from your local Python environment, ensure that the executable that Poetry will use to spawn a virtual environment is available on AFS.
 
