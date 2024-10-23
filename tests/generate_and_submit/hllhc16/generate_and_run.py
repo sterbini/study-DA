@@ -30,7 +30,7 @@ config["config_simulation"]["n_turns"] = 200
 write_dic_to_path(config, name_template_config, ryaml)
 
 # Now generate the study in the local directory
-path_tree, name_main_config = create(path_config_scan="config_scan.yaml", force_overwrite=True)
+path_tree, name_main_config = create(path_config_scan="config_scan.yaml", force_overwrite=False)
 
 # Delete the configuration
 os.remove(name_template_config)

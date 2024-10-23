@@ -65,7 +65,7 @@ class SubmitScan:
             self.path_python_environment = path_python_environment
 
         # Add /bin/activate to the path_python_environment if needed
-        if not self.path_python_environment.endswith("/bin/activate"):
+        if "bin/activate" not in self.path_python_environment:
             self.path_python_environment += "/bin/activate"
 
         # Container image (Docker or Singularity, if any)
