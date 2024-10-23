@@ -27,7 +27,8 @@ structure:
         path_list: ["____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
-        linspace: [62.31, 62.32, 2]
+        linspace: [62.305, 62.330, 26]
       qy:
         subvariables: [lhcb1, lhcb2]
-        linspace: [60.31, 60.32, 2]
+        linspace: [60.305, 60.330, 26]
+        condition: qy < qx - 2 + 0.0039

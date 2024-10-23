@@ -30,7 +30,7 @@ class SubmitScan:
     def __init__(
         self,
         path_tree: str,
-        path_python_environment: str,
+        path_python_environment: str = "",
         path_python_environment_container: str = "",
         path_container_image: Optional[str] = None,
     ) -> None:
@@ -39,7 +39,7 @@ class SubmitScan:
 
         Args:
             path_tree (str): The path to the tree structure.
-            path_python_environment (str): The path to the Python environment.
+            path_python_environment (str): The path to the Python environment. Defaults to "".
             path_python_environment_container (str, optional): The path to the Python environment
                 in the container. Defaults to "".
             path_container_image (Optional[str], optional): The path to the container image.
@@ -56,17 +56,6 @@ class SubmitScan:
 
         # Absolute path to the study folder (get from the path_tree)
         self.abs_path = os.path.abspath(self.study_name).split(f"/{self.study_name}")[0]
-
-        # Path to the python environment, activate with `source path_python_environment`
-        # Turn to absolute path if it is not already
-        if not os.path.isabs(path_python_environment):
-            self.path_python_environment = os.path.abspath(path_python_environment)
-        else:
-            self.path_python_environment = path_python_environment
-
-        # Add /bin/activate to the path_python_environment if needed
-        if "bin/activate" not in self.path_python_environment:
-            self.path_python_environment += "/bin/activate"
 
         # Container image (Docker or Singularity, if any)
         # Turn to absolute path if it is not already
@@ -90,6 +79,23 @@ class SubmitScan:
         # Add /bin/activate to the path_python_environment if needed
         if not self.path_python_environment_container.endswith("/bin/activate"):
             self.path_python_environment_container += "/bin/activate"
+
+        # Ensure the path to the python environment is not "" if the container image is not set
+        if not self.path_container_image and not path_python_environment:
+            raise ValueError(
+                "The path to the python environment must be set if the container image is not set."
+            )
+
+        # Path to the python environment, activate with `source path_python_environment`
+        # Turn to absolute path if it is not already
+        if not os.path.isabs(path_python_environment):
+            self.path_python_environment = os.path.abspath(path_python_environment)
+        else:
+            self.path_python_environment = path_python_environment
+
+        # Add /bin/activate to the path_python_environment if needed
+        if "bin/activate" not in self.path_python_environment:
+            self.path_python_environment += "/bin/activate"
 
         # Lock file to avoid concurrent access (softlock as several platforms are used)
         self.lock = SoftFileLock(f"{self.path_tree}.lock", timeout=60)
@@ -621,4 +627,4 @@ class SubmitScan:
             logging.info(f"Waiting {wait_time} minutes before checking again.")
             time.sleep(wait_time * 60)
 
-        logging.info("All jobs are finished.")
+        print("All jobs are finished.")

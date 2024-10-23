@@ -110,7 +110,7 @@ def create_single_job(
 
 def submit(
     path_tree: str,
-    path_python_environment: str,
+    path_python_environment: str = "",
     path_python_environment_container: str = "",
     path_container_image: Optional[str] = None,
     force_configure: bool = False,
@@ -135,9 +135,9 @@ def submit(
 
     Args:
         path_tree (str): The path to the tree file.
-        path_python_environment (str): The path to the python environment.
+        path_python_environment (str): The path to the python environment. Default to "".
         path_python_environment_container (str): The path to the python environment in the
-            container.
+            container. Default to "".
         path_container_image (Optional[str], optional): The path to the container image.
             Defaults to None.
         force_configure (bool, optional): Whether to force reconfiguration. Defaults to False.
