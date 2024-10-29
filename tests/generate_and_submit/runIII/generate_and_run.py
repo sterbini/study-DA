@@ -8,32 +8,29 @@ import os
 # Import third-party modules
 # Import user-defined modules
 from study_da import create, submit
-from study_da.utils import load_template_configuration_as_dic, write_dic_to_path
+from study_da.utils import load_dic_from_path, write_dic_to_path
 
 # ==================================================================================================
 # --- Script to generate a study
 # ==================================================================================================
 
-# Load the configuration from hllhc16
-name_template_config = "config_hllhc16.yaml"
-config, ryaml = load_template_configuration_as_dic(name_template_config)
-
-# Update the location of acc-models
-config["config_mad"]["links"]["acc-models-lhc"] = (
-    "../../../../../external_dependencies/acc-models-lhc"
+# Load the configuration
+config, ryaml = load_dic_from_path(
+    "../../../study_da/generate/template_configurations/config_runIII.yaml"
 )
 
 # Adapt the number of turns
 config["config_simulation"]["n_turns"] = 1000000
 
 # Drop the configuration locally
-write_dic_to_path(config, name_template_config, ryaml)
+write_dic_to_path(config, "config_runIII.yaml", ryaml)
 
+# Now generate the study in the local directory
 # Now generate the study in the local directory
 path_tree, name_main_config = create(path_config_scan="config_scan.yaml", force_overwrite=False)
 
 # Delete the configuration
-os.remove(name_template_config)
+os.remove("config_runIII.yaml")
 
 # ==================================================================================================
 # --- Script to submit the study
@@ -53,12 +50,6 @@ dic_dependencies_per_gen = {
     2: ["path_collider_file_for_configuration_as_input", "path_distribution_folder_input"],
 }
 
-# Dic copy_back_per_gen (only matters for HTC)
-dic_copy_back_per_gen = {
-    1: {"parquet": True, "yaml": True, "txt": True, "json": True, "zip": True},
-    2: {"parquet": True, "yaml": True, "txt": True, "json": False, "zip": False},
-}
-
 # Submit the study
 submit(
     path_tree=path_tree,
@@ -68,5 +59,4 @@ submit(
     dic_dependencies_per_gen=dic_dependencies_per_gen,
     name_config=name_main_config,
     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
-    dic_copy_back_per_gen=dic_copy_back_per_gen,
 )

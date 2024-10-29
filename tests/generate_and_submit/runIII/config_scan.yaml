@@ -1,7 +1,7 @@
 # ==================================================================================================
 # --- Structure of the study ---
 # ==================================================================================================
-name: example_tune_scan
+name: example_oct_scan
 
 # List all useful files that will be used by executable in generations below
 # These files are placed at the root of the study
@@ -34,7 +34,7 @@ structure:
         expression: qx - 2 + 0.005
         concomitant: [qx]
       i_oct_b1:
-        linspace: [-300, 300, 11]
+        linspace: [-300, 300, 21]
       i_oct_b2:
-        linspace: [-300, 300, 11]
+        linspace: [-300, 300, 21]
         concomitant: [i_oct_b1]
