@@ -14,17 +14,14 @@ from study_da.utils import load_template_configuration_as_dic, write_dic_to_path
 # --- Script to generate a study
 # ==================================================================================================
 
-# Load the configuration from hllhc16
+# Load the template configuration
 name_template_config = "config_hllhc16.yaml"
 config, ryaml = load_template_configuration_as_dic(name_template_config)
 
-# Update the location of acc-models
+# Update the location of acc-models since it's copied in a different folder
 config["config_mad"]["links"]["acc-models-lhc"] = (
     "../../../../../external_dependencies/acc-models-lhc"
 )
-
-# Adapt the number of turns if needed
-config["config_simulation"]["n_turns"] = 1000000
 
 # Drop the configuration locally
 write_dic_to_path(config, name_template_config, ryaml)

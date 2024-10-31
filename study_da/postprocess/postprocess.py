@@ -249,8 +249,6 @@ def aggregate_output_data(
         l_df_output, l_group_by_parameters, only_keep_lost_particles, l_parameters_to_keep
     )
 
-    print("ICI", df_final)
-
     # Fix the LHC version type
     df_final = fix_LHC_version(df_final)
 

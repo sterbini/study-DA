@@ -364,7 +364,7 @@ def plot_heatmap(
     label_cbar: str = "Minimum DA (" + r"$\sigma$" + ")",
     colormap: str = "coolwarm_r",
     style: str = "ggplot",
-    output_path: str = "output.pdf",
+    output_path: str = "output.png",
     display_plot: bool = True,
     latex_fonts: bool = True,
     vectorize: bool = False,

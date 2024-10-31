@@ -67,15 +67,12 @@ from study_da.utils import write_dic_to_path, load_template_configuration_as_dic
 # --- Script to generate a study
 # ==================================================================================================
 
-# Load the configuration from hllhc16
+# Load the template configuration 
 name_template_config = "config_hllhc16.yaml"
 config, ryaml = load_template_configuration_as_dic(name_template_config)
 
-# Update the location of acc-models
+# Update the location of acc-models since it's dumped in a different folder
 config["config_mad"]["links"]["acc-models-lhc"] = "path/to/acc-models-lhc"
-
-# Adapt the number of turns if needed
-config["config_simulation"]["n_turns"] = 1000000
 
 # Drop the configuration locally
 write_dic_to_path(config, name_template_config, ryaml)
@@ -222,12 +219,18 @@ fig, ax = plot_heatmap(
 )
 ```
 
-Basically, the ```aggregate_output_data``` function will gather all the output data from each individual job of the second generation. You have to provide it yourself the parameters that you are scanning (```qx_b1``` and ```qy_b1``` in this case), and the name of the output file that you want check for each individual jobs (if you didn't touch the configuration, it should be ```output_particles.parquet```) of the generation that you are interested in (2 in this case). ```write_output``` tells the function if it should write the aggregated data to a file (```da.parquet```  by default). It is useful since aggregating the data can be quite long, and you might want to save it for later. Finally,  ```only_keep_lost_particles``` tells the function if it should only keep the data from lost particles (if you're only interested in the DA, for example); this is useful since the output data can be quite large.
+Basically, the ```aggregate_output_data``` function will gather all the output data from each individual job of the second generation. You have to provide it yourself the parameters that you are scanning (```qx_b1``` and ```qy_b1``` in this case), and the name of the output file that you want check for each individual jobs (if you didn't touch the configuration, it should be ```output_particles.parquet```) of the generation that you are interested in (2 in this case).
+
+```write_output``` tells the function if it should write the aggregated data to a file (```da.parquet```  by default). It is useful since aggregating the data can be quite long, and you might want to save it for later.
+
+Finally,  ```only_keep_lost_particles``` tells the function if it should only keep the data from lost particles (if you're only interested in the DA, for example); this is useful since the output data can be quite large.
 
 From here, you will have to customize the title of the plot to your liking. I won't detail every single parameters as there are many, but they should be quite explicit.
 
-Finally, you can plot the result, with, again, many possibilities for customization. I only used the parameters that I thought were the most important, but you can find more in the documentation of the ```plot_heatmap``` function. Note that, since we only ran jobs on the super-diagonal, we have to mask the lower triangle of the heatmap and set ```symmetric_missing``` to True (for proper smoothing). Also note that, in this case, one job didn't work for some reason, so I had to fill the missing value with an interpolation. This is why I used the ```fill_missing_value_with="interpolate"``` parameter.
+Finally, you can plot the result, with, again, many possibilities for customization. I only used the parameters that I thought were the most important, but you can find more in the documentation of the ```plot_heatmap``` function.
+
+Note that, since we only ran jobs on the super-diagonal, we have to mask the lower triangle of the heatmap and set ```symmetric_missing``` to True (for proper smoothing). Also note that, in this case, one job didn't work for some reason, so I had to fill the missing value with an interpolation. This is why I used the ```fill_missing_value_with="interpolate"``` parameter.
 
 Just for illustration, here's the final plot that I obtained:
 
-![Tune scan](plots/output.png)
+![Tune scan](plots/tune_scan.png)

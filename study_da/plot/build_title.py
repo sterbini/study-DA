@@ -102,13 +102,13 @@ def get_crossing_type(dataframe_data: pd.DataFrame) -> str:
     """
     if "optics_file" in dataframe_data.columns:
         optics_file = dataframe_data["optics_file"].unique()[0]
-        if "flatvh" in optics_file:
-            return "flatvh"
-        elif "flathv" in optics_file:
-            return "flathv"
+        if "flatvh" in optics_file or "vh" in optics_file:
+            return "vh"
+        elif "flathv" in optics_file or "hv" in optics_file:
+            return "hv"
 
-    logging.warning("Crossing type not found in the dataframe. Falling back to flathv.")
-    return "flathv"
+    logging.warning("Crossing type not found in the dataframe. Falling back to hv.")
+    return "hv"
 
 
 def get_LHC_version_str(dataframe_data: pd.DataFrame) -> str:
@@ -248,17 +248,17 @@ def _get_plane_crossing_IP_1_5_str(
 
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing plane crossing information.
-        type_crossing (str): The type of crossing. Either "flathv" or "flatvh".
+        type_crossing (str): The type of crossing. Either "hv" or "vh".
 
     Returns:
         tuple[str, str]: The plane crossing strings for IP1 and IP5.
     """
-    if type_crossing == "flatvh":
+    if type_crossing == "vh":
         phi_1_str = r"$\Phi/2_{1(V)}$"
         phi_5_str = r"$\Phi/2_{5(H)}$"
 
     # Crossing angle at IP1/5
-    elif type_crossing == "flathv":
+    elif type_crossing == "hv":
         phi_1_str = r"$\Phi/2_{1(H)}$"
         phi_5_str = r"$\Phi/2_{5(V)}$"
     else:
@@ -294,7 +294,7 @@ def get_crossing_IP_1_5_str(dataframe_data: pd.DataFrame, type_crossing: str) ->
 
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing crossing angle information.
-        type_crossing (str): The type of crossing. Either "flathv" or "flatvh".
+        type_crossing (str): The type of crossing. Either "hv" or "vh".
 
     Returns:
         tuple[str, str]: The crossing angle strings for IP1 and IP5.
@@ -640,7 +640,8 @@ def get_title_from_configuration(
         dataframe_data (pd.DataFrame): The dataframe containing configuration data.
         betx_value (float, optional): The value of the horizontal beta function. Defaults to np.nan.
         bety_value (float, optional): The value of the vertical beta function. Defaults to np.nan.
-        crossing_type (str, optional): The type of crossing. Defaults to "flathv".
+        crossing_type (str, optional): The type of crossing: 'vh' or 'hv'. Defaults to None, meaning
+            it will try to be inferred from the optics file name. Back to 'hv' if not found.
         display_LHC_version (bool, optional): Whether to display the LHC version. Defaults to True.
         display_energy (bool, optional): Whether to display the energy. Defaults to True.
         display_bunch_index (bool, optional): Whether to display the bunch index. Defaults to True.
@@ -686,7 +687,8 @@ def get_title_from_configuration(
         str: The generated title string.
     """
     # Find out what is the crossing type
-    crossing_type = get_crossing_type(dataframe_data)
+    if crossing_type is None:
+        crossing_type = get_crossing_type(dataframe_data)
 
     # Collect all the information to display
     LHC_version_str = get_LHC_version_str(dataframe_data)
