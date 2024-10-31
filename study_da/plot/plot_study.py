@@ -346,7 +346,7 @@ def plot_heatmap(
     plot_contours: bool = True,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
-    symmetric_missing: bool = True,
+    symmetric_missing: bool = False,
     mask_lower_triangle: bool = False,
     mask_upper_triangle: bool = False,
     plot_diagonal_lines: bool = True,
@@ -369,6 +369,7 @@ def plot_heatmap(
     latex_fonts: bool = True,
     vectorize: bool = False,
     fill_missing_value_with: Optional[str | float] = None,
+    dpi=300,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Plots a heatmap from the given dataframe.
@@ -382,7 +383,8 @@ def plot_heatmap(
         plot_contours (bool, optional): Whether to plot contours. Defaults to True.
         xlabel (Optional[str], optional): The label for the x-axis. Defaults to None.
         ylabel (Optional[str], optional): The label for the y-axis. Defaults to None.
-        symmetric_missing (bool, optional): Whether to make the matrix symmetric by replacing the lower triangle with the upper triangle. Defaults to True.
+        symmetric_missing (bool, optional): Whether to make the matrix symmetric by replacing the
+            lower triangle with the upper triangle. Defaults to False.
         mask_lower_triangle (bool, optional): Whether to mask the lower triangle. Defaults to False.
         mask_upper_triangle (bool, optional): Whether to mask the upper triangle. Defaults to False.
         plot_diagonal_lines (bool, optional): Whether to plot diagonal lines. Defaults to True.
@@ -406,6 +408,7 @@ def plot_heatmap(
         vectorize (bool, optional): Whether to vectorize the plot. Defaults to False.
         fill_missing_value_with (Optional[str | float], optional): The value to fill missing values
             with. Can be a number or 'interpolate'. Defaults to None.
+        dpi (int, optional): The DPI for the plot. Defaults to 300.
 
     Returns:
         tuple[plt.Figure, plt.Axes]: The figure and axes of the plot.
@@ -506,7 +509,11 @@ def plot_heatmap(
 
     # Save and potentially display the plot
     if output_path is not None:
-        plt.savefig(output_path, bbox_inches="tight")
+        if output_path.endswith(".pdf") and not vectorize:
+            raise ValueError("Please set vectorize=True to save as PDF")
+        elif not output_path.endswith(".pdf") and vectorize:
+            raise ValueError("Please set vectorize=False to save as PNG or JPG")
+        plt.savefig(output_path, bbox_inches="tight", dpi=dpi)
 
     if display_plot:
         plt.show()

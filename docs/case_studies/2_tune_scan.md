@@ -143,8 +143,91 @@ Also note that in this case, we didn't specify ```keep_submit_until_done=True```
 
 ## Study post-processing and plotting
 
-The following script shoud allow you to post-process the study (gather all the output data from each individual job) and plot the results:
+The following script shoud allow you to post-process the study (gather all the output data from each individual job) and plot the results. You might want to work in a Jupyter notebook from now on, since you will probably have to play with the parameters of the plot to get the best visualization:
 
 ```py title="postprocess_and_plot.py"
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+from study_da.plot import get_title_from_configuration, plot_heatmap
+from study_da.postprocess import aggregate_output_data
 
+# ==================================================================================================
+# --- Postprocess the study
+# ==================================================================================================
+
+df_final = aggregate_output_data(
+    "example_tune_scan/tree.yaml",
+    l_group_by_parameters=["qx_b1", "qy_b1"],
+    generation_of_interest=2,
+    name_output="output_particles.parquet",
+    write_output=True,
+    only_keep_lost_particles=True,
+)
+
+# ==================================================================================================
+# --- Plot
+# ==================================================================================================
+
+title = get_title_from_configuration(
+    df_final,
+    betx_value=0.15,
+    bety_value=0.15,
+    display_LHC_version=True,
+    display_energy=True,
+    display_bunch_index=True,
+    display_CC_crossing=True,
+    display_bunch_intensity=True,
+    display_beta=True,
+    display_crossing_IP_1=True,
+    display_crossing_IP_2=True,
+    display_crossing_IP_5=True,
+    display_crossing_IP_8=True,
+    display_bunch_length=True,
+    display_polarity_IP_2_8=True,
+    display_emittance=True,
+    display_chromaticity=True,
+    display_octupole_intensity=True,
+    display_coupling=True,
+    display_filling_scheme=True,
+    display_tune=False,
+    display_luminosity_1=True,
+    display_luminosity_2=True,
+    display_luminosity_5=True,
+    display_luminosity_8=True,
+    display_PU_1=True,
+    display_PU_2=True,
+    display_PU_5=True,
+    display_PU_8=True,
+)
+
+fig, ax = plot_heatmap(
+    df_final,
+    horizontal_variable="qx_b1",
+    vertical_variable="qy_b1",
+    color_variable="normalized amplitude in xy-plane",
+    plot_contours=True,
+    xlabel=r"Horizontal tune $Q_x$",
+    ylabel=r"Vertical tune $Q_y$",
+    mask_lower_triangle=True,
+    symmetric_missing = True,
+    title=title,
+    vmin=4,
+    vmax=8,
+    green_contour=6.0,
+    label_cbar="Minimum DA (" + r"$\sigma$" + ")",
+    output_path="output.png",
+    vectorize=False,
+    fill_missing_value_with="interpolate",
+)
 ```
+
+Basically, the ```aggregate_output_data``` function will gather all the output data from each individual job of the second generation. You have to provide it yourself the parameters that you are scanning (```qx_b1``` and ```qy_b1``` in this case), and the name of the output file that you want check for each individual jobs (if you didn't touch the configuration, it should be ```output_particles.parquet```) of the generation that you are interested in (2 in this case). ```write_output``` tells the function if it should write the aggregated data to a file (```da.parquet```  by default). It is useful since aggregating the data can be quite long, and you might want to save it for later. Finally,  ```only_keep_lost_particles``` tells the function if it should only keep the data from lost particles (if you're only interested in the DA, for example); this is useful since the output data can be quite large.
+
+From here, you will have to customize the title of the plot to your liking. I won't detail every single parameters as there are many, but they should be quite explicit.
+
+Finally, you can plot the result, with, again, many possibilities for customization. I only used the parameters that I thought were the most important, but you can find more in the documentation of the ```plot_heatmap``` function. Note that, since we only ran jobs on the super-diagonal, we have to mask the lower triangle of the heatmap and set ```symmetric_missing``` to True (for proper smoothing). Also note that, in this case, one job didn't work for some reason, so I had to fill the missing value with an interpolation. This is why I used the ```fill_missing_value_with="interpolate"``` parameter.
+
+Just for illustration, here's the final plot that I obtained:
+
+![Tune scan](plots/output.png)
