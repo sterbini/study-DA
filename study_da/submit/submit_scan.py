@@ -280,20 +280,46 @@ class SubmitScan:
         with self.lock:
             # Get dic tree once to avoid reloading it for every job
             dic_tree = self.dic_tree
+
+            # First pass to update the state of the tree
             for job in dic_all_jobs:
+                # Skip jobs that are already finished, failed or unsubmittable
+                if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) in [
+                    "finished",
+                    "failed",
+                    "unsubmittable",
+                ]:
+                    continue
+
+                # Check the state of the others
                 relative_job_folder = os.path.dirname(job)
                 absolute_job_folder = f"{self.abs_path}/{relative_job_folder}"
-                # Check if the file .finished exists
                 if os.path.exists(f"{absolute_job_folder}/.finished"):
                     nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "finished")
                 # Check if the job failed otherwise (not to resubmit it again)
                 elif os.path.exists(f"{absolute_job_folder}/.failed"):
                     nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "failed")
-                else:
+                # else:
+                #     at_least_one_job_to_finish = True
+
+            # Second pass to update the state of the tree with unreachable jobs
+            dependency_graph = DependencyGraph(dic_tree, dic_all_jobs)
+            for job in dic_all_jobs:
+                # Get all failed dependencies across the tree
+                l_dep_failed = dependency_graph.get_failed_dependency(job)
+                if len(l_dep_failed) > 0:
+                    nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "unsubmittable")
+                elif nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) == "to_submit":
                     at_least_one_job_to_finish = True
 
             if not at_least_one_job_to_finish:
+                # No more jobs to submit so finished
                 dic_tree["status"] = final_status = "finished"
+                # Last pass to check if all jobs are properly finished
+                for job in dic_all_jobs:
+                    if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "finished":
+                        dic_tree["status"] = final_status = "finished with issues"
+                        break
 
             # Update dic_tree from cluster_submission
             self.dic_tree = dic_tree
@@ -346,7 +372,10 @@ class SubmitScan:
         # Update the status of all jobs before submitting
         dic_all_jobs, final_status = self.check_and_update_all_jobs_status()
         if final_status == "finished":
-            logging.info("All jobs are finished. No need to submit.")
+            print("All jobs are finished. No need to submit.")
+            return final_status
+        elif final_status == "finished with issues":
+            print("All jobs are finished but some did not run properly.")
             return final_status
 
         logging.info("Acquiring lock to submit jobs")
@@ -613,18 +642,13 @@ class SubmitScan:
 
         # I don't need to lock the tree here since the status cheking is read only and
         # the lock is acquired in the submit method for the submission
-        while (
-            self.submit(
-                one_generation_at_a_time,
-                dic_additional_commands_per_gen,
-                dic_dependencies_per_gen,
-                dic_copy_back_per_gen,
-                name_config,
-            )
-            != "finished"
-        ):
+        while self.submit(
+            one_generation_at_a_time,
+            dic_additional_commands_per_gen,
+            dic_dependencies_per_gen,
+            dic_copy_back_per_gen,
+            name_config,
+        ) not in ["finished", "finished with issues"]:
             # Wait for a certain amount of time before checking again
             logging.info(f"Waiting {wait_time} minutes before checking again.")
             time.sleep(wait_time * 60)
-
-        print("All jobs are finished.")
