@@ -48,9 +48,9 @@ If you missed this step and clone the repository without the submodules, you can
 git submodule update --init --recursive
 ```
 
-## Installing with Poetry
+### Installing with Poetry
 
-### Standard installation with Poetry
+#### Standard installation with Poetry
 
 If not already done, install Poetry following the tutorial [here](https://python-poetry.org/docs/). 
 
@@ -78,7 +78,7 @@ poetry env use /full/path/to/python
 
 If you're not interested in using GPUs, you can jump directly to the [Installing dependencies](#installing-dependencies) section. Otherwise, follow the next section.
 
-### Installing with Poetry for GPUs
+#### Installing with Poetry for GPUs
 
 Using Poetry along with GPUs is a bit more complicated, as conda is not natively supported by Poetry. However, not all is lost as a simple trick allows to bypass this issue. First, from a conda-compatible Python environment (not the one you used to install Poetry), create a virtual environment with the following command:
 
@@ -118,7 +118,7 @@ submit(
 
 You're now good to go with the next section, as Poetry will automatically detect that the conda virtual environment is activated and use it to install the dependencies.
 
-### Installing dependencies
+#### Installing dependencies
 
 Finally, install the dependencies by running the following command:
 
@@ -159,7 +159,7 @@ or run the command directly with Poetry:
 poetry run python my_script.py
 ```
 
-## Installing locally without Poetry
+### Installing locally without Poetry
 
 It is strongly recommended to use Poetry as it will handle all the packages dependencies and the virtual environment for you. However, if you prefer to install the dependencies manually, you can do so by running the following commands (granted that you have Python installed along with pip):
 

@@ -37,6 +37,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import qrcode
+from scipy.interpolate import griddata
 from scipy.ndimage.filters import gaussian_filter
 
 # Local imports
@@ -137,7 +138,7 @@ def _smooth(data_array: np.ndarray, symmetric_missing: bool) -> np.ndarray:
 
 def _mask(
     mask_lower_triangle: bool, mask_upper_triangle: bool, data_smoothed: np.ndarray, k_masking: int
-) -> np.ndarray:
+) -> tuple[np.ndarray, np.ndarray | None]:
     """
     Masks the lower or upper triangle of the data array.
 
@@ -148,17 +149,17 @@ def _mask(
         k_masking (int): The k parameter for masking (distance form the diagonal).
 
     Returns:
-        np.ndarray: The masked data array.
+        tuple[np.ndarray, np.ndarray|None]: The masked data array and the mask.
     """
     # You might need to adjust the k_masking parameter if the matrix you work with is not symmetric
     if mask_lower_triangle:
         mask = np.tri(data_smoothed.shape[0], k=k_masking)
-        return np.ma.masked_array(data_smoothed, mask=mask.T)
+        return np.ma.masked_array(data_smoothed, mask=mask.T), mask.T
     elif mask_upper_triangle:
         mask = np.tri(data_smoothed.shape[0], k=k_masking)
-        return np.ma.masked_array(data_smoothed, mask=mask)
+        return np.ma.masked_array(data_smoothed, mask=mask), mask.T
     else:
-        return data_smoothed
+        return data_smoothed, None
 
 
 def _add_contours(
@@ -169,6 +170,7 @@ def _add_contours(
     min_level: float = 1,
     max_level: float = 15,
     delta_levels: float = 0.5,
+    mask: np.ndarray | None = None,
 ) -> plt.Axes:
     """
     Adds contour lines to the heatmap.
@@ -181,6 +183,7 @@ def _add_contours(
         min_level (float, optional): The minimum level for the contours. Defaults to 1.
         max_level (float, optional): The maximum level for the contours. Defaults to 15.
         delta_levels (float, optional): The delta between contour levels. Defaults to 0.5.
+        mask (np.ndarray, optional): The mask for the data array. Defaults to None.
 
     Returns:
         plt.Axes: The axes with contour lines.
@@ -193,6 +196,9 @@ def _add_contours(
         )
     X = np.arange(0.5, data_array.shape[1])
     Y = np.arange(0.5, data_array.shape[0])
+
+    if mask is not None:
+        mx = np.ma.masked_array(mx, mask=mask)
 
     CSS = ax.contour(X, Y, mx, colors="black", levels=levels, linewidths=0.2)
     ax.clabel(CSS, inline=True, fontsize=6)
@@ -398,7 +404,8 @@ def plot_heatmap(
         display_plot (bool, optional): Whether to display the plot. Defaults to True.
         latex_fonts (bool, optional): Whether to use LaTeX fonts. Defaults to True.
         vectorize (bool, optional): Whether to vectorize the plot. Defaults to False.
-        fill_missing_value_with (Optional[str | float], optional): The value to fill missing values with. Defaults to None.
+        fill_missing_value_with (Optional[str | float], optional): The value to fill missing values
+            with. Can be a number or 'interpolate'. Defaults to None.
 
     Returns:
         tuple[plt.Figure, plt.Axes]: The figure and axes of the plot.
@@ -419,13 +426,19 @@ def plot_heatmap(
         if isinstance(fill_missing_value_with, (int, float)):
             data_array[np.isnan(data_array)] = fill_missing_value_with
         elif fill_missing_value_with == "interpolate":
-            raise NotImplementedError("Interpolation of missing values is not implemented yet")
+            # Interpolate missing values with griddata
+            x = np.arange(data_array.shape[1])
+            y = np.arange(data_array.shape[0])
+            xx, yy = np.meshgrid(x, y)
+            x = xx[~np.isnan(data_array)]
+            y = yy[~np.isnan(data_array)]
+            z = data_array[~np.isnan(data_array)]
+            data_array = griddata((x, y), z, (xx, yy), method="cubic")
 
-    # Mask the lower or upper triangle
-    if mask_lower_triangle or mask_upper_triangle:
-        data_array_masked = _mask(mask_lower_triangle, mask_upper_triangle, data_array, k_masking)
-    else:
-        data_array_masked = data_array
+    # Mask the lower or upper triangle (checks are done in the function)
+    data_array_masked, mask_main_array = _mask(
+        mask_lower_triangle, mask_upper_triangle, data_array, k_masking
+    )
 
     # Define colormap and set NaNs to white
     cmap = matplotlib.colormaps.get_cmap(colormap)
@@ -454,6 +467,7 @@ def plot_heatmap(
             min_level_contours,
             max_level_contours,
             delta_levels_contours,
+            mask_main_array,
         )
 
     if plot_diagonal_lines:

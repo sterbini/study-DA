@@ -162,3 +162,5 @@ configured: true
 ```
 
 From here, one can load the collider file ```collider_file_for_tracking.json``` with Xsuite and/or check the result of the tracking using the file ```output_particles.parquet```.
+
+# ! TODO : show example with collider_dashboard here ?

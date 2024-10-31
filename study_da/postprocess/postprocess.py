@@ -23,6 +23,7 @@ import os
 from typing import Dict, List, Optional
 
 # Third party imports
+import numpy as np
 import pandas as pd
 
 # Local imports
@@ -248,6 +249,8 @@ def aggregate_output_data(
         l_df_output, l_group_by_parameters, only_keep_lost_particles, l_parameters_to_keep
     )
 
+    print("ICI", df_final)
+
     # Fix the LHC version type
     df_final = fix_LHC_version(df_final)
 
@@ -271,9 +274,16 @@ def fix_LHC_version(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The fixed DataFrame.
     """
     # Fix the LHC version type
-    if "ver_lhc_run" in df.columns:
-        df["ver_lhc_run"] = df["ver_lhc_run"].astype("int32")
-    if "ver_hllhc_optics" in df.columns:
-        df["ver_hllhc_optics"] = df["ver_hllhc_optics"].astype("float32")
+    print(df["ver_lhc_run"])
+    if "ver_lhc_run" in df.columns and not df["ver_lhc_run"].empty:
+        if df["ver_lhc_run"].isna().sum() != 0:
+            logging.warning("Some LHC version numbers are NaN... Ignoring")
+        else:
+            df["ver_lhc_run"] = df["ver_lhc_run"].astype("int32")
+    if "ver_hllhc_optics" in df.columns and not df["ver_hllhc_optics"].empty:
+        if df["ver_hllhc_optics"].isna().sum() != 0:
+            logging.warning("Some HLLHC optics version numbers are NaN... Ignoring")
+        else:
+            df["ver_hllhc_optics"] = df["ver_hllhc_optics"].astype("float32")
 
     return df

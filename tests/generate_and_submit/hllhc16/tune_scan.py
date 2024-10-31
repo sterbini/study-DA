@@ -23,7 +23,7 @@ config["config_mad"]["links"]["acc-models-lhc"] = (
     "../../../../../external_dependencies/acc-models-lhc"
 )
 
-# Adapt the number of turns
+# Adapt the number of turns if needed
 config["config_simulation"]["n_turns"] = 1000000
 
 # Drop the configuration locally
