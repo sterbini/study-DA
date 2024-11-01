@@ -121,6 +121,10 @@ As you can see, the tre file keeps track of everything that has been done, and t
 
 ### Submitting to HTCondor
 
+!!! warning "For the following to work, you need to have access to the CERN HTCondor cluster"
+
+    For the following to work, you need to have access to the CERN HTCondor cluster. If you don't have access, you can still run the script locally, but you won't be able to submit the jobs to the cluster (which is usually needed for large scans). You might want to read more about HTCondor [here](https://abpcomputing.web.cern.ch/computing_resources/cernbatch/).
+
 The procedure for submitting to HTCondor (or Slurm) is fairly similar, but there are a few tricky points to consider:
 
 - If you don't use an (externally hosted) Docker distribution, you might want to ensure that your Python environment is available from the cluster. Otherwise, the cluster will not be able to run the scripts.
