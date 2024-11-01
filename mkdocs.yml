@@ -6,7 +6,6 @@ nav:
   - Tutorials:
     - tutorials/index.md
     - Concepts: 
-      - tutorials/concepts/index.md
       - Generation: tutorials/concepts/1_generation.md
       - Submission: tutorials/concepts/2_submission.md
       - Analysis: tutorials/concepts/3_analysis.md
