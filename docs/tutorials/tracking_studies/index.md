@@ -52,6 +52,10 @@ The configuration file is a YAML file that contains all the parameters needed to
 
 Although it's probably better if you understand the role of each individual parameter in the file, all you have to know for now is that this is a fairly standard configuration for an end-of-levelling tracking. However, you will *definitely* have to adapt it to your needs for your own scans.
 
+!!! warning "You need to properly configure the path to the optics"
+  
+      The path to the optics must be properly set in the configuration file (fields `acc-models-lhc` and `optics_file`). You need to make sure that the path is correct, and that the optics are available on your machine (or on AFS if you're at CERN). If not, you will get an error when trying to load the collider sequence.
+
 ### Scan configuration
 
 The scan configuration is not provided as a template since this is completely dependent on the study. We provide here an example in the case of a scan over the horizontal tune for a varying number of turns.

@@ -32,6 +32,12 @@ The package is available on PyPI and can be installed using `pip`.
 pip install study-da
 ```
 
+You might also want to clone the optics repositories for the LHC versions you're interested in. For instance, to clone the HL-LHC optics v1.6, run the following command:
+
+```bash
+git clone https://gitlab.cern.ch/acc-models/acc-models-lhc.git -b hl16
+```
+
 ## Installing study-DA locally
 
 ### Cloning the repository
@@ -48,11 +54,13 @@ If you missed this step and clone the repository without the submodules, you can
 git submodule update --init --recursive
 ```
 
+Cloning the submodules is important as this download the optics for HL-LHC, which are necessary to run the tracking examples.
+
 ### Installing with Poetry
 
 #### Standard installation with Poetry
 
-If not already done, install Poetry following the tutorial [here](https://python-poetry.org/docs/). 
+If not already done, install Poetry following the tutorial [here](https://python-poetry.org/docs/).
 
 For easier submission later, impose the virtual environment to be created in the repository folder by running the following command:
 
