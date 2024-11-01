@@ -1,0 +1,30 @@
+# ==================================================================================================
+# --- Structure of the study ---
+# ==================================================================================================
+name: example_scan_1_gen
+
+# List all useful files that will be used by executable in generations below
+# These files are placed at the root of the study
+dependencies:
+  main_configuration: config_runIII_ions.yaml
+
+structure:
+  # First generation is always at the root of the study
+  # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
+  generation_1:
+    executable: custom_files/generation_1_custom.py
+    common_parameters:
+      # Needs to be redeclared as it's used for parallelization
+      # And re-used ine the second generation
+      n_split: 5
+    scans:
+      distribution_file:
+        # Number of paths is set by n_split in the main config
+        path_list: ["____.parquet", n_split]
+      qx:
+        subvariables: [lhcb1, lhcb2]
+        linspace: [62.305, 62.330, 11]
+      qy:
+        subvariables: [lhcb1, lhcb2]
+        linspace: [60.305, 60.330, 11]
+        condition: qy >= qx - 2 + 0.0039

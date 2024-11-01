@@ -66,7 +66,7 @@ def linspace(l_values_linspace: list) -> np.ndarray:
             l_values_linspace[2],
             endpoint=True,
         ),
-        5,
+        8,
     )
 
 
@@ -92,7 +92,7 @@ def logspace(l_values_logspace: list) -> np.ndarray:
             l_values_logspace[2],
             endpoint=True,
         ),
-        5,
+        8,
     )
 
 
