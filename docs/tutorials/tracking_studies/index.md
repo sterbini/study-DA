@@ -30,19 +30,19 @@ Again, this script should be relatively self-explanatory. Basically, it loads th
 
 The collider configuration is itself done in several steps:
 
-    - The collider is loaded from the file created in the first generation
-    - The beam-beam elements are installed (but remain inactive for now)
-    - The trackers are built for running Xsuite Twiss
-    - The knobs are set. This is where the mutation of the parameters usually has some impact, for instance when you scan the tune, you modify the knobs here.
-    - The tune and chromaticity are matched
-    - The filling scheme is set
-    - The number of collisions in the IPs is computed
-    - The leveling is done if requested
-    - The linear coupling is added
-    - The tune and chromaticity are rematched
-    - The beam-beam is computed and activated if needed
-    - The final luminosity is recorded
-    - The collider is saved to disk
+- The collider is loaded from the file created in the first generation
+- The beam-beam elements are installed (but remain inactive for now)
+- The trackers are built for running Xsuite Twiss
+- The knobs are set. This is where the mutation of the parameters usually has some impact, for instance when you scan the tune, you modify the knobs here.
+- The tune and chromaticity are matched
+- The filling scheme is set
+- The number of collisions in the IPs is computed
+- The leveling is done if requested
+- The linear coupling is added
+- The tune and chromaticity are rematched
+- The beam-beam is computed and activated if needed
+- The final luminosity is recorded
+- The collider is saved to disk
   
 Again, you are invited to check the details of the functions if you want to know more. After this configuration step, the particles are tracked and the output is saved to disk.
 
@@ -91,12 +91,78 @@ structure:
         list: [1000, 20000, 50000, 100000]
 ```
 
-!!! info "Scanning the number of turns makes no sense"
+!!! info "Scanning the number might not be the wisest choice"
 
-    This is just an example to show you how to scan over some parameters. In practice, scanning the number of turns makes no sense, as you could just do one scan with a large number of turns and regularly save the output to disk (e.g. every 1000 turns).
+    This is just an example to show you how to scan over some parameters. In practice, scanning the number of turns doesn't really make sense, as you could just do one scan with a large number of turns and regularly save the output to disk (e.g. every 1000 turns).
 
-Thre are several things to notice. First, and contrary to the dummy studies presented in the concepts, we don't run an parametric scan in the first generation: we just take the collider with the configuration as it is. However, there is an exception for the `n_split` parameter, which is used for parallelization. This parameter is redeclared in the `common_parameters` of the first generation, and then used in the second generation. This is because it is used for parallelization and needs to be re-used in the second generation (in this case, each job will track one half of the particles distribution, which corresponds to the files ```00.parquet``` and ```01.parquet```).
+Thre are several things to notice. First, and contrary to the dummy studies presented in the concepts, we don't run an parametric scan in the first generation: we just take the collider with the configuration as it is. However, there is an exception for the `n_split` parameter. It is declared in the `common_parameters` of the first generation, and then used in the second generation as a variable. This is because it is used for parallelization and sets how many subsets there will be for the particles distribution (in this case, each job will track one half of the particles distribution, which corresponds to the files ```00.parquet``` and ```01.parquet```).
 
 Then, in this case, the executables ```generation_1.py``` and ```generation_2_level_by_nb.py``` are directly provided by the package (we don't need to place them in the same folder as the configuration, altough we could).
 
 Finally, you might notice that two parameters are being scanned in the second generation (the horizontal tune and the number of turns). In this case, if no specific keyword is provided (see the [case studies](../../case_studies/index.md) for example of keywords), it's the cartesian product of all the parameters that is being scanned.
+
+One can then run the following lines of code generate the study:
+
+```python title="dummy_scan.py"
+
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+from study_da import create, submit
+
+# ==================================================================================================
+# --- Script to generate a study
+# ==================================================================================================
+
+# Now generate the study in the local directory
+path_tree, name_main_config = create(path_config_scan="config_scan.yaml")
+```
+
+At this point, the study is created in the local directory. You can check the files that have been created, to better understand how generations and parameter mutations work.
+
+## Submitting the study
+
+The next step is to submit the study. This is done with the following lines of code (continuation of the previous script):
+
+```python title="dummy_scan.py"
+# ==================================================================================================
+# --- Script to submit the study
+# ==================================================================================================
+
+# In case gen_1 is submitted locally
+dic_additional_commands_per_gen = {
+    # To clean up the folder after the first generation if submitted locally
+    1: "rm -rf final_* modules optics_repository optics_toolkit tools tracking_tools temp mad_collider.log __pycache__ twiss* errors fc* optics_orbit_at* \n"
+}
+
+# Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
+dic_dependencies_per_gen = {
+    1: ["acc-models-lhc"],
+    2: ["path_collider_file_for_configuration_as_input", "path_distribution_folder_input"],
+}
+
+# Submit the study
+submit(
+    path_tree=path_tree,
+    path_python_environment="/afs/cern.ch/work/c/cdroin/private/study-DA/.venv",
+    path_python_environment_container="/usr/local/DA_study/miniforge_docker",
+    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:ad541f20",
+    dic_dependencies_per_gen=dic_dependencies_per_gen,
+    name_config=name_main_config,
+    dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+)
+```
+
+Let's comment a bit on this part of the script.
+
+The ```dic_additional_commands_per_gen``` is used to clean up the folder after the first generation (since we're going to submit it locally).
+
+The ```dic_dependencies_per_gen``` is only needed if one uses HTC, and basically specifies which path should be mutated to be absolute in the configuration file of the executable, so that the executable can find the files it needs even if it's being run from a distant node.
+
+Finally, the ```submit``` function is called with the path to the study, the path to the Python environment (for the first generation that we submit locally), the path to the container image, the path to the environment in the container (for the second generation that we submit on HTC), the name of the main configuration file, and the two dictionaries we just described.
+
+And that's it! If you run this file, you will be prompted how to do the submission (although this can also be preconfigured, as explained in the [concepts](../../concepts/2_submission.md)) and the first generation will be submitted.
+
+Running the same script a bit later will submit the second generation (although you can try to re-run it right away, to have the package explaining you which jobs are running and why it doesn't submit the second generation). Alternatively, you can just add the argument ```keep_submit_until_done=True``` to the ```submit``` function to have the package regularly try to re-submit the second generation.
+
+## Analyzing the results

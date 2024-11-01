@@ -8,25 +8,12 @@ from study_da import create, submit
 # ==================================================================================================
 
 # Now generate the study in the local directory
-path_tree, name_main_config = create(path_config_scan="config_scan.yaml", force_overwrite=False)
+path_tree, name_main_config = create(path_config_scan="config_scan.yaml")
 
 
 # ==================================================================================================
 # --- Script to submit the study
 # ==================================================================================================
-
-# Preconfigure submission to HTC
-dic_config_jobs = {
-    "generation_1" + ".py": {
-        "context": "cpu",
-        "submission_type": "local",
-    },
-    "generation_2" + ".py": {
-        "context": "cpu",
-        "submission_type": "htc_docker",
-        "htc_flavor": "workday",
-    },
-}
 
 # In case gen_1 is submitted locally
 dic_additional_commands_per_gen = {
