@@ -84,7 +84,13 @@ path_tree, name_main_config = create(path_config_scan="config_scan.yaml")
 os.remove(name_template_config)
 ```
 
-Running this, the directory with all the jobs should be created, along with the corresponding tree file.
+As you can see, we load the template configuration from the package, update the location of the ```acc-models-lhc``` link (since it's dumped in a different folder), and then drop the configuration locally. We then generate the study in the local directory, and delete the configuration.
+
+!!! note "How you modify the configuration is up to you "
+    
+    We could also have used the configuration file of our liking, that we can for instance place in the study directory (but that's not even needed). In this case, no need to load it as a dict and modify it in a Python script, we can just modify the `yaml` file and provide the corresponding path in the ```create``` function.
+
+Anyway, at this point, the directory with all the jobs should be created, along with the corresponding tree file.
 
 ## Study submission
 
@@ -226,6 +232,10 @@ Basically, the ```aggregate_output_data``` function will gather all the output d
 Finally,  ```only_keep_lost_particles``` tells the function if it should only keep the data from lost particles (if you're only interested in the DA, for example); this is useful since the output data can be quite large.
 
 From here, you will have to customize the title of the plot to your liking. I won't detail every single parameters as there are many, but they should be quite explicit.
+
+!!! warning "Beta function values must be specified manually"
+    
+    Beta functions are not stored in the output data, so you should remember to specify them manually. In this case, I used 0.15 for both horizontal and vertical beta functions.
 
 Finally, you can plot the result, with, again, many possibilities for customization. I only used the parameters that I thought were the most important, but you can find more in the documentation of the ```plot_heatmap``` function.
 
