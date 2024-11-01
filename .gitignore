@@ -165,3 +165,4 @@ cython_debug/
 tests/**/example*
 tests/**/generation_*
 !tests/generate_and_submit/dummy_custom_template/custom_files/**.py
+tests/**/da.parquet
