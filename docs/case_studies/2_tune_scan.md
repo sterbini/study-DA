@@ -43,9 +43,10 @@ structure:
         condition: qy >= qx - 2 + 0.0039
 ```
 
-Here, ```generation_1.py``` and ```generation_2_level_by_nb.py``` are the same template scripts as in the [1_simple_collider.md](1_simple_collider.md) case study. The only difference is that the second generation will now be mutated in each job of generation 2 to scan the tunes. If no specific keyword is provided, it's the cartesian product of all the variables that will be scanned. In this case, since we added a condition on the tunes (because we're only interest in the working points above the super-diagonal), the scan will be done on the tune combinations that satisfy the condition.
+Here, ```generation_1.py``` and ```generation_2_level_by_nb.py``` are the same template scripts as in the [1_simple_collider.md](1_simple_collider.md) case study. The only difference is that the second generation will now be mutated in each job of generation 2 to scan the tunes.
 
-In addition, you might notice that the ```n_split``` parameter is declared as a "common_parameters" in the first generation. This is because it is used for parallelization and needs to be re-used in the second generation (in this case, each job will track 1/5th of the particles distribution, which corresponds to the files ```00.parquet```, ```01.parquet```, etc.).
+If no specific keyword is provided, it's the cartesian product of all the variables that will be scanned. In this case, since we added a condition on the tunes (because we're only interest in the working points above the super-diagonal), the scan will be done on the tune combinations that satisfy the condition.
+
 
 ## Study generation
 

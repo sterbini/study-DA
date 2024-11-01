@@ -237,6 +237,6 @@ The file should have self-explanatory comments. There are however severla differ
   
 # ! TODO: Give a link to a case with dependencies
 
-If all goes well, after a while (this depends on the load on the cluster), the `result.txt` should be copied back to the local machine for each leaf of the tree that has been tagged as finished (all, normally). 
+If all goes well, after a while (this depends on the load on the cluster), the `result.txt` should be copied back to the local machine for each leaf of the tree that has been tagged as finished (all, normally).
 
 We should now have to automatically retrieve all these results. However, the study-da package only provides the tools to do this for tracking studies. You will therefore have to refer directly to the [tracking studies](../tracking_studies/index.md) section to see how to do this.

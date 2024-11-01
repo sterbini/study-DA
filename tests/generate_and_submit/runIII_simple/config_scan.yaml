@@ -6,33 +6,27 @@ name: example_dummy_scan
 # List all useful files that will be used by executable in generations below
 # These files are placed at the root of the study
 dependencies:
-  main_configuration: ../../../study_da/generate/template_configurations/config_dummy.yaml
+  main_configuration: config_runIII.yaml
 
 structure:
   # First generation is always at the root of the study
   # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
   generation_1:
-    executable: generation_1_dummy.py
-    scans:
-      n_angles:
-        list: [5]
+    executable: generation_1.py
     common_parameters:
       # Needs to be redeclared as it's used for parallelization
       # And re-used ine the second generation
-      n_split: 3
+      n_split: 2
 
   # Second generation depends on the config from the first generation
   generation_2:
-    executable: generation_2_dummy.py
+    executable: generation_2_level_by_nb.py
     scans:
       distribution_file:
         # Number of paths is set by n_split in the main config
         path_list: ["____.parquet", n_split]
-
-  # Second generation depends on the config from the first generation
-  generation_3:
-    executable: generation_3_dummy.py
-    scans:
-      device_number:
-        # Number of paths is set by n_split in the main config
-        list: [0, 1, 2]
+      qx:
+        subvariables: [lhcb1, lhcb2]
+        linspace: [62.305, 62.330, 6]
+      n_turns:
+        list: [1000, 20000, 50000, 100000]
