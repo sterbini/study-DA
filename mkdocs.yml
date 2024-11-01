@@ -1,7 +1,11 @@
 site_name: Study-DA documentation
 
 nav:
-  - Study-DA: index.md
+  - Study-DA:
+    - index.md
+    - Getting Started: getting_started.md
+    - Why this package: why_this_package.md
+    - Contributing: contributing.md
   - Installation: installation.md
   - Tutorials:
     - tutorials/index.md
