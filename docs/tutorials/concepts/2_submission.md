@@ -60,7 +60,7 @@ No need to explain more here as this is quite explicit, but you can observe that
 
 You can also observe that, in the study folder, run files have appeared as `run.sh`, basically instructing the machine that will run the job (here, the local machine) how to proceed:
 
-```bash
+```bash title="run.sh"
 #!/bin/bash
 # Load the environment
 source /afs/cern.ch/work/c/cdroin/private/study-DA/.venv/bin/activate
@@ -89,7 +89,7 @@ The optional user defined command to run at the end can be provided through an a
 
 After a dozen seconds, the script should finish for good. When checking the tree, you should get the following output (cropped for clarity):
 
-```yaml
+```yaml title="tree.yaml"
 x_1:
   generation_1:
     file: example_dummy/x_1/generation_1.py
@@ -181,20 +181,60 @@ Some new variables and/or arguments are introduced here:
 - `dic_copy_back_per_gen` is a dictionary that allows to specify which files will be copied back from the cluster to the local machine after the completion of the jobs. This is useful when you want to retrieve the results of the study, or some intermediate files that have been generated during the study. In this case, a text file has been produced during the second generation, so we set the value to `True` for `txt` for the second generation. Possible file extensions are `parquet`, `yaml`, `txt`, `json`, `zip` and `all` (in which case all files will be copied back).
 - dic_config_jobs is a dictionary that allows to preconfigure the submission of the jobs. This is useful when you don't want to get prompted for each job. In this case, we set the context to `cpu`, the submission type to `htc`, and the flavor to `espresso` for all the jobs, since our scripts are very simple.
 
-!!! warning Copying back large file is not recommended
+!!! warning "Copying back large file is not recommended"
 
     Copying back large files on AFS can easily throttle the network, especially when you're running thousands of jobs at the same time.
 
-!!! bug Don't forget to provide an environment if you don't use a Docker container
+!!! bug "Don't forget to provide an environment if you don't use a Docker container"
 
     If you submit on HTC but don't use a Docker container (or submit locally), you have to provide the path to the python environment on the cluster using the `path_python_environment` argument.
 
-You should get more or less the same output as before, except that your jobs are now most likely queued on the cluster (for confirmation, you can check the status of your jobs using the `condor_q` command). In the meanwhile, we can have a look at one of the new run files, for instance for the second generation:
+You should get more or less the same output as before, except that your jobs are now most likely queued on the cluster (for confirmation, you can check the status of your jobs using the `condor_q` command). In the meanwhile, we can have a look at one of the new run files, for instance for the second generation (if you run the script above, remember that you have to wait for the second generation to be submitted to have the run files created):
 
-```bash
+```bash title="dummy_custom_template/example_dummy/x_2/y_1.0/run.sh"
+#!/bin/bash
+# Load the environment
+source /usr/local/DA_study/miniforge_docker/bin/activate
+
+# Copy config in (what will be) the level above
+cp -f /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/dummy_custom_template/example_dummy/x_2/y_1.0/../config_dummy.yaml .
+
+# Create local directory on node and cd into it
+mkdir y_1.0
+cd y_1.0
+
+# Mutate the paths in config to be absolute
+
+# Run the job and tag
+python /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/dummy_custom_template/example_dummy/x_2/y_1.0/generation_2.py > output_python.txt 2> error_python.txt
+
+
+# Ensure job run was successful and tag as finished, or as failed otherwise
+if [ $? -eq 0 ]; then
+    touch /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/dummy_custom_template/example_dummy/x_2/y_1.0/.finished
+else
+    touch /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/dummy_custom_template/example_dummy/x_2/y_1.0/.failed
+fi
+
+# Delete the config file from the above directory, otherwise it will be copied back and overwrite the new config
+rm ../config_dummy.yaml
+# Copy back output, including the new config
+cp -f *.parquet *.yaml *.txt /afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/dummy_custom_template/example_dummy/x_2/y_1.0
+
+# Store abs path as a variable in case it's needed for additional commands
+path_job=/afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/dummy_custom_template/example_dummy/x_2/y_1.0
+
+# Optional user defined command to run
 
 ```
 
-TODO: Explain whatever is in the run file
+The file should have self-explanatory comments. There are however severla difference:
+
+    - The environment is loaded from the Docker container
+    - The configuration file is copied in the job folder on the node (and the output configuration file is copied back to the local machine after the completion of the job)
+    - Some paths in the configuration file (declared as ```dependencies```) are mutated to be absolute, so that they can be accessed from the cluster node. In this case, there are no dependencies. 
+    - The output files are copied back to the local machine after the completion of the job. By default, only light files are copied back (parquet, yaml, txt). In we had set the ```dic_copy_back_per_gen``` argument to ```{"txt": False}```, the output would not have been copied back.
+  
+# ! TODO: Give a link to a case with dependencies
 
 If all goes well, after a while (this depends on the load on the cluster), the `result.txt` should be copied back to the local machine for each leaf of the tree that has been tagged as finished (all, normally). We now have to automatically retrieve all these results, this is part of the next section of this tutorial: [Analysis](3_analysis.md).
