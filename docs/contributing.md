@@ -19,4 +19,3 @@ To do a pull request, please follow these steps:
 4. Commit your changes (`git commit -am 'Add your feature'`)
 5. Push to the branch (`git push origin feature/yourfeature`)
 6. Create a new Pull Request
-

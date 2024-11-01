@@ -85,7 +85,7 @@ path_job=$(pwd)
 
 There's nothing too fancy here: the script loads the python environment, moves to the job folder, runs the python script, and tags the job as finished or failed depending on the return code of the python script. As soon as the job reach completion, some `.finished` files appear in the study folder (or `failed`if they fail). This is a way to keep track of the jobs that have been completed, and to avoid re-submitting them.
 
-The optional user defined command to run at the end can be provided through an argument called `dic_additional_commands_per_gen`, which takes the generation number as key, and the additional command as value. This is useful when you want to run some additional commands after the completion of a generation, such as cleaning the output folder from temporary files, copying the results to a specific folder, or sending an email to the user. This will be illustrated in the [Configuration and Tracking section](../configuration_tracking/practical_example.md).
+The optional user defined command to run at the end can be provided through an argument called `dic_additional_commands_per_gen`, which takes the generation number as key, and the additional command as value. This is useful when you want to run some additional commands after the completion of a generation, such as cleaning the output folder from temporary files, copying the results to a specific folder, or sending an email to the user.
 
 After a dozen seconds, the script should finish for good. When checking the tree, you should get the following output (cropped for clarity):
 
@@ -117,7 +117,7 @@ status: finished
 configured: true
 ```
 
-As you can see, the tre file keeps track of everything that has been done, and the status of each job. When the status of each individual job is finished, the tree itself gets tagged as finished. From here, one can actually retrieve the results of the study, and analyze them. This will be part of the next section of this tutorial: [Analysis](3_analysis.md).
+As you can see, the tre file keeps track of everything that has been done, and the status of each job. When the status of each individual job is finished, the tree itself gets tagged as finished. 
 
 ### Submitting to HTCondor
 

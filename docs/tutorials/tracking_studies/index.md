@@ -12,7 +12,7 @@ The tracking is usually done in two generations to optimize the process. In the 
 
 #### Generation 1
 
-Generation 1 usually corresponds to the step in which the Xsuite collider is created from a MAD-X sequence, and the particle distribution is created. At this step, only a few checks are performed, and the collider is not yet ready for tracking studies. For this example, we will work with the [template script provided in the package to create the collider](../../template_files/scripts/generatation_1.md).
+Generation 1 usually corresponds to the step in which the Xsuite collider is created from a MAD-X sequence, and the particle distribution is created. At this step, only a few checks are performed, and the collider is not yet ready for tracking studies. For this example, we will work with the [template script provided in the package to create the collider](../../template_files/scripts/generation_1.md).
 
 This script should very much be self-explanatory, especially if you have understood the concepts explained in the previous sections, and already have a basic knowledge of Mad-X and Xsuite. Basically, it loads the configuration file, mutates it with the parameters provided in the scan configuration (explained a bit below), and then builds the particle distribution and the collider. You are invited to check the details of the functions (e.g. on the [GitHub repository](https://github.com/ColasDroin/study-DA/tree/master/study_da/generate/master_classes) of the package) to better understand what is happening.
 
@@ -24,7 +24,7 @@ The collider configuration file is then saved with the mutated parameters, so th
 
 #### Generation 2
 
-Generation 2 corresponds to the step in which the collider is configured and the tracking is performed. For this example, we will still work with the [template script provided in the package to perform the tracking](../../template_files/scripts/generatation_2_level_by_nb.md).
+Generation 2 corresponds to the step in which the collider is configured and the tracking is performed. For this example, we will still work with the [template script provided in the package to perform the tracking](../../template_files/scripts/generation_2_level_by_nb.md).
 
 Again, this script should be relatively self-explanatory. Basically, it loads the configuration file, mutates it with the parameters provided in the scan configuration, and then configures the collider and tracks the particles.
 
@@ -48,7 +48,7 @@ Again, you are invited to check the details of the functions if you want to know
 
 ### Template configuration
 
-The configuration file is a YAML file that contains all the parameters needed to configure the collider and run the tracking. It is loaded in both generations, and mutated in the second generation to scan over some parameters. In this example, we will work with the [template configuration provided for LHC run III](../../template_files/configurations/config_runIII.yaml).
+The configuration file is a YAML file that contains all the parameters needed to configure the collider and run the tracking. It is loaded in both generations, and mutated in the second generation to scan over some parameters. In this example, we will work with the [template configuration provided for LHC run III](../../template_files/configurations/config_runIII.md).
 
 Although it's probably better if you understand the role of each individual parameter in the file, all you have to know for now is that this is a fairly standard configuration for an end-of-levelling tracking. However, you will *definitely* have to adapt it to your needs for your own scans.
 
@@ -165,7 +165,7 @@ The ```dic_dependencies_per_gen``` is only needed if one uses HTC, and basically
 
 Finally, the ```submit``` function is called with the path to the study, the path to the Python environment (for the first generation that we submit locally), the path to the container image, the path to the environment in the container (for the second generation that we submit on HTC), the name of the main configuration file, and the two dictionaries we just described.
 
-And that's it! If you run this file, you will be prompted how to do the submission (although this can also be preconfigured, as explained in the [concepts](../../concepts/2_submission.md)) and the first generation will be submitted.
+And that's it! If you run this file, you will be prompted how to do the submission (although this can also be preconfigured, as explained in the [concepts](../concepts/2_submission.md)) and the first generation will be submitted.
 
 Running the same script a bit later will submit the second generation (although you can try to re-run it right away, to have the package explaining you which jobs are running and why it doesn't submit the second generation). Alternatively, you can just add the argument ```keep_submit_until_done=True``` to the ```submit``` function to have the package regularly try to re-submit the second generation.
 

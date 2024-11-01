@@ -12,13 +12,8 @@ nav:
     - Concepts: 
       - Generation: tutorials/concepts/1_generation.md
       - Submission: tutorials/concepts/2_submission.md
-      - Analysis: tutorials/concepts/3_analysis.md
-    - Doing a tracking study:
-      - tutorials/configuration_tracking/index.md
-      - Understanding template files: tutorials/configuration_tracking/template_description.md
-      - A concrete example: tutorials/configuration_tracking/practical_example.md
-    - Using GPUs:
-      - tutorials/using_GPUs/index.md
+    - Pratical example:
+      - Doing a tracking study: tutorials/tracking_studies/index.md
   - Case studies: 
     - case_studies/index.md
     - A simple collider: case_studies/1_simple_collider.md
@@ -27,6 +22,7 @@ nav:
     - A 3D scan: case_studies/4_3D_scan.md
     - A 1-generational scan: case_studies/5_1_generational_scan.md
     - A 3 generational scan: case_studies/6_3_generational_scan.md
+    - Tracking with GPU: case_studies/7_tracking_with_GPU.md
   - Templates:
     - template_files/index.md
     - Configurations:
