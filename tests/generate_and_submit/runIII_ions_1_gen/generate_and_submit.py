@@ -61,7 +61,7 @@ dic_config_jobs = {
     "generation_1" + ".py": {
         "context": "cpu",
         "submission_type": "htc_docker",
-        "htc_flavor": "tomorrow",
+        "htc_flavor": "testmatch",
     }
 }
 
