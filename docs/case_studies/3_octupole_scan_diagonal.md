@@ -2,7 +2,7 @@
 
 Octupole scans are an other type of scans that are frequently requested. Just like tune scan, they are usually done in second generation: the first one allows to convert the Mad sequence to a Xsuite collider (single job), while the second one enables to configure the collider and do the scan for various octupoles and tune values (tune values being on the superdiagonal). Let's give an example with the ```config_runIII.yaml``` configuration template.
 
-!!! note "Shorter explanations"
+!!! note "You're getting better at this! I'm getting lazy..."
 
     You should have a reasonable understanding of the package by now. Therefore, details about the scripts and the configuration will not be explained in detail. If you need more information, please refer to the previous case studies.
 
@@ -192,8 +192,6 @@ fig, ax = plot_heatmap(
     horizontal_variable="i_oct_b1",
     vertical_variable="qx_b1",
     color_variable="normalized amplitude in xy-plane",
-    link="www.link-to-your-study.com",
-    position_qr="bottom-right",
     plot_contours=True,
     xlabel="Octupole intensity [A]",
     ylabel=r"$Q_x$" + "with " + r"$Q_y = Q_x -2 + 0.005$",
@@ -210,10 +208,6 @@ fig, ax = plot_heatmap(
 ```
 
 Note that, in this case, the parameters we used to group by the output data with are both the tune and the octupole current for beam 1 and beam 2. Also, in this case, we have to specify the type of crossing for the plotting since it can't be parsed from the configuration. Finally, a few adjustements are needed in the ```plot_heatmap``` function, they should be self-explanatory.
-
-!!! tip "You can add a link as a qrcode to your plot"
-
-    You can add a link to your study as a qrcode in the plot by specifying the `link` argument in the `plot_heatmap` function. In this case, the qrcode will be displayed in the bottom right corner of the plot. However, the qrcode will be clickable only if you use a vectorized output format (e.g. pdf).
 
 Just for illustration, here is the output of the plot (not vectorized):
 

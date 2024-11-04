@@ -46,8 +46,6 @@ dic_parameter_all_gen_naming = {
     }
 }
 
-print(dic_parameter_all_gen)
-
 # Generate the study in the local directory
 path_tree, name_main_config = create(
     path_config_scan="config_scan.yaml",

@@ -18,7 +18,7 @@ This script should very much be self-explanatory, especially if you have underst
 
 The collider configuration file is then saved with the mutated parameters, so that the subsequent generation can use it.
 
-!!! info "These template scripts should be adapted to your needs"
+!!! info "You'll have to adapt these templates to your needs"
 
     The template scripts provided in the package are just that: templates. They should be adapted to your needs, especially if you have a more complex collider configuration. For example, you might want to add some checks to ensure that the collider is correctly built, or that the particle distribution is correctly generated. You might also want to add some logging to keep track of what is happening in the script. You're basically free to not use at all the convenience functions provided with the package. 
 
@@ -79,7 +79,7 @@ structure:
     common_parameters:
       # Needs to be redeclared as it's used for parallelization
       # And re-used ine the second generation
-      n_split: 2
+      n_split: 5
 
   # Second generation depends on the config from the first generation
   generation_2:
@@ -90,16 +90,16 @@ structure:
         path_list: ["____.parquet", n_split]
       qx:
         subvariables: [lhcb1, lhcb2]
-        linspace: [62.305, 62.330, 6]
+        linspace: [62.305, 62.315, 11]
       n_turns:
-        list: [1000, 20000, 50000, 100000]
+        logspace: [2, 5, 20]
 ```
 
-!!! info "Scanning the number might not be the wisest choice"
+!!! info "Scanning the number of turns might not be the wisest choice"
 
     This is just an example to show you how to scan over some parameters. In practice, scanning the number of turns doesn't really make sense, as you could just do one scan with a large number of turns and regularly save the output to disk (e.g. every 1000 turns).
 
-Thre are several things to notice. First, and contrary to the dummy studies presented in the concepts, we don't run an parametric scan in the first generation: we just take the collider with the configuration as it is. However, there is an exception for the `n_split` parameter. It is declared in the `common_parameters` of the first generation, and then used in the second generation as a variable. This is because it is used for parallelization and sets how many subsets there will be for the particles distribution (in this case, each job will track one half of the particles distribution, which corresponds to the files ```00.parquet``` and ```01.parquet```).
+Thre are several things to notice. First, and contrary to the dummy studies presented in the concepts, we don't run an parametric scan in the first generation: we just take the collider with the configuration as it is. However, there is an exception for the `n_split` parameter. It is declared in the `common_parameters` of the first generation, and then used in the second generation as a variable. This is because it is used for parallelization and sets how many subsets there will be for the particles distribution (in this case, each job will track one fifth of the particles distribution, which corresponds to the files ```00.parquet```, ```01.parquet```, etc.).
 
 Then, in this case, the executables ```generation_1.py``` and ```generation_2_level_by_nb.py``` are directly provided by the package (we don't need to place them in the same folder as the configuration, altough we could).
 
@@ -170,3 +170,21 @@ And that's it! If you run this file, you will be prompted how to do the submissi
 Running the same script a bit later will submit the second generation (although you can try to re-run it right away, to have the package explaining you which jobs are running and why it doesn't submit the second generation). Alternatively, you can just add the argument ```keep_submit_until_done=True``` to the ```submit``` function to have the package regularly try to re-submit the second generation.
 
 ## Analyzing the results
+
+Once the study is done, re-running the script will just tell you that the study is done. You can then post-process the results and plot them with the following lines of code:
+
+```python title="postprocess_and_plot.py"
+
+```
+
+TODO: Explain this code
+
+!!! tip "You can add a link as a qrcode to your plot"
+
+    You can add a link to your study as a qrcode in the plot by specifying the `link` argument in the `plot_heatmap` function. In this case, the qrcode will be displayed in the bottom right corner of the plot. However, the qrcode will be clickable only if you use a vectorized output format (e.g. pdf).
+
+Just for illustration, here is the output of the plot (not vectorized):
+
+![Tune scan](plots/qx_turns.png)
+
+I used a png version as it's lighter to display for the browser but you should probably use a vectorized format for your plots, especially if you want to print them or include them in a presentation (you can always convert them to png afterwards if you need to).

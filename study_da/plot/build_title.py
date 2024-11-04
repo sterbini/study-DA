@@ -523,12 +523,20 @@ def get_filling_scheme_str(dataframe_data: pd.DataFrame) -> str:
         return ""
 
 
-def get_tune_str(dataframe_data: pd.DataFrame) -> str:
+def get_tune_str(
+    dataframe_data: pd.DataFrame,
+    display_horizontal_tune: Optional[bool] = None,
+    display_vertical_tune: Optional[bool] = None,
+) -> str:
     """
     Retrieves the tune from the dataframe.
 
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing tune information.
+        display_horizontal_tune (bool, optional): Whether to display the horizontal tune. Defaults to
+            None.
+        display_vertical_tune (bool, optional): Whether to display the vertical tune. Defaults to
+            None.
 
     Returns:
         str: The tune string.
@@ -536,7 +544,23 @@ def get_tune_str(dataframe_data: pd.DataFrame) -> str:
     if "qx_b1" in dataframe_data.columns and "qy_b1" in dataframe_data.columns:
         tune_h_value = dataframe_data["qx_b1"].unique()[0]
         tune_v_value = dataframe_data["qy_b1"].unique()[0]
-        return f"$Q_x = {tune_h_value}$, $Q_y = {tune_v_value}$"
+        if (
+            (
+                display_horizontal_tune is not None
+                and display_vertical_tune is not None
+                and display_horizontal_tune
+                and display_vertical_tune
+            )
+            or display_horizontal_tune is None
+            and display_vertical_tune is None
+        ):
+            return f"$Q_x = {tune_h_value}$, $Q_y = {tune_v_value}$"
+        elif display_horizontal_tune is not None and display_horizontal_tune:
+            return f"$Q_x = {tune_h_value}$"
+        elif display_vertical_tune is not None and display_vertical_tune:
+            return f"$Q_y = {tune_v_value}$"
+        else:
+            return ""
     else:
         logging.warning("Tune not found in the dataframe")
         return ""
@@ -623,6 +647,8 @@ def get_title_from_configuration(
     display_octupole_intensity: bool = True,
     display_coupling: bool = True,
     display_filling_scheme: bool = True,
+    display_horizontal_tune: Optional[bool] = None,
+    display_vertical_tune: Optional[bool] = None,
     display_tune: bool = True,
     display_luminosity_1: bool = True,
     display_luminosity_2: bool = True,
@@ -669,6 +695,10 @@ def get_title_from_configuration(
         display_coupling (bool, optional): Whether to display the coupling. Defaults to True.
         display_filling_scheme (bool, optional): Whether to display the filling scheme. Defaults to
             True.
+        display_horizontal_tune (bool, optional): Whether to display the horizontal tune. Defaults to
+            None. Takes precedence over display_tune.
+        display_vertical_tune (bool, optional): Whether to display the vertical tune. Defaults to
+            None. Takes precedence over display_tune.
         display_tune (bool, optional): Whether to display the tune. Defaults to True.
         display_luminosity_1 (bool, optional): Whether to display the luminosity at IP1. Defaults to
             True.
@@ -686,6 +716,16 @@ def get_title_from_configuration(
     Returns:
         str: The generated title string.
     """
+
+    # Warn about tune definition
+    if (
+        display_horizontal_tune is not None or display_vertical_tune is not None
+    ) and not display_tune:
+        logging.warning(
+            "You have defined display_horizontal_tune or display_vertical_tune, but not "
+            "display_tune. The horizontal and/or vertical tunes will still be displayed."
+        )
+
     # Find out what is the crossing type
     if crossing_type is None:
         crossing_type = get_crossing_type(dataframe_data)
@@ -706,7 +746,7 @@ def get_title_from_configuration(
     octupole_intensity_str = get_octupole_intensity_str(dataframe_data)
     coupling_str = get_linear_coupling_str(dataframe_data)
     filling_scheme_str = get_filling_scheme_str(dataframe_data)
-    tune_str = get_tune_str(dataframe_data)
+    tune_str = get_tune_str(dataframe_data, display_horizontal_tune, display_vertical_tune)
 
     # Collect luminosity and PU strings at each IP
     dic_lumi_PU_str = {

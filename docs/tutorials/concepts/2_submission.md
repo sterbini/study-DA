@@ -234,13 +234,11 @@ path_job=/afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/d
 
 The file should have self-explanatory comments. There are however severla difference:
 
-    - The environment is loaded from the Docker container
-    - The configuration file is copied in the job folder on the node (and the output configuration file is copied back to the local machine after the completion of the job)
-    - Some paths in the configuration file (declared as ```dependencies```) are mutated to be absolute, so that they can be accessed from the cluster node. In this case, there are no dependencies. 
-    - The output files are copied back to the local machine after the completion of the job. By default, only light files are copied back (parquet, yaml, txt). In we had set the ```dic_copy_back_per_gen``` argument to ```{"txt": False}```, the output would not have been copied back.
+- The environment is loaded from the Docker container
+- The configuration file is copied in the job folder on the node (and the output configuration file is copied back to the local machine after the completion of the job)
+- Some paths in the configuration file (declared as ```dependencies```) are mutated to be absolute, so that they can be accessed from the cluster node. In this case, there are no dependencies, but you can find many examples with dependencies in the [Case studies](../../case_studies/index.md) section (look for when the `dic_dependencies_per_gen`is defined in the generating script).
+- The output files are copied back to the local machine after the completion of the job. By default, only light files are copied back (parquet, yaml, txt). In we had set the ```dic_copy_back_per_gen``` argument to ```{"txt": False}```, the output would not have been copied back.
   
-# ! TODO: Give a link to a case with dependencies
-
 If all goes well, after a while (this depends on the load on the cluster), the `result.txt` should be copied back to the local machine for each leaf of the tree that has been tagged as finished (all, normally).
 
 We should now have to automatically retrieve all these results. However, the study-da package only provides the tools to do this for tracking studies. You will therefore have to refer directly to the [tracking studies](../tracking_studies/index.md) section to see how to do this.
