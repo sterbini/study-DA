@@ -437,11 +437,18 @@ class GenerateScan:
     ) -> list[str]:
         """
         Creates study files for parametric scans.
+        If a dictionary of parameter lists is provided, the scan will be done on the parameter
+        lists (no cartesian product). Otherwise, the scan will be done on the cartesian product of
+        the parameters defined in the scan configuration file.
 
         Args:
             generation (str): The generation name.
             generation_path (str): The path to the layer folder.
             template_path (str): The path to the template folder.
+            dic_parameter_lists (Optional[dict[str, Any]]): The dictionary of parameter lists.
+                Defaults to None.
+            dic_parameter_lists_for_naming (Optional[dict[str, Any]]): The dictionary of parameter
+                lists for naming. Defaults to None.
 
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
@@ -451,20 +458,35 @@ class GenerateScan:
             dic_parameter_lists, dic_parameter_lists_for_naming, array_conditions = (
                 self.get_dic_parametric_scans(generation)
             )
+            apply_cartesian_product = True
         else:
             if dic_parameter_lists_for_naming is None:
                 dic_parameter_lists_for_naming = copy.deepcopy(dic_parameter_lists)
             array_conditions = None
+            apply_cartesian_product = False
 
-        # Generate render write for cartesian product of all parameters
+        # Generate render write for the parameters parameters
         l_study_path = []
-        logging.info(
-            f"Now generation cartesian product of all parameters for generation: {generation}"
-        )
+        if apply_cartesian_product:
+            logging.info(
+                f"Now generation cartesian product of all parameters for generation: {generation}"
+            )
+            array_param_values = itertools.product(*dic_parameter_lists.values())
+            array_param_values_for_naming = itertools.product(
+                *dic_parameter_lists_for_naming.values()
+            )
+            array_idx = itertools.product(*[range(len(x)) for x in dic_parameter_lists.values()])
+        else:
+            logging.info(f"Now generation parameters for generation: {generation}")
+            array_param_values = [list(x) for x in zip(*dic_parameter_lists.values())]
+            array_param_values_for_naming = [
+                list(x) for x in zip(*dic_parameter_lists_for_naming.values())
+            ]
+            array_idx = range(len(array_param_values))
+
+        # Loop over the parameters
         for l_values, l_values_for_naming, l_idx in zip(
-            itertools.product(*dic_parameter_lists.values()),
-            itertools.product(*dic_parameter_lists_for_naming.values()),
-            itertools.product(*[range(len(x)) for x in dic_parameter_lists.values()]),
+            array_param_values, array_param_values_for_naming, array_idx
         ):
             # Check the idx to keep if conditions are present
             if array_conditions is not None and not array_conditions[l_idx]:

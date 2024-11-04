@@ -1,0 +1,19 @@
+# ==================================================================================================
+# --- Structure of the study ---
+# ==================================================================================================
+name: example_GPU_scan
+
+# List all useful files that will be used by executable in generations below
+# These files are placed at the root of the study
+dependencies:
+  main_configuration: config_hllhc16_GPU.yaml
+
+structure:
+  # First generation is always at the root of the study
+  # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
+  generation_1:
+    executable: generation_1.py
+
+  # Second generation depends on the config from the first generation
+  generation_2:
+    executable: generation_2_level_by_nb.py
