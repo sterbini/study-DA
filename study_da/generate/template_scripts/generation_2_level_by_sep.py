@@ -68,7 +68,7 @@ def configure_collider(full_configuration):
     # Do the leveling if requested
     if "config_lumi_leveling" in config_collider and not config_collider["skip_leveling"]:
         xc.level_all_by_separation(
-            n_collisions_ip2, n_collisions_ip8, collider, n_collisions_ip1_and_5
+            n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8, collider
         )
     else:
         logging.warning(

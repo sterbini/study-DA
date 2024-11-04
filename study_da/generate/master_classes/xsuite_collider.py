@@ -436,10 +436,10 @@ class XsuiteCollider:
 
     def level_all_by_separation(
         self,
+        n_collisions_ip1_and_5: int,
         n_collisions_ip2: int,
         n_collisions_ip8: int,
         collider: xt.Multiline,
-        n_collisions_ip1_and_5: int,
     ) -> None:
         """
         This method updates the number of colliding bunches for IP1, IP2, IP5, and IP8 in the
@@ -447,10 +447,10 @@ class XsuiteCollider:
         It also updates the separation knobs for the collider based on the new configuration.
 
         Args:
+            n_collisions_ip1_and_5 (int): Number of collisions at interaction points 1 and 5.
             n_collisions_ip2 (int): Number of collisions at interaction point 2.
             n_collisions_ip8 (int): Number of collisions at interaction point 8.
             collider (xt.Multiline): The collider object to be used for luminosity leveling.
-            n_collisions_ip1_and_5 (int): Number of collisions at interaction points 1 and 5.
 
         Returns:
             None
@@ -836,6 +836,8 @@ class XsuiteCollider:
         """
         if knob_name in collider.vars.keys():
             dictionnary[f"final_{knob_name}"] = float(collider.vars[knob_name]._value)
+        else:
+            logging.warning(f"Knob {knob_name} not found in the collider")
 
     @staticmethod
     def return_fingerprint(collider, line_name="lhcb1") -> str:
