@@ -1,46 +1,6 @@
-# Installation
+# Installing study-DA locally
 
-## Installing Python
-
-Python is probably already available on your machine. You can check by running the following commands:
-
-```bash
-which python # Tells you the path to the python executable
-python --version # Tells you the version of Python
-```
-
-If Python (>3.8) is not available, you can install it with, for instance, miniforge or miniconda. 
-For instance, to install the latest version of Python with miniforge in your home directory, run the following commands:
-
-```bash
-cd
-wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
-bash Miniforge3-Linux-x86_64.sh -b  -p ./miniforge -f
-rm -f Miniforge3-Linux-x86_64.sh
-source miniforge/bin/activate
-```
-
-!!! warning "Be careful where Python is installed"
-
-    Note that, if you're from CERN and intend to submit job to HTCondor without using a CVMFS environment or Docker environment, your environment must be available on AFS (i.e. must be installed on AFS).
-
-## Installing study-DA with pip
-
-The package is available on PyPI and can be installed using `pip`.
-
-```bash
-pip install study-da
-```
-
-You might also want to clone the optics repositories for the LHC versions you're interested in. For instance, to clone the HL-LHC optics v1.6, run the following command:
-
-```bash
-git clone https://gitlab.cern.ch/acc-models/acc-models-lhc.git -b hl16
-```
-
-## Installing study-DA locally
-
-### Cloning the repository
+## Cloning the repository
 
 If you encounter trouble with the pip installation, or if you want to modify and/or contribute to the package, you can install it locally by cloning the repository and installing the dependencies with Poetry. Note, that, if you plan to submit jobs to CERN HTCondor from a local Python installation, you should move to your AFS space first (e.g. ```cd /afs/cern.ch/work/u/username/private```).:
 
@@ -54,11 +14,11 @@ If you missed this step and clone the repository without the submodules, you can
 git submodule update --init --recursive
 ```
 
-Cloning the submodules is important as this download the optics for HL-LHC, which are necessary to run the tracking examples.
+Cloning the submodules is important as this download the optics for HL-LHC, which are necessary to run the tracking examples. Therefore, you should be able to skip the [Installing the optics](installing_the_optics.md) section.
 
-### Installing with Poetry
+## Installing with Poetry
 
-#### Standard installation with Poetry
+### Standard installation with Poetry
 
 If not already done, install Poetry following the tutorial [here](https://python-poetry.org/docs/).
 
@@ -86,7 +46,7 @@ poetry env use /full/path/to/python
 
 If you're not interested in using GPUs, you can jump directly to the [Installing dependencies](#installing-dependencies) section. Otherwise, follow the next section.
 
-#### Installing with Poetry for GPUs
+### Installing with Poetry for GPUs
 
 Using Poetry along with GPUs is a bit more complicated, as conda is not natively supported by Poetry. However, not all is lost as a simple trick allows to bypass this issue. First, from a conda-compatible Python environment (not the one you used to install Poetry), create a virtual environment with the following command:
 
@@ -126,7 +86,7 @@ submit(
 
 You're now good to go with the next section, as Poetry will automatically detect that the conda virtual environment is activated and use it to install the dependencies.
 
-#### Installing dependencies
+### Installing dependencies
 
 Finally, install the dependencies by running the following command:
 
@@ -167,7 +127,7 @@ or run the command directly with Poetry:
 poetry run python my_script.py
 ```
 
-### Installing locally without Poetry
+## Installing locally without Poetry
 
 It is strongly recommended to use Poetry as it will handle all the packages dependencies and the virtual environment for you. However, if you prefer to install the dependencies manually, you can do so by running the following commands (granted that you have Python installed along with pip):
 

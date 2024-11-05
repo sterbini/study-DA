@@ -6,7 +6,11 @@ nav:
     - Getting Started: getting_started.md
     - Why this package: why_this_package.md
     - Contributing: contributing.md
-  - Installation: installation.md
+  - Installation:
+    - Installing Python: installation/installing_python.md
+    - Installing Study-DA with pip: installation/installing_with_pip.md
+    - Installing Study-DA locally: installation/installing_locally.md
+    - Installing the optics: installation/installing_the_optics.md
   - Tutorials:
     - tutorials/index.md
     - Concepts: 
