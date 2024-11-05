@@ -21,6 +21,18 @@ for filename, header in zip(
         ryaml.dump(dic, fid)
         fid.write("""```\n""")
 
+# Add the dictionnary of parameter names and keys
+path = "study_da/postprocess/configs/parameters_lhc.yaml"
+ryaml = ruamel.yaml.YAML()
+with open(path, "r") as fid:
+    dic = ryaml.load(fid)
+
+with open("docs/template_files/mapping/parameters_lhc.md", "w") as fid:
+    fid.write("# Parameters mapping \n\n")
+    fid.write("""```yaml title="parameters_lhc.yaml"\n""")
+    ryaml.dump(dic, fid)
+    fid.write("""```\n""")
+
 ##### Then update scripts
 for filename, header in zip(
     ["generation_1", "generation_2_level_by_nb", "generation_2_level_by_sep"],

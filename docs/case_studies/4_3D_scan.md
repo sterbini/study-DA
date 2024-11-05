@@ -189,9 +189,10 @@ fig = plot_3D(
     vmax=8.1,
     output_path="3D.png",
     output_path_html="3D.html",
-    surface_count=20,
+    surface_count=10,
     display_plot=False,
-    figsize=(750, 750),
+    display_colormap=False,
+    figsize=(600, 600),
 )
 ```
 
@@ -201,4 +202,4 @@ Finally, the 3D plotting function should be relatively straightforward to use, e
 
 Just for illustration, here is the output of the plot (interactive, although the png is also available):
 
-<iframe src="plots/3D.html" style="border:none;width:750px;height:750px;display:block;"></iframe>
+<iframe src="plots/3D.html" style="border:none;width:600px;height:600px;display:block;"></iframe>

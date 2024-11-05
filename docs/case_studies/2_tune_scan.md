@@ -227,6 +227,10 @@ fig, ax = plot_heatmap(
 
 Basically, the ```aggregate_output_data``` function will gather all the output data from each individual job of the second generation. You have to provide it yourself the parameters that you are scanning (```qx_b1``` and ```qy_b1``` in this case), and the name of the output file that you want check for each individual jobs (if you didn't touch the configuration, it should be ```output_particles.parquet```) of the generation that you are interested in (2 in this case).
 
+!!! info "Variables name"
+
+    You might wonder why the name for the tunes are ```qx_b1``` and ```qy_b1``` when they're defined as ```qx: lhcb1``` and ```qy: lhcb1``` in the scan configuration file. This is just a simplification of the name. The whole dictionnary showing the final mapping for the name of the parameters is available [here](../template_files/mapping/parameters_lhc.md)
+
 ```write_output``` tells the function if it should write the aggregated data to a file (```da.parquet```  by default). It is useful since aggregating the data can be quite long, and you might want to save it for later.
 
 Finally,  ```only_keep_lost_particles``` tells the function if it should only keep the data from lost particles (if you're only interested in the DA, for example); this is useful since the output data can be quite large.

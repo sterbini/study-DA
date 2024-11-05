@@ -34,6 +34,8 @@ nav:
       - Generation 1: template_files/scripts/generation_1.md
       - Generation 2 (level by bunch intensity): template_files/scripts/generation_2_level_by_nb.md
       - Generation 2 (level by separation): template_files/scripts/generation_2_level_by_sep.md
+    - Mapping:
+      - LHC parameters: template_files/mapping/parameters_lhc.md
   - Code Reference: reference/
 
 plugins:

@@ -573,6 +573,7 @@ def plot_3D(
     figsize: tuple[float, float] = (1000, 1000),
     colormap: str = "RdBu",
     colorbar_title_text: str = "Minimum DA (σ)",
+    display_colormap: bool = False,
     output_path: str = "output.png",
     output_path_html: str = "output.html",
     display_plot: bool = True,
@@ -597,6 +598,8 @@ def plot_3D(
         opacity (float, optional): The opacity of the volume rendering. Defaults to 0.2.
         figsize (tuple[float, float], optional): The size of the figure. Defaults to (1000, 1000).
         colormap (str, optional): The colormap to use. Defaults to "RdBu".
+        colorbar_title_text (str, optional): The label for the colorbar. Defaults to "Minimum DA (σ)".
+        display_colormap (bool, optional): Whether to display the colormap. Defaults to False.
         output_path (str, optional): The path to save the plot image. Defaults to "output.png".
         output_path_html (str, optional): The path to save the plot HTML. Defaults to "output.html".
         display_plot (bool, optional): Whether to display the plot. Defaults to True.
@@ -649,8 +652,13 @@ def plot_3D(
     # Remove margins and padding
     fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))
 
-    # Make colorbar smaller
-    fig.update_layout(coloraxis_colorbar=dict(thickness=10, len=0.5))
+    # Display the colormap
+    if not display_colormap:
+        fig.update_layout(coloraxis_showscale=False)
+        fig.update_traces(showscale=False)
+    else:
+        # Make colorbar smaller
+        fig.update_layout(coloraxis_colorbar=dict(thickness=10, len=0.5))
 
     # Set the theme
     if dark_theme:

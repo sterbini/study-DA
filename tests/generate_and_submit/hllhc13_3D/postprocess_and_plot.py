@@ -56,7 +56,8 @@ fig = plot_3D(
     vmax=8.1,
     output_path="3D.png",
     output_path_html="3D.html",
-    surface_count=20,
+    surface_count=10,
     display_plot=False,
-    figsize=(750, 750),
+    display_colormap=False,
+    figsize=(600, 600),
 )
