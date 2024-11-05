@@ -161,6 +161,8 @@ status: finished
 configured: true
 ```
 
-From here, one can load the collider file ```collider_file_for_tracking.json``` with Xsuite and/or check the result of the tracking using the file ```output_particles.parquet```.
+From here, one can load the collider file ```collider_file_for_tracking.json``` with Xsuite and/or check the result of the tracking using the file ```output_particles.parquet```. If you want to inspect the collider object, you can use the [collider-dashboard package](https://github.com/ColasDroin/collider-dashboard), which should be fully compatible with the collider file produced here:
 
-# ! TODO : show example with collider_dashboard here ?
+```bash
+python -m collider_dashboard -c /path_to_adapt/single_collider_hllhc16/single_job_study_hllhc16/generation_1/generation_2/collider_file_for_configuration.json
+```
