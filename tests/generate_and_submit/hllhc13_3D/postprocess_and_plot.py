@@ -1,7 +1,7 @@
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
-from study_da.plot import get_title_from_configuration, plot_heatmap
+from study_da.plot import get_title_from_configuration, plot_3D
 from study_da.postprocess import aggregate_output_data
 
 # ==================================================================================================
@@ -37,9 +37,9 @@ title = get_title_from_configuration(
     display_crossing_IP_8=True,
     display_bunch_length=True,
     display_polarity_IP_2_8=True,
-    display_emittance=True,
+    display_emittance=False,
     display_chromaticity=True,
-    display_octupole_intensity=True,
+    display_octupole_intensity=False,
     display_coupling=True,
     display_filling_scheme=True,
     display_tune=False,
@@ -53,22 +53,19 @@ title = get_title_from_configuration(
     display_PU_8=True,
 )
 
-fig, ax = plot_heatmap(
+plot_3D(
     df_final,
-    horizontal_variable="qx_b1",
-    vertical_variable="qy_b1",
-    color_variable="normalized amplitude in xy-plane",
-    plot_contours=True,
-    xlabel=r"Horizontal tune $Q_x$",
-    ylabel=r"Vertical tune $Q_y$",
-    symmetric_missing=True,
-    mask_lower_triangle=True,
+    "qx_b1",
+    "i_oct_b1",
+    "nemitt_x",
+    "normalized amplitude in xy-plane",
+    xlabel=r"$Q_x$" + "with " + r"$Q_y = Q_x -2 + 0.005$",
+    ylabel="Octupole intensity [A]",
+    z_label=r"Normalized emittance [$\mu$m]",
     title=title,
     vmin=4,
     vmax=8,
-    green_contour=6.0,
-    label_cbar="Minimum DA (" + r"$\sigma$" + ")",
-    output_path="tune_scan.png",
-    vectorize=False,
-    fill_missing_value_with="interpolate",
+    output_path="output.png",
+    output_path_html="output.html",
+    display_plot=False,
 )

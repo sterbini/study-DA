@@ -161,7 +161,7 @@ def merge_and_group_by_parameters_of_interest(
     #     [df_grouped[parameter].min() for parameter in l_parameters_to_keep]
     # ).transpose()
     return pd.DataFrame(
-        [df_grouped[parameter].function_to_aggregate() for parameter in l_parameters_to_keep]
+        [df_grouped[parameter].agg(function_to_aggregate) for parameter in l_parameters_to_keep]
     ).transpose()
 
 

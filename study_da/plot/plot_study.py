@@ -572,6 +572,7 @@ def plot_3D(
     opacity: float = 0.2,
     figsize: tuple[float, float] = (1000, 1000),
     colormap: str = "RdBu",
+    colorbar_title_text: str = "Minimum DA (σ)",
     output_path: str = "output.png",
     output_path_html: str = "output.html",
     display_plot: bool = True,
@@ -623,6 +624,7 @@ def plot_3D(
             opacity=opacity,  # needs to be small to see through all surfaces
             surface_count=surface_count,  # needs to be a large number for good volume rendering
             colorscale=colormap,
+            colorbar_title_text=colorbar_title_text,
         )
     )
 
