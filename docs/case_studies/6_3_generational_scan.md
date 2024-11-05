@@ -700,4 +700,6 @@ Finally, you can notice that we preconfigured the submission to HTC with the `di
 
 Because we do three generations in a row, we set `keep_submit_until_done=True` to ensure we don't have to submit each generation manually. We also set `wait_time=15` to ensure we don't overload the system.
 
-And that's it! You can now run this script and let it run. It will take a bit of time, but it should run smoothly. Some jobs will fail because the matching of the tune and chroma could not be done, but that's expected, and other jobs will get to the end of generation three. You can now adapt this script to your needs and run your own 3-generational scan.
+And that's it! You can now run this script and let it run. It will take a bit of time, but it should run smoothly. Some jobs will fail because the matching of the tune and chroma could not be done, but that's expected, and other jobs will get to the end of generation three.
+
+You can now adapt this script to your needs and run your own 3-generational scan.

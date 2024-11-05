@@ -239,7 +239,7 @@ fig, ax = plot_heatmap(
     color_variable="normalized amplitude in xy-plane",
     link="www.link-to-your-study.com",
     position_qr="bottom-right",
-    plot_contours=True,
+    plot_contours=False,
     xlabel="Number of turns",
     ylabel=r"$Q_x$",
     tick_interval=1,
@@ -271,7 +271,7 @@ In this case, since I'm scanning over the horizontal tune, I'm not displaying it
 
     The beta functions are not stored in the output files, so you need to specify them manually in the function. Same for the crossing, which is not always inferred from the name of the optics.
 
-Finally, the last function being called, ```plot_heatmap```, is used to plot the heatmap. The function takes the DataFrame, the horizontal and vertical variables, the color variable, and a bunch of other arguments to customize the plot. In particular, the ```green_contour``` is to highlight the target DA (very useful to easily detect the islands of viable DA).
+Finally, the last function being called, ```plot_heatmap```, is used to plot the heatmap. The function takes the DataFrame, the horizontal and vertical variables, the color variable, and a bunch of other arguments to customize the plot. In particular, the ```green_contour``` is to highlight the target DA (very useful to easily detect the islands of viable DA). In this case, we don't plot contours at all since the plot is very small.
 
 In addition, it's quite often that some values are missing in the plots, because some jobs failed, or, in this case, because no particles were lost for simulations with low number of turns. In this case, one can fill the missing values with either a number (as in here), or just try to interpolate them (setting ```fill_missing_value_with='interpolate'```).
 
