@@ -576,6 +576,7 @@ def plot_3D(
     output_path: str = "output.png",
     output_path_html: str = "output.html",
     display_plot: bool = True,
+    dark_theme: bool = False,
 ) -> Any:
     """
     Plots a 3D volume rendering from the given dataframe.
@@ -599,6 +600,7 @@ def plot_3D(
         output_path (str, optional): The path to save the plot image. Defaults to "output.png".
         output_path_html (str, optional): The path to save the plot HTML. Defaults to "output.html".
         display_plot (bool, optional): Whether to display the plot. Defaults to True.
+        dark_theme (bool, optional): Whether to use a dark theme. Defaults to False.
 
     Returns:
         go.Figure: The plotly figure object.
@@ -635,11 +637,24 @@ def plot_3D(
         title=title,
     )
 
+    # Get a good initial view, dezoomed
+    fig.update_layout(scene_camera=dict(eye=dict(x=1.5, y=1.5, z=1.5)))
+
     # Center the title
     fig.update_layout(title_x=0.5, title_y=0.9, title_xanchor="center", title_yanchor="top")
 
     # Specify the width and height of the figure
     fig.update_layout(width=figsize[0], height=figsize[1])
+
+    # Remove margins and padding
+    fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))
+
+    # Make colorbar smaller
+    fig.update_layout(coloraxis_colorbar=dict(thickness=10, len=0.5))
+
+    # Set the theme
+    if dark_theme:
+        fig.update_layout(template="plotly_dark")
 
     # Display/save/return the figure
     if output_path is not None:

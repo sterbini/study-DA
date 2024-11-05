@@ -1,7 +1,9 @@
 # ==================================================================================================
 # --- Imports
 # ==================================================================================================
-from study_da.plot import get_title_from_configuration, plot_3D
+import pandas as pd
+
+from study_da.plot import plot_3D
 from study_da.postprocess import aggregate_output_data
 
 # ==================================================================================================
@@ -17,55 +19,44 @@ df_final = aggregate_output_data(
     only_keep_lost_particles=True,
 )
 
+
+# Some more manual postprocessing to fill the missing values
+df_final = df_final[["qx_b1", "i_oct_b1", "nemitt_x", "normalized amplitude in xy-plane"]]
+df_final = df_final.drop_duplicates()
+df_final = df_final.set_index(["qx_b1", "i_oct_b1", "nemitt_x"])
+idx = pd.MultiIndex.from_product(
+    [df_final.index.levels[0], df_final.index.levels[1], df_final.index.levels[2]]
+)
+df_final = df_final.reindex(idx, fill_value=None).reset_index()
+
+# Interpolate missing values in df_final for the column "normalized amplitude in xy-plane"
+df_final["normalized amplitude in xy-plane"] = df_final.groupby(["qx_b1", "i_oct_b1"])[
+    "normalized amplitude in xy-plane"
+].transform(lambda x: x.interpolate(method="linear", limit_direction="both"))
+
+# Fill remaining missing values with 8 as it corresponds to simulation with no lost particles
+df_final["normalized amplitude in xy-plane"] = df_final["normalized amplitude in xy-plane"].fillna(
+    8
+)
 # ==================================================================================================
 # --- Plot
 # ==================================================================================================
 
-title = get_title_from_configuration(
-    df_final,
-    betx_value=0.15,
-    bety_value=0.15,
-    display_LHC_version=True,
-    display_energy=True,
-    display_bunch_index=True,
-    display_CC_crossing=True,
-    display_bunch_intensity=True,
-    display_beta=True,
-    display_crossing_IP_1=True,
-    display_crossing_IP_2=True,
-    display_crossing_IP_5=True,
-    display_crossing_IP_8=True,
-    display_bunch_length=True,
-    display_polarity_IP_2_8=True,
-    display_emittance=False,
-    display_chromaticity=True,
-    display_octupole_intensity=False,
-    display_coupling=True,
-    display_filling_scheme=True,
-    display_tune=False,
-    display_luminosity_1=True,
-    display_luminosity_2=True,
-    display_luminosity_5=True,
-    display_luminosity_8=True,
-    display_PU_1=True,
-    display_PU_2=True,
-    display_PU_5=True,
-    display_PU_8=True,
-)
 
-plot_3D(
+fig = plot_3D(
     df_final,
     "qx_b1",
     "i_oct_b1",
     "nemitt_x",
     "normalized amplitude in xy-plane",
-    xlabel=r"$Q_x$" + "with " + r"$Q_y = Q_x -2 + 0.005$",
-    ylabel="Octupole intensity [A]",
-    z_label=r"Normalized emittance [$\mu$m]",
-    title=title,
-    vmin=4,
-    vmax=8,
-    output_path="output.png",
-    output_path_html="output.html",
+    xlabel=r"Qx",
+    ylabel=r"I [A]",
+    z_label=r"Normalized emittance [μm]",
+    vmin=3.9,
+    vmax=8.1,
+    output_path="3D.png",
+    output_path_html="3D.html",
+    surface_count=20,
     display_plot=False,
+    figsize=(750, 750),
 )

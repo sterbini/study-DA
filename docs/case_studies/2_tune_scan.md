@@ -2,7 +2,7 @@
 
 Tune scans are usually done in two generations: the first one allows to convert the Mad sequence to a Xsuite collider (single job), while the second one enables to configure the collider and do the tracking (scan, since many tunes are tested). Let's give an example with the ```config_hllhc16.yaml``` configuration template.
 
-## Study configuration
+## Scan configuration
 
 First, let's configure our scan:
 

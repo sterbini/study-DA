@@ -6,7 +6,7 @@ Octupole scans are an other type of scans that are frequently requested. Just li
 
     You should have a reasonable understanding of the package by now. Therefore, details about the scripts and the configuration will not be explained in detail. If you need more information, please refer to the previous case studies.
 
-## Study configuration
+## Scan configuration
 
 First, let's configure our scan. We want to do a two-dimensional scan, the first dimension being the tune on the superdiagonal (basically having `qx` and `qy` evolving together), and the second dimension being the octupole current.
 
