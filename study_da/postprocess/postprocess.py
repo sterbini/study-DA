@@ -284,7 +284,6 @@ def fix_LHC_version(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The fixed DataFrame.
     """
     # Fix the LHC version type
-    print(df["ver_lhc_run"])
     if "ver_lhc_run" in df.columns and not df["ver_lhc_run"].empty:
         if df["ver_lhc_run"].isna().sum() != 0:
             logging.warning("Some LHC version numbers are NaN... Ignoring")

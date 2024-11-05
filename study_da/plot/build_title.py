@@ -111,18 +111,20 @@ def get_crossing_type(dataframe_data: pd.DataFrame) -> str:
     return "hv"
 
 
-def get_LHC_version_str(dataframe_data: pd.DataFrame) -> str:
+def get_LHC_version_str(dataframe_data: pd.DataFrame, ions: bool = False) -> str:
     """
     Retrieves the LHC version from the dataframe.
 
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing LHC version information.
+        ions (bool, optional): Whether the study is for ions. Defaults to False.
 
     Returns:
         str: The LHC version string.
     """
     string_HL_LHC = None
     string_LHC = None
+    ions_string = " (ions)" if ions else ""
     if "ver_hllhc_optics" in dataframe_data.columns:
         ver_hllhc_optics = dataframe_data["ver_hllhc_optics"].unique()[0]
         if ver_hllhc_optics is not None and not np.isnan(ver_hllhc_optics):
@@ -135,26 +137,30 @@ def get_LHC_version_str(dataframe_data: pd.DataFrame) -> str:
     if string_HL_LHC is not None and string_LHC is not None:
         raise ValueError("Both HL-LHC and LHC Run versions found in the dataframe. Please check.")
     elif string_HL_LHC is not None:
-        return string_HL_LHC
+        return string_HL_LHC + ions_string
     elif string_LHC is not None:
-        return string_LHC
+        return string_LHC + ions_string
     logging.warning("LHC version not found in the dataframe")
-    return ""
+    return "" + ions_string
 
 
-def get_energy_str(dataframe_data: pd.DataFrame) -> str:
+def get_energy_str(dataframe_data: pd.DataFrame, ions: bool = False) -> str:
     """
     Retrieves the energy from the dataframe.
 
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing energy information.
+        ions (bool, optional): Whether the study is for ions. Defaults to False.
 
     Returns:
         str: The energy string.
     """
     if "beam_energy_tot_b1" in dataframe_data.columns:
         energy_value = dataframe_data["beam_energy_tot_b1"].unique()[0] / 1000
-        return f"$E = {{{energy_value:.1f}}}$ $TeV$"
+        if not ions:
+            return f"$E = {{{energy_value:.1f}}}$ $TeV$"
+        else:
+            return f"$E = {{{energy_value/82:.1f}}}$ Z $TeV$"
     else:
         logging.warning("Energy not found in the dataframe")
         return ""
@@ -645,6 +651,7 @@ def get_number_of_turns_str(dataframe_data: pd.DataFrame) -> str:
 
 def get_title_from_configuration(
     dataframe_data: pd.DataFrame,
+    ions: bool = False,
     betx_value: float = np.nan,
     bety_value: float = np.nan,
     crossing_type: Optional[str] = None,
@@ -683,6 +690,7 @@ def get_title_from_configuration(
 
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing configuration data.
+        ions (bool, optional): Whether the beam is composed of ions. Defaults to False.
         betx_value (float, optional): The value of the horizontal beta function. Defaults to np.nan.
         bety_value (float, optional): The value of the vertical beta function. Defaults to np.nan.
         crossing_type (str, optional): The type of crossing: 'vh' or 'hv'. Defaults to None, meaning
@@ -752,8 +760,8 @@ def get_title_from_configuration(
         crossing_type = get_crossing_type(dataframe_data)
 
     # Collect all the information to display
-    LHC_version_str = get_LHC_version_str(dataframe_data)
-    energy_str = get_energy_str(dataframe_data)
+    LHC_version_str = get_LHC_version_str(dataframe_data, ions)
+    energy_str = get_energy_str(dataframe_data, ions)
     bunch_index_str = get_bunch_index_str(dataframe_data)
     CC_crossing_str = get_CC_crossing_str(dataframe_data)
     bunch_intensity_str = get_bunch_intensity_str(dataframe_data)
