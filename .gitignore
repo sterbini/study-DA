@@ -162,7 +162,7 @@ cython_debug/
 #.idea/
 
 # Folders produced by test
-tests/**/example*
-tests/**/generation_*
-!tests/generate_and_submit/dummy_custom_template/custom_files/**.py
-tests/**/da.parquet
+examples/**/example*
+examples/**/generation_*
+!examples/**/custom_files/**.py
+examples/**/da.parquet
