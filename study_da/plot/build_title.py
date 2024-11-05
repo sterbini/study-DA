@@ -625,6 +625,24 @@ def get_PU_at_IP_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=True) -> s
             return ""
 
 
+def get_number_of_turns_str(dataframe_data: pd.DataFrame) -> str:
+    """
+    Retrieves the number of turns from the dataframe.
+
+    Args:
+        dataframe_data (pd.DataFrame): The dataframe containing the number of turns information.
+
+    Returns:
+        str: The number of turns string.
+    """
+    if "n_turns" in dataframe_data.columns:
+        n_turns_value = dataframe_data["n_turns"].unique()[0]
+        return f"$N_{{turns}} = {{{n_turns_value}}}$"
+    else:
+        logging.warning("Number of turns not found in the dataframe")
+        return ""
+
+
 def get_title_from_configuration(
     dataframe_data: pd.DataFrame,
     betx_value: float = np.nan,
@@ -658,6 +676,7 @@ def get_title_from_configuration(
     display_PU_2: bool = True,
     display_PU_5: bool = True,
     display_PU_8: bool = True,
+    display_number_of_turns=False,
 ) -> str:
     """
     Generates a title string from the configuration data.
@@ -712,6 +731,8 @@ def get_title_from_configuration(
         display_PU_2 (bool, optional): Whether to display the PU at IP2. Defaults to True.
         display_PU_5 (bool, optional): Whether to display the PU at IP5. Defaults to True.
         display_PU_8 (bool, optional): Whether to display the PU at IP8. Defaults to True.
+        display_number_of_turns (bool, optional): Whether to display the number of turns. Defaults to
+            False.
 
     Returns:
         str: The generated title string.
@@ -747,6 +768,7 @@ def get_title_from_configuration(
     coupling_str = get_linear_coupling_str(dataframe_data)
     filling_scheme_str = get_filling_scheme_str(dataframe_data)
     tune_str = get_tune_str(dataframe_data, display_horizontal_tune, display_vertical_tune)
+    n_turns_str = get_number_of_turns_str(dataframe_data)
 
     # Collect luminosity and PU strings at each IP
     dic_lumi_PU_str = {
@@ -841,5 +863,9 @@ def get_title_from_configuration(
         title += test_if_empty_and_add_period(filling_scheme_str)
     if display_bunch_index:
         title += test_if_empty_and_add_period(bunch_index_str)
+    # Jump to the next line
+    if display_number_of_turns:
+        title += "\n"
+        title += test_if_empty_and_add_period(n_turns_str)
 
     return title

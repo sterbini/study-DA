@@ -82,7 +82,7 @@ dic_config_jobs = {
         # Note that the context is also set in the config file
         "context": "cupy",
         "submission_type": "htc_docker",
-        "htc_flavor": "microcentury",
+        "htc_flavor": "tomorrow",
     },
 }
 

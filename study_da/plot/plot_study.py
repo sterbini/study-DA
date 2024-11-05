@@ -289,6 +289,9 @@ def _set_labels(
     xlabel: Optional[str],
     ylabel: Optional[str],
     xaxis_ticks_on_top: bool,
+    tick_interval: int = 2,
+    round_xticks: Optional[int] = None,
+    round_yticks: Optional[int] = None,
 ) -> plt.Axes:
     """
     Sets the labels for the heatmap.
@@ -302,13 +305,33 @@ def _set_labels(
         xlabel (Optional[str]): The label for the x-axis.
         ylabel (Optional[str]): The label for the y-axis.
         xaxis_ticks_on_top (bool): Whether to place the x-axis ticks on top.
+        tick_interval (int, optional): The interval for the ticks. Defaults to 2.
+        round_xticks (Optional[int], optional): The number of decimal places to round the x-ticks to.
+            Defaults to None.
+        round_yticks (Optional[int], optional): The number of decimal places to round the y-ticks to.
+            Defaults to None.
 
     Returns:
         plt.Axes: The axes with labels set.
     """
+    # Round the ticks if requested
+    if round_xticks is not None:
+        df_to_plot.columns = df_to_plot.columns.round(round_xticks)
+        if round_xticks == 0:
+            df_to_plot.columns = df_to_plot.columns.astype(int)
+    if round_yticks is not None:
+        df_to_plot.index = df_to_plot.index.round(round_yticks)
+        if round_yticks == 0:
+            df_to_plot.index = df_to_plot.index.astype(int)
+
     # Filter out odd ticks and and label the rest with the respective list entries
-    ax.set_xticks(np.arange(len(df_to_plot.columns))[::2], labels=df_to_plot.columns[::2])
-    ax.set_yticks(np.arange(len(df_to_plot.index))[::2], labels=df_to_plot.index[::2])
+    ax.set_xticks(
+        np.arange(len(df_to_plot.columns))[::tick_interval],
+        labels=df_to_plot.columns[::tick_interval],
+    )
+    ax.set_yticks(
+        np.arange(len(df_to_plot.index))[::tick_interval], labels=df_to_plot.index[::tick_interval]
+    )
 
     if xlabel is None:
         xlabel = horizontal_variable
@@ -346,6 +369,9 @@ def plot_heatmap(
     plot_contours: bool = True,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
+    tick_interval: int = 2,
+    round_xticks: Optional[int] = None,
+    round_yticks: Optional[int] = None,
     symmetric_missing: bool = False,
     mask_lower_triangle: bool = False,
     mask_upper_triangle: bool = False,
@@ -383,6 +409,11 @@ def plot_heatmap(
         plot_contours (bool, optional): Whether to plot contours. Defaults to True.
         xlabel (Optional[str], optional): The label for the x-axis. Defaults to None.
         ylabel (Optional[str], optional): The label for the y-axis. Defaults to None.
+        tick_interval (int, optional): The interval for the ticks. Defaults to 2.
+        round_xticks (Optional[int], optional): The number of decimal places to round the x-ticks to.
+            Defaults to None.
+        round_yticks (Optional[int], optional): The number of decimal places to round the y-ticks to.
+            Defaults to None.
         symmetric_missing (bool, optional): Whether to make the matrix symmetric by replacing the
             lower triangle with the upper triangle. Defaults to False.
         mask_lower_triangle (bool, optional): Whether to mask the lower triangle. Defaults to False.
@@ -494,6 +525,9 @@ def plot_heatmap(
         xlabel,
         ylabel,
         xaxis_ticks_on_top,
+        tick_interval,
+        round_xticks,
+        round_yticks,
     )
 
     # Create colorbar

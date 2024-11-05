@@ -174,10 +174,106 @@ Running the same script a bit later will submit the second generation (although 
 Once the study is done, re-running the script will just tell you that the study is done. You can then post-process the results and plot them with the following lines of code:
 
 ```python title="postprocess_and_plot.py"
+# ==================================================================================================
+# --- Imports
+# ==================================================================================================
+from study_da.plot import get_title_from_configuration, plot_heatmap
+from study_da.postprocess import aggregate_output_data
 
+# ==================================================================================================
+# --- Postprocess the study
+# ==================================================================================================
+
+df_final = aggregate_output_data(
+    "example_dummy_scan/tree.yaml",
+    l_group_by_parameters=["qx_b1", "n_turns"],
+    generation_of_interest=2,
+    name_output="output_particles.parquet",
+    write_output=True,
+    only_keep_lost_particles=True,
+    force_overwrite=False,
+)
+
+# ==================================================================================================
+# --- Plot
+# ==================================================================================================
+
+title = get_title_from_configuration(
+    df_final,
+    betx_value=0.485,
+    bety_value=0.485,
+    crossing_type="vh",
+    display_LHC_version=True,
+    display_energy=True,
+    display_bunch_index=True,
+    display_CC_crossing=False,
+    display_bunch_intensity=True,
+    display_beta=True,
+    display_crossing_IP_1=True,
+    display_crossing_IP_2=True,
+    display_crossing_IP_5=True,
+    display_crossing_IP_8=True,
+    display_bunch_length=True,
+    display_polarity_IP_2_8=True,
+    display_emittance=True,
+    display_chromaticity=True,
+    display_octupole_intensity=False,
+    display_coupling=True,
+    display_filling_scheme=True,
+    display_horizontal_tune=False,
+    display_vertical_tune=True,
+    display_luminosity_1=True,
+    display_luminosity_2=True,
+    display_luminosity_5=True,
+    display_luminosity_8=True,
+    display_PU_1=True,
+    display_PU_2=True,
+    display_PU_5=True,
+    display_PU_8=True,
+)
+
+fig, ax = plot_heatmap(
+    df_final,
+    horizontal_variable="n_turns",
+    vertical_variable="qx_b1",
+    color_variable="normalized amplitude in xy-plane",
+    link="www.link-to-your-study.com",
+    position_qr="bottom-right",
+    plot_contours=True,
+    xlabel="Number of turns",
+    ylabel=r"$Q_x$",
+    tick_interval=1,
+    round_xticks=0,
+    title=title,
+    vmin=4.0,
+    vmax=8.0,
+    green_contour=6.0,
+    label_cbar="Minimum DA (" + r"$\sigma$" + ")",
+    output_path="qx_turns.png",
+    vectorize=False,
+    xaxis_ticks_on_top=False,
+    plot_diagonal_lines=False,
+    fill_missing_value_with=8.0,
+)
 ```
 
-TODO: Explain this code
+The first function being called in this script is the ```aggregate_output_data``` function. This function reads the output files (here ```"output_particles.parquet"```) of the second generation (since ```generation_of_interest=2```), and aggregates them in a single DataFrame, according to the provided parameters (```l_group_by_parameters```)  and function (not provided, ```min``` by default).
+
+Since we've set ```only_keep_lost_particles=True```, only the lost particles are kept in the DataFrame. Therefore, when we aggregate, we will get the minimum amplitude of the lost particles for each combination of the parameters ```qx_b1``` and ```n_turns```, i.e. the DA (Dynamic Aperture) of the collider for each combination of the parameters.
+
+The DataFrame is then saved to disk (if the argument ```write_output``` is set to ```True```). If the file already exists, the function will ask you if you want to overwrite it (unless you set ```force_overwrite=True```).
+
+The second function being called, ```get_title_from_configuration```, is used to get a title for the plot. This title is generated from the configuration file of the collider (which is itself stored in the ```output_particles.parquet```), and is used to display the main parameters of the collider in the plot. The arguments should be relatively self-explanatory, but you can check the documentation of the function for more details.
+
+In this case, since I'm scanning over the horizontal tune, I'm not displaying it in the title (since it's already displayed in the horizontal axis of the plot). However, I'm displaying the vertical tune. By default, we never display the number of turns in the title (it should always be 1M for DA computations), but you can change this by setting ```display_number_of_turns=True```.
+
+!!! warning "Don't forget to specify manually the beta functions"
+
+    The beta functions are not stored in the output files, so you need to specify them manually in the function. Same for the crossing, which is not always inferred from the name of the optics.
+
+Finally, the last function being called, ```plot_heatmap```, is used to plot the heatmap. The function takes the DataFrame, the horizontal and vertical variables, the color variable, and a bunch of other arguments to customize the plot. In particular, the ```green_contour``` is to highlight the target DA (very useful to easily detect the islands of viable DA).
+
+In addition, it's quite often that some values are missing in the plots, because some jobs failed, or, in this case, because no particles were lost for simulations with low number of turns. In this case, one can fill the missing values with either a number (as in here), or just try to interpolate them (setting ```fill_missing_value_with='interpolate'```).
 
 !!! tip "You can add a link as a qrcode to your plot"
 
@@ -185,6 +281,8 @@ TODO: Explain this code
 
 Just for illustration, here is the output of the plot (not vectorized):
 
-![Tune scan](plots/qx_turns.png)
+![Tune scan](qx_turns.png)
 
 I used a png version as it's lighter to display for the browser but you should probably use a vectorized format for your plots, especially if you want to print them or include them in a presentation (you can always convert them to png afterwards if you need to).
+
+Many examples of plotting are available in the [case studies](../../case_studies/index.md) section, so you can check them out to see how to plot more realistic types of studies.

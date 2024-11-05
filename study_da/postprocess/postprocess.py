@@ -20,7 +20,7 @@ Functions:
 import inspect
 import logging
 import os
-from typing import Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 # Third party imports
 import numpy as np
@@ -119,6 +119,7 @@ def merge_and_group_by_parameters_of_interest(
     l_group_by_parameters: List[str],
     only_keep_lost_particles: bool = True,
     l_parameters_to_keep: Optional[List[str]] = None,
+    function_to_aggregate: Callable = min,
 ) -> pd.DataFrame:
     """
     Merges and groups the output data by parameters of interest.
@@ -129,6 +130,8 @@ def merge_and_group_by_parameters_of_interest(
         only_keep_lost_particles (bool, optional): Flag to indicate if only lost particles should
             be kept. Defaults to True.
         l_parameters_to_keep (list, optional): List of parameters to keep. Defaults to None.
+        function_to_aggregate (callable, optional): Function to aggregate the grouped data.
+            Defaults to min.
 
     Returns:
         pd.DataFrame: The merged and grouped DataFrame.
@@ -154,14 +157,18 @@ def merge_and_group_by_parameters_of_interest(
 
     # Return the grouped dataframe, keeping only the minimum values of the parameters of interest
     # (should not have impact except for DA, which we want to be minimal)
+    # return pd.DataFrame(
+    #     [df_grouped[parameter].min() for parameter in l_parameters_to_keep]
+    # ).transpose()
     return pd.DataFrame(
-        [df_grouped[parameter].min() for parameter in l_parameters_to_keep]
+        [df_grouped[parameter].function_to_aggregate() for parameter in l_parameters_to_keep]
     ).transpose()
 
 
 def aggregate_output_data(
     path_tree: str,
     l_group_by_parameters: List[str],
+    function_to_aggregate: Callable = min,
     generation_of_interest: int = 2,
     name_output: str = "output_particles.parquet",
     write_output: bool = True,
@@ -179,6 +186,7 @@ def aggregate_output_data(
     Args:
         path_tree (str): The path to the tree file.
         l_group_by_parameters (list): List of parameters to group by.
+        function_to_aggregate (callable, optional): Function to aggregate the grouped data.
         generation_of_interest (int, optional): The generation of interest. Defaults to 2.
         name_output (str, optional): The name of the output file. Defaults to "output_particles.parquet".
         write_output (bool, optional): Flag to indicate if the output should be written to a file.
@@ -246,7 +254,11 @@ def aggregate_output_data(
     )
 
     df_final = merge_and_group_by_parameters_of_interest(
-        l_df_output, l_group_by_parameters, only_keep_lost_particles, l_parameters_to_keep
+        l_df_output,
+        l_group_by_parameters,
+        only_keep_lost_particles,
+        l_parameters_to_keep,
+        function_to_aggregate,
     )
 
     # Fix the LHC version type
