@@ -128,7 +128,7 @@ def get_LHC_version_str(dataframe_data: pd.DataFrame, ions: bool = False) -> str
     if "ver_hllhc_optics" in dataframe_data.columns:
         ver_hllhc_optics = dataframe_data["ver_hllhc_optics"].unique()[0]
         if ver_hllhc_optics is not None and not np.isnan(ver_hllhc_optics):
-            string_HL_LHC = f"HL-LHC v{ver_hllhc_optics}"
+            string_HL_LHC = f"HL-LHC v{ver_hllhc_optics:.1f}"
     if "ver_lhc_run" in dataframe_data.columns:
         ver_lhc_run = dataframe_data["ver_lhc_run"].unique()[0]
         if ver_lhc_run is not None and not np.isnan(ver_lhc_run):
@@ -588,14 +588,16 @@ def get_luminosity_at_ip_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=Tr
     unit_luminosity = "cm$^{-2}$s$^{-1}$"
     if beam_beam:
         if f"luminosity_ip{ip}_with_beam_beam" in dataframe_data.columns:
-            luminosity_value = dataframe_data[f"luminosity_ip{ip}_with_beam_beam"].unique()[0]
+            luminosity_value = np.mean(dataframe_data[f"luminosity_ip{ip}_with_beam_beam"].unique())
             return f"$L_{{{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
         else:
             logging.warning(f"Luminosity at IP{ip} with beam-beam not found in the dataframe")
             return ""
     else:
         if f"luminosity_ip{ip}_without_beam_beam" in dataframe_data.columns:
-            luminosity_value = dataframe_data[f"luminosity_ip{ip}_without_beam_beam"].unique()[0]
+            luminosity_value = np.mean(
+                dataframe_data[f"luminosity_ip{ip}_without_beam_beam"].unique()
+            )
             return f"$L_{{{ip}}} \simeq ${latex_float(float(luminosity_value))} {unit_luminosity}"
         else:
             logging.warning(f"Luminosity at IP{ip} without beam-beam not found in the dataframe")
@@ -617,14 +619,14 @@ def get_PU_at_IP_str(dataframe_data: pd.DataFrame, ip: int, beam_beam=True) -> s
     # sourcery skip: merge-else-if-into-elif, simplify-fstring-formatting
     if beam_beam:
         if f"Pile-up_ip{ip}_with_beam_beam" in dataframe_data.columns:
-            PU_value = dataframe_data[f"Pile-up_ip{ip}_with_beam_beam"].unique()[0]
+            PU_value = np.mean(dataframe_data[f"Pile-up_ip{ip}_with_beam_beam"].unique())
             return f"$PU_{{{ip}}} \simeq ${latex_float(float(PU_value))}"
         else:
             logging.warning(f"Pile-up at IP{ip} with beam-beam not found in the dataframe")
             return ""
     else:
         if f"Pile-up_ip{ip}_without_beam_beam" in dataframe_data.columns:
-            PU_value = dataframe_data[f"Pile-up_ip{ip}_without_beam_beam"].unique()[0]
+            PU_value = np.mean(dataframe_data[f"Pile-up_ip{ip}_without_beam_beam"].unique())
             return f"$PU_{{{ip}}} \simeq ${latex_float(float(PU_value))}"
         else:
             logging.warning(f"Pile-up at IP{ip} without beam-beam not found in the dataframe")
@@ -875,5 +877,8 @@ def get_title_from_configuration(
     if display_number_of_turns:
         title += "\n"
         title += test_if_empty_and_add_period(n_turns_str)
+
+    # Filter final title for empty lines
+    title = "\n".join([line for line in title.split("\n") if line.strip() != ""])
 
     return title

@@ -36,12 +36,12 @@ dic_copy_back_per_gen = {
 dic_config_jobs = {
     "generation_1" + ".py": {
         "context": "cpu",
-        "submission_type": "htc_docker",
+        "submission_type": "local",
         "htc_flavor": "espresso",
     },
     "generation_2" + ".py": {
         "context": "cpu",
-        "submission_type": "htc_docker",
+        "submission_type": "local",
         "htc_flavor": "espresso",
     },
 }
@@ -55,5 +55,5 @@ submit(
     dic_copy_back_per_gen=dic_copy_back_per_gen,
     dic_config_jobs=dic_config_jobs,
     keep_submit_until_done=True,
-    wait_time=2,
+    wait_time=0.1,
 )
