@@ -112,7 +112,7 @@ theme:
 copyright: Copyright &copy; 2024 CERN
 repo_url: https://github.com/ColasDroin/study-DA
 repo_name: study-DA
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
 
 markdown_extensions:
   - pymdownx.highlight:
