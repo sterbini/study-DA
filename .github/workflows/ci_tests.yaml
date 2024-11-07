@@ -32,11 +32,10 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry run pip install nafflib
           poetry install --with dev
-          poetry shell
           cd external_dependencies
-          pip install -e xmask
-          poetry run xsuite-prebuild regenerate
+          poetry run pip install -e xmask
           cd ..
+          poetry run xsuite-prebuild regenerate
 
       - name: Run tests
         run: poetry run pytest
