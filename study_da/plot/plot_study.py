@@ -38,7 +38,7 @@ import numpy as np
 import pandas as pd
 import qrcode
 from scipy.interpolate import griddata
-from scipy.ndimage.filters import gaussian_filter
+from scipy.ndimage import gaussian_filter
 
 # Local imports
 from .utils import (

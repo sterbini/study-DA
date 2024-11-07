@@ -1,6 +1,6 @@
 # Dynamics Aperture Study Package
 
-This package consists of a collection of tools to study the dynamics aperture of a particle accelerator with [Xsuite](https://github.com/xsuite/xsuite). In a sense, it is a replacement of the [DA study template](https://github.com/xsuite/DA_study_template), but much more advanced. It also allows to configure colliders and do tracking without necessarily running parametric scans.
+This package consists of a collection of tools to study the dynamics aperture of a particle accelerator built with [Xsuite](https://github.com/xsuite/xsuite). In a sense, it is a replacement of the [DA study template](https://github.com/xsuite/DA_study_template), but much more advanced. It also allows to configure colliders and do tracking without necessarily running parametric scans.
 
 The whole project is described in details in the [full documentation](https://colasdroin.github.io/study-DA/), along with tutorials and description of the implemented functions.
 

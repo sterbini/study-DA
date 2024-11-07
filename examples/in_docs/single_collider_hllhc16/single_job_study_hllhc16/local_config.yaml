@@ -244,7 +244,7 @@ config_collider:
   # Save collider or not (usually at the end of the collider tuning)
   save_output_collider: true
   path_collider_file_for_tracking_as_output: collider_file_for_tracking.json
-  compress: true # will compress the collider file, filename will end with .zip
+  compress: false # will compress the collider file, filename will end with .zip
 
 config_simulation:
   # Collider file to load for the tracking

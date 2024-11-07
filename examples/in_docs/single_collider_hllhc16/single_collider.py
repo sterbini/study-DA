@@ -37,6 +37,7 @@ config["config_simulation"]["n_turns"] = 10
 
 # Save the collider produced after the configuration step
 config["config_collider"]["save_output_collider"] = True
+config["config_collider"]["compress"] = False
 
 # Drop the configuration locally
 local_config_name = "local_config.yaml"
