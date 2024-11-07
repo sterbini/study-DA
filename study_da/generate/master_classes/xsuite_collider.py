@@ -557,6 +557,12 @@ class XsuiteCollider:
         if "ip8" in self.config_lumi_leveling:
             self.config_lumi_leveling["ip8"]["num_colliding_bunches"] = n_collisions_ip8
 
+        # Ensure the the num particles per bunch corresponds to the final one
+        temp_num_particles_per_bunch = self.config_beambeam["num_particles_per_bunch"]
+        if "final_num_particles_per_bunch" in self.config_beambeam:
+            self.config_beambeam["num_particles_per_bunch"] = self.config_beambeam[
+                "final_num_particles_per_bunch"
+            ]
         # Do levelling in IP2 and IP8
         xm.lhc.luminosity_leveling(  # type: ignore
             collider,
@@ -573,6 +579,9 @@ class XsuiteCollider:
             self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8")
             self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8h")
             self.update_configuration_knob(collider, self.config_lumi_leveling["ip8"], "on_sep8v")
+
+        # Set back the num particles per bunch to its initial value
+        self.config_beambeam["num_particles_per_bunch"] = temp_num_particles_per_bunch
 
     def add_linear_coupling(self, collider: xt.Multiline) -> None:
         """
