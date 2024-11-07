@@ -14,7 +14,7 @@ If you missed this step and clone the repository without the submodules, you can
 git submodule update --init --recursive
 ```
 
-Cloning the submodules is important as this download the optics for HL-LHC, which are necessary to run the tracking examples. Therefore, you should be able to skip the [Installing the optics](installing_the_optics.md) section.
+Cloning the submodules is important as this allows to download the optics for HL-LHC, which are necessary to run the tracking examples. Therefore, you should be able to skip the [Installing the optics](installing_the_optics.md) section.
 
 ## Installing with Poetry
 
@@ -119,6 +119,7 @@ To run any subsequent Python command, either activate the virtual environment (a
 
 ```bash
 poetry shell
+# you then run a command as simply as `python my_script.py`
 ```
 
 or run the command directly with Poetry:
@@ -127,10 +128,22 @@ or run the command directly with Poetry:
 poetry run python my_script.py
 ```
 
+At this point, the only step left is to install xmask (which is normally already cloned), which is an external dependency that is not handled by Poetry since it requires cloning submodules. You can do so by running the following commands:
+
+```bash
+poetry shell
+cd external_dependencies
+pip install -e xmask
+```
+
 ## Installing locally without Poetry
 
 It is strongly recommended to use Poetry as it will handle all the packages dependencies and the virtual environment for you. However, if you prefer to install the dependencies manually, you can do so by running the following commands (granted that you have Python installed along with pip):
 
 ```bash
 pip install -r requirements.txt
+
+# Now install xmask
+cd external_dependencies
+pip install -e xmask
 ```

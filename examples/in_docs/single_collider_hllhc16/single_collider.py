@@ -32,8 +32,8 @@ config["config_mad"]["links"]["acc-models-lhc"] = (
     "../../../../../external_dependencies/acc-models-lhc"
 )
 
-# Adapt the number of turns
-config["config_simulation"]["n_turns"] = 1000
+# Track for 10 turn just to ensure there's no issue with the collider
+config["config_simulation"]["n_turns"] = 10
 
 # Save the collider produced after the configuration step
 config["config_collider"]["save_output_collider"] = True

@@ -8,7 +8,6 @@ nav:
     - Contributing: contributing.md
   - Installation:
     - Installing Python: installation/installing_python.md
-    - Installing Study-DA with pip: installation/installing_with_pip.md
     - Installing Study-DA locally: installation/installing_locally.md
     - Installing the optics: installation/installing_the_optics.md
   - Tutorials:

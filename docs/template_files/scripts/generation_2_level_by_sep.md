@@ -1,8 +1,9 @@
 # Generation 2 (configure and level by separation, track) template script
 
 ```py title="generation_2_level_by_sep.py"
-"""This is a template script for generation 1 of simulation study, in which ones generates a
-particle distribution and a collider from a MAD-X model."""
+"""This is a template script for generation 2 of simulation study, in which ones configures a
+a Xsuite collider (including luminosity levelling and beam-beam) and tracks a given particle
+distribution."""
 
 # ==================================================================================================
 # --- Imports
