@@ -75,7 +75,7 @@ def test_build_single_collider(name_template_config: str) -> None:
     # ==================================================================================================
 
     # Define the variables of interest for the submission
-    path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
+    path_python_environment = "../../.venv"
     force_configure = False
 
     # Preconfigure submission to local

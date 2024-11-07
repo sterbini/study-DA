@@ -29,8 +29,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
+          poetry config virtualenvs.in-project true
           poetry run pip install nafflib
-          poetry install
+          poetry install --with dev
           poetry shell
           cd external_dependencies
           pip install -e xmask
