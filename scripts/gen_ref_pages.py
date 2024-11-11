@@ -42,7 +42,7 @@ for filename, header in zip(
         "Generation 2 (configure and level by separation, track) template script",
     ],
 ):
-    path = f"study_da/generate/template_scripts/{filename}.py"
+    path = f"study_da/assets/template_scripts/{filename}.py"
     with open(path, "r") as f:
         content = f.read()
 

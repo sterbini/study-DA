@@ -598,7 +598,9 @@ class GenerateScan:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
         executable_path = self.config["structure"][generation]["executable"]
-        path_local_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_scripts/"
+        path_local_template = (
+            f"{os.path.dirname(inspect.getfile(GenerateScan))}/../assets/template_scripts/"
+        )
 
         # Check if the executable path corresponds to a file
         if not os.path.isfile(executable_path):

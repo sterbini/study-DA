@@ -56,7 +56,7 @@ def load_template_script_as_str(template_script_name: str) -> str:
 
     """
     path_local_template_scripts = (
-        f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_scripts/"
+        f"{os.path.dirname(inspect.getfile(GenerateScan))}/../assets/template_scripts/"
     )
 
     # Get path to template
