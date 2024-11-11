@@ -1,5 +1,11 @@
 """This class is used to generate a study (along with the corresponding tree) from a parameter file,
-and potentially a set of template files."""
+and potentially a set of template files.
+
+This class makes use of "eval", which is known to be a security risk. ast.literal_eval can't be
+used here because variables from a specified namespace are being passed to the eval function.
+The use of eval is justified here because the input is controlled by the user only through the
+configuration file. If the user wants to write an unsafe expression, it's their responsibility.
+"""
 
 # ==================================================================================================
 # --- Imports

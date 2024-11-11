@@ -447,8 +447,8 @@ class SubmitScan:
                 "Cropping list of jobs to submit to ensure only one generation is submitted at "
                 "a time."
             )
-            max_gen = max(dic_to_submit_by_gen.keys())
-            dic_to_submit_by_gen = {max_gen: dic_to_submit_by_gen[max_gen]}
+            min_gen = min(dic_to_submit_by_gen.keys())
+            dic_to_submit_by_gen = {min_gen: dic_to_submit_by_gen[min_gen]}
 
         # Convert dic_to_submit_by_gen to contain all requested information
         l_jobs_to_submit = [job for dic_gen in dic_to_submit_by_gen.values() for job in dic_gen]
@@ -595,6 +595,7 @@ class SubmitScan:
         self,
         one_generation_at_a_time: bool = False,
         wait_time: float = 30,
+        max_try=100,
         dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
         dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
         dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
@@ -614,6 +615,7 @@ class SubmitScan:
                 time. Defaults to False.
             wait_time (float, optional): The wait time between submissions in minutes.
                 Defaults to 30.
+            max_try (int, optional): The maximum number of tries before stopping the submission.
             dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
                 generation. Defaults to None.
             dic_dependencies_per_gen (dict[int, list[str]], optional): Dependencies per generation.
@@ -642,13 +644,18 @@ class SubmitScan:
 
         # I don't need to lock the tree here since the status cheking is read only and
         # the lock is acquired in the submit method for the submission
-        while self.submit(
-            one_generation_at_a_time,
-            dic_additional_commands_per_gen,
-            dic_dependencies_per_gen,
-            dic_copy_back_per_gen,
-            name_config,
-        ) not in ["finished", "finished with issues"]:
+        while (
+            self.submit(
+                one_generation_at_a_time,
+                dic_additional_commands_per_gen,
+                dic_dependencies_per_gen,
+                dic_copy_back_per_gen,
+                name_config,
+            )
+            not in ["finished", "finished with issues"]
+            and max_try > 0
+        ):
             # Wait for a certain amount of time before checking again
             logging.info(f"Waiting {wait_time} minutes before checking again.")
             time.sleep(wait_time * 60)
+            max_try -= 1
