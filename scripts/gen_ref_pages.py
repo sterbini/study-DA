@@ -52,7 +52,6 @@ for filename, header in zip(
         f.write(content)
         f.write("""```\n""")
 
-
 ##### Then generate technical documentation
 nav = mkdocs_gen_files.Nav()
 
