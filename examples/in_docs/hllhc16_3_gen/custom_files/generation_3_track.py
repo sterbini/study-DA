@@ -79,10 +79,13 @@ def track_particles(full_configuration, collider):
 
 
 # ==================================================================================================
-# --- Parameters definition
+# --- Parameters placeholders definition
 # ==================================================================================================
 dict_mutated_parameters = {}  ###---parameters---###
 path_configuration = "{} ###---main_configuration---###"
+# In case the placeholders have not been replaced, use default path
+if path_configuration.startswith("{}"):
+    path_configuration = "config.yaml"
 
 # ==================================================================================================
 # --- Script for execution

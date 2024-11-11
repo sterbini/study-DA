@@ -43,10 +43,13 @@ def add(configuration):
 
 
 # ==================================================================================================
-# --- Parameters definition
+# --- Parameters placeholders definition
 # ==================================================================================================
 dict_mutated_parameters = {} ###---parameters---###
 path_configuration = "{} ###---main_configuration---###"
+# In case the placeholders have not been replaced, use default path
+if path_configuration.startswith("{}"):
+    path_configuration = "config.yaml"
 
 # ==================================================================================================
 # --- Script for execution
@@ -79,6 +82,9 @@ If you work with a linter, it will probably protest at this point. Indeed, the f
 ```python
 dict_mutated_parameters = {} ###---parameters---###
 path_configuration = "{} ###---main_configuration---###"
+# In case the placeholders have not been replaced, use default path
+if path_configuration.startswith("{}"):
+    path_configuration = "config.yaml"
 ```
 
 This is not a mistake. The `{{`and `}}` are used to indicate placeholders for the actual values that will be filled in by the study-da package, using [jinja2](https://jinja.palletsprojects.com/en/3.1.x/) under the hood. In practice, as it will be shown later in this tutorial, the `{} ###---parameters---###` will be replaced by a dictionary of parameters (the ones being scanned), and `{} ###---main_configuration---###` will be replaced by the path to the main configuration file. This allows to mutate selectively some of the parameters in the configuration file, and to write the modified configuration back to the disk. The parameter values are specific to each generated job.
@@ -132,10 +138,13 @@ def multiply_and_dump(configuration):
 
 
 # ==================================================================================================
-# --- Parameters definition
+# --- Parameters placeholders definition
 # ==================================================================================================
 dict_mutated_parameters = {} ###---parameters---###
 path_configuration = "{} ###---main_configuration---###"
+# In case the placeholders have not been replaced, use default path
+if path_configuration.startswith("{}"):
+    path_configuration = "config.yaml"
 
 # ==================================================================================================
 # --- Script for execution
