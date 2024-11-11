@@ -243,8 +243,8 @@ def clean():
 # ==================================================================================================
 # --- Parameters definition
 # ==================================================================================================
-dict_mutated_parameters = {{parameters}}
-path_configuration = "{{main_configuration}}"
+dict_mutated_parameters = {} ###---parameters---###
+path_configuration = "{} ###---main_configuration---###"
 
 # ==================================================================================================
 # --- Script for execution

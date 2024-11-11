@@ -167,8 +167,8 @@ def clean():
 # ==================================================================================================
 # --- Parameters definition
 # ==================================================================================================
-dict_mutated_parameters = {{parameters}}
-path_configuration = "{{main_configuration}}"
+dict_mutated_parameters = {} ###---parameters---###
+path_configuration = "{} ###---main_configuration---###"
 
 # ==================================================================================================
 # --- Script for execution
@@ -285,8 +285,8 @@ def track_particles(full_configuration, collider):
 # ==================================================================================================
 # --- Parameters definition
 # ==================================================================================================
-dict_mutated_parameters = {{parameters}}
-path_configuration = "{{main_configuration}}"
+dict_mutated_parameters = {} ###---parameters---###
+path_configuration = "{} ###---main_configuration---###"
 
 # ==================================================================================================
 # --- Script for execution
