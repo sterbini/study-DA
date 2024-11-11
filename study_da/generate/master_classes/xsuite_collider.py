@@ -329,7 +329,9 @@ class XsuiteCollider:
         filling_scheme_path = self.config_beambeam["mask_with_filling_pattern"]["pattern_fname"]
 
         # Check if the filling scheme path must be obtained from the template schemes
-        scheme_folder = pathlib.Path(__file__).parent.parent.resolve().joinpath("filling_schemes")
+        scheme_folder = (
+            pathlib.Path(__file__).parent.parent.parent.resolve().joinpath("assets/filling_schemes")
+        )
         if filling_scheme_path in os.listdir(scheme_folder):
             filling_scheme_path = str(scheme_folder.joinpath(filling_scheme_path))
             self.config_beambeam["mask_with_filling_pattern"]["pattern_fname"] = filling_scheme_path
