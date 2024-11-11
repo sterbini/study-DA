@@ -10,7 +10,7 @@ for filename, header in zip(
     ["config_hllhc16", "config_hllhc13", "config_runIII", "config_runIII_ions"],
     ["HL-LHC v1.6", "HL-LHC v1.3", "Run III", "Run III ions"],
 ):
-    path = f"study_da/generate/template_configurations/{filename}.yaml"
+    path = f"study_da/assets/configurations/{filename}.yaml"
     ryaml = ruamel.yaml.YAML()
     with open(path, "r") as fid:
         dic = ryaml.load(fid)

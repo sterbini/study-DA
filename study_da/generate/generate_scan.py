@@ -707,7 +707,7 @@ class GenerateScan:
                 # Check if the dependency exists as a file
                 if not os.path.isfile(path):
                     # Check if the dependency exists as a file in the template folder
-                    path_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_configurations/{path}"
+                    path_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/../assets/configurations/{path}"
                     if not os.path.isfile(path_template):
                         raise FileNotFoundError(
                             f"Dependency file {path} not found locally nor in the study-da "

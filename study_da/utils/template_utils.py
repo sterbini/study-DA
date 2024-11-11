@@ -31,7 +31,7 @@ def load_template_configuration_as_dic(
 
     """
     path_local_template_configurations = (
-        f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_configurations/"
+        f"{os.path.dirname(inspect.getfile(GenerateScan))}/../assets/configurations/"
     )
 
     # Add .yaml extension to template name
