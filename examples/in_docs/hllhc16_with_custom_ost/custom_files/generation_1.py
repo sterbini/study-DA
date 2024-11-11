@@ -28,11 +28,11 @@ import custom_ost
 # ==================================================================================================
 # --- Override the MadCollider class
 # ==================================================================================================
-# class MadColliderCustom(MadCollider):
-#     def __init__(self, configuration: dict):
-#         super().__init__(configuration)
+class MadColliderCustom(MadCollider):
+    def __init__(self, configuration: dict):
+        super().__init__(configuration)
 
-#         self._ost = custom_ost
+        self._ost = custom_ost
 
 
 # ==================================================================================================
