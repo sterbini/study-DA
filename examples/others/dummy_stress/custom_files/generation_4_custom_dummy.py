@@ -7,9 +7,7 @@ particle distribution and a collider from a MAD-X model."""
 
 # Import standard library modules
 import logging
-import time
-
-import numpy as np
+import os
 
 # Import third-party modules
 # Import user-defined modules

@@ -447,7 +447,7 @@ class SubmitScan:
                 "Cropping list of jobs to submit to ensure only one generation is submitted at "
                 "a time."
             )
-            min_gen = min(dic_to_submit_by_gen.keys())
+            min_gen = min(k for k, l_jobs in dic_to_submit_by_gen.items() if l_jobs)
             dic_to_submit_by_gen = {min_gen: dic_to_submit_by_gen[min_gen]}
 
         # Convert dic_to_submit_by_gen to contain all requested information
@@ -659,3 +659,6 @@ class SubmitScan:
             logging.info(f"Waiting {wait_time} minutes before checking again.")
             time.sleep(wait_time * 60)
             max_try -= 1
+
+        if max_try == 0:
+            print("Maximum number of tries reached. Stopping submission.")

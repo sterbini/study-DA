@@ -305,6 +305,9 @@ class ClusterSubmission:
 
         # True if job must be (re)submitted
         else:
+            # ? If some jobs finish in the second-long step between the tree update and the
+            # ? submission, they will be considered as needed to be submitted...
+            # ? Should happend rarely but still a problem... And no easy way to fix thiss
             return True
         return False
 
