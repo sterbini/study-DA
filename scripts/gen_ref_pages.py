@@ -1,5 +1,6 @@
 """Generate the code reference pages and navigation."""
 
+import os
 from pathlib import Path
 
 import mkdocs_gen_files
@@ -51,6 +52,16 @@ for filename, header in zip(
         f.write(f"""```py title="{filename}.py"\n""")
         f.write(content)
         f.write("""```\n""")
+
+##### Then update the list of filling schemes
+with open("docs/template_files/filling_schemes/index.md", "w") as f:
+    f.write("# List of available filling schemes\n\n")
+    # List files in the directory
+    for file in os.listdir("study_da/assets/filling_schemes"):
+        if file.endswith(".json"):
+            f.write(f"- {file}\n")
+        f.write("\n")
+
 
 ##### Then generate technical documentation
 nav = mkdocs_gen_files.Nav()

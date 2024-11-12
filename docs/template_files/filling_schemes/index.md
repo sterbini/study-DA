@@ -1,0 +1,54 @@
+# List of available filling schemes
+
+- 25ns_1886b_1873_1217_1173_236bpi_12inj_hybrid_2INDIV.json
+
+- 25ns_1886b_1873_1217_1173_236bpi_12inj_hybrid_2INDIV_converted.json
+
+- 25ns_1983b_1970_1657_1684_144bpi_19inj_3INDIVs.json
+
+- 25ns_1983b_1970_1657_1684_144bpi_19inj_3INDIVs_converted.json
+
+- 25ns_2076b_2064_1327_1928_216bpi_12inj_800ns_bs200ns.json
+
+- 25ns_2076b_2064_1327_1928_216bpi_12inj_800ns_bs200ns_with_identical_bunches.json
+
+- 25ns_2228b_2216_1686_2112_hybrid_8b4e_2x56b_25ns_3x48b_12inj.json
+
+- 25ns_2228b_2216_1686_2112_hybrid_8b4e_2x56b_25ns_3x48b_12inj_with_identical_bunches.json
+
+- 25ns_2358b_2345_1692_1628_236bpi_14inj_hybrid_2INDIV.json
+
+- 25ns_2358b_2345_1692_1628_236bpi_14inj_hybrid_2INDIV_converted.json
+
+- 25ns_2374b_2361_1730_1773_236bpi_13inj_hybrid_2INDIV.json
+
+- 25ns_2374b_2361_1730_1773_236bpi_13inj_hybrid_2INDIV_converted.json
+
+- 25ns_2374b_2361_1730_1773_236bpi_13inj_hybrid_2INDIV_converted_with_identical_bunches.json
+
+- 25ns_2464b_2452_1842_1821_236bpi_12inj_hybrid copy.json
+
+- 25ns_2464b_2452_1842_1821_236bpi_12inj_hybrid.json
+
+- 25ns_2464b_2452_1842_1821_236bpi_12inj_hybrid_converted.json
+
+- 25ns_2464b_2452_1842_1821_236bpi_12inj_hybrid_converted_with_identical_bunches.json
+
+- 25ns_2760b_2748_2492_2574_288bpi_13inj_800ns_bs200ns.json
+
+- 25ns_2760b_2748_2492_2574_288bpi_13inj_800ns_bs200ns_converted.json
+
+- 50ns_1240b_1088_1088_398_56bpi_PbPb.json
+
+- 50ns_1240b_1088_1088_398_56bpi_PbPb_converted.json
+
+- 50ns_160b_160_80_73_40bpi_PbPb_BBMD.json
+
+- 50ns_961b_880_880_209_40bpi_25inj_PbPb.json
+
+- 8b4e_1972b_1960_1178_1886_224bpi_12inj_800ns_bs200ns.json
+
+- full_scheme.json
+
+- 25ns_2604b_2592_2310_2421_4x48bpi_16inj.json
+

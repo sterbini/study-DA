@@ -29,7 +29,7 @@ nav:
     - A 3 generational scan: case_studies/6_3_generational_scan.md
     - Tracking with GPU: case_studies/7_tracking_with_GPU.md
 
-  - Templates:
+  - Templates and assets:
     - template_files/index.md
     - Configurations:
       - HL-LHC v1.6: template_files/configurations/config_hllhc16.md
@@ -42,6 +42,8 @@ nav:
       - Generation 2 (level by separation): template_files/scripts/generation_2_level_by_sep.md
     - Mapping:
       - LHC parameters: template_files/mapping/parameters_lhc.md
+    - Filling schemes:
+      - template_files/filling_schemes/index.md
   - Code Reference: reference/
 
 plugins:
