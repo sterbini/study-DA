@@ -507,7 +507,7 @@ class GenerateScan:
             array_idx = range(len(array_param_values))
 
         # Loop over the parameters
-        gen_length  = np.sum(array_conditions) if array_conditions is not None else 1
+        to_disk_len  = np.sum(array_conditions) if array_conditions is not None else 1
         to_disk_idx = 0
         for idx, (l_values, l_values_for_naming, l_idx) in enumerate(
             zip(array_param_values, array_param_values_for_naming, array_idx)
@@ -525,7 +525,7 @@ class GenerateScan:
             # Handle prefix
             prefix_path = ""
             if add_prefix_to_folder_names:
-                prefix_path = "ID_" + str(to_disk_idx).zfill(gen_length) + "_"
+                prefix_path = "ID_" + str(to_disk_idx).zfill(len(str(to_disk_len))) + "_"
                 to_disk_idx += 1
 
             # Handle suffix
