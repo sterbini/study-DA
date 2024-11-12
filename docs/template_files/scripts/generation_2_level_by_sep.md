@@ -169,6 +169,16 @@ path_configuration = "{{main_configuration}}"
 # ==================================================================================================
 
 if __name__ == "__main__":
+    # Adding command line parser
+    #----------------------------
+    import argparse
+    aparser = argparse.ArgumentParser()
+    aparser.add_argument("-s"  , "--save" , help = "Save output collider for inspection", action  = "store_true")
+    args = aparser.parse_args()
+    if args.save:
+        dict_mutated_parameters.update({'save_output_collider': True})
+    #----------------------------
+
     logging.info("Starting script to configure collider and track")
 
     # Load full configuration
