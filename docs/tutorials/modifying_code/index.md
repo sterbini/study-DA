@@ -1,10 +1,12 @@
 # Customizing internal code
 
-In this case study, we show how to customize the code of study-DA to suit your needs. Note that this goes a bit beyond customizing the template scripts, since, in this case, we're going to change the internal code of the tool (although we can do this using only the template scripts, see below).
+It can sometimes be needed to customize the code of study-DA to implement a feature that is not natively present. For instance, implementing a new way of doing the luminosity levelling, or even adding some custom checks when building the collider from a MAD-X model.
+
+Note that this goes a bit beyond customizing the template scripts, since, in this case, we would like to change the internal code of the tool (although we can do this using only the template scripts, see below).
 
 ## Scan configuration
 
-We will use an extremely simple scan configuration, with only one generation. Indeed, this case study is not about doing a scan or even configure a collider, but simply to illustrate how to modify the template scripts. You can easily adapt this example to a multi-generational scan.
+We will use an extremely simple scan configuration, with only one generation. Indeed, this tutorial is not about doing a scan or even configure a collider, but simply to illustrate how to modify the template scripts. You should be able to easily adapt this example to a multi-generational scan.
 
 ```yaml title="config_scan.yaml"
 # ==================================================================================================
@@ -35,7 +37,7 @@ What you can already note here is that:
 
 ## Study configuration
 
-The configuration is the [template one](../template_files/configurations/config_hllhc16.md) for HL-LHC v1.6.
+The configuration is the [template one](../../template_files/configurations/config_hllhc16.md) for HL-LHC v1.6.
 
 ## Template script
 
@@ -164,7 +166,7 @@ The most elegant way of proceeding is to inherit from and override the `MadColli
 
 Alternatively, you could directly use the `MadCollider` class and just update the `_ost` attribute. This is shown as a comment in the script. This is less flexible than the first method, but it is easier to implement. If you choose this approach, you can of course comment out the MadColliderCustom class.
 
-In both of these cases, just modify the initial ```optics_specific_tools.py``` (that you can find, for instance, on [GitHub](https://github.com/ColasDroin/study-DA/blob/master/study_da/generate/version_specific_files/hllhc16/optics_specific_tools.py)) as you please, and put it in the `custom_files` folder.
+In both of these cases, you just have to modify the initial ```optics_specific_tools.py``` (that you can find, for instance, on [GitHub](https://github.com/ColasDroin/study-DA/blob/master/study_da/generate/version_specific_files/hllhc16/optics_specific_tools.py)) as you please, and put it in the `custom_files` folder.
 
 Finally, you could define a function yourself and override it in the default ost. This is also shown in as commented lines. This is a more surgical way of customizing the code, but note that the new function you define must have a behaviour similar to the original one (same number of arguments, same return type, etc.). If you choose this approach, you don't even have to define a custom OST file.
 
@@ -176,7 +178,7 @@ Finally, you could define a function yourself and override it in the default ost
 
 ## Study generation
 
-Generation is done as usual, with the following script:
+In this case, generation is done as usual, with, for instance, the following script:
 
 ```python title="generate.py"
 # ==================================================================================================
