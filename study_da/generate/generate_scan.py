@@ -597,6 +597,10 @@ class GenerateScan:
         Args:
             generation (str): The name of the current generation.
             study_path (str): The path to the study folder.
+            dic_parameter_lists (Optional[dict[str, Any]]): The dictionary of parameter lists.
+                Defaults to None.
+            dic_parameter_lists_for_naming (Optional[dict[str, Any]]): The dictionary of parameter
+                lists for naming. Defaults to None.
 
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
