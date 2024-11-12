@@ -19,6 +19,7 @@ def create(
     force_overwrite: bool = False,
     dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]] = None,
     dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]] = None,
+    add_prefix_to_folder_names: bool = False,
 ) -> tuple[str, str]:
     """
     Create a study based on the configuration file.
@@ -32,6 +33,8 @@ def create(
         dic_parameter_all_gen_naming (Optional[dict[str, dict[str, Any]]], optional): Dictionary of
             parameters for the naming of the scan subfolders, if not provided through the scan
             config. Defaults to None.
+        add_prefix_to_folder_names (bool, optional): Whether to add a prefix to the folder names.
+            Defaults to False.
 
     Returns:
         tuple[str, str]: The path to the tree file and the name of the main configuration file.
@@ -42,6 +45,7 @@ def create(
         force_overwrite=force_overwrite,
         dic_parameter_all_gen=dic_parameter_all_gen,
         dic_parameter_all_gen_naming=dic_parameter_all_gen_naming,
+        add_prefix_to_folder_names=add_prefix_to_folder_names,
     )
 
     # Get variables of interest for the submission
@@ -118,6 +122,7 @@ def submit(
     one_generation_at_a_time: bool = False,
     keep_submit_until_done: bool = False,
     wait_time: float = 30,
+    max_try: int = 100,
     dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
     dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
     dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
@@ -147,6 +152,7 @@ def submit(
             time. Defaults to False.
         keep_submit_until_done (bool, optional): Whether to keep submitting jobs until all jobs
             are finished or failed. Defaults to False.
+        max_try (int, optional): The maximum number of tries to submit a job. Defaults to 100.
         wait_time (float, optional): The wait time between submissions in minutes. Defaults to 30.
         dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
             generation. Defaults to None.
@@ -177,6 +183,7 @@ def submit(
     if keep_submit_until_done:
         study_sub.keep_submit_until_done(
             wait_time=wait_time,
+            max_try=max_try,
             one_generation_at_a_time=one_generation_at_a_time,
             dic_additional_commands_per_gen=dic_additional_commands_per_gen,
             dic_dependencies_per_gen=dic_dependencies_per_gen,

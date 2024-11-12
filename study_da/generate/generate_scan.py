@@ -1,5 +1,11 @@
 """This class is used to generate a study (along with the corresponding tree) from a parameter file,
-and potentially a set of template files."""
+and potentially a set of template files.
+
+This class makes use of "eval", which is known to be a security risk. ast.literal_eval can't be
+used here because variables from a specified namespace are being passed to the eval function.
+The use of eval is justified here because the input is controlled by the user only through the
+configuration file. If the user wants to write an unsafe expression, it's their responsibility.
+"""
 
 # ==================================================================================================
 # --- Imports
@@ -124,7 +130,11 @@ class GenerateScan:
         # Generate generations from template
         directory_path = os.path.dirname(template_path)
         template_name = os.path.basename(template_path)
-        environment = Environment(loader=FileSystemLoader(directory_path))
+        environment = Environment(
+            loader=FileSystemLoader(directory_path),
+            variable_start_string="{} ###---",
+            variable_end_string="---###",
+        )
         template = environment.get_template(template_name)
 
         return template.render(parameters=str_parameters, **dependencies)
@@ -434,6 +444,7 @@ class GenerateScan:
         template_path: str,
         dic_parameter_lists: Optional[dict[str, Any]] = None,
         dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
+        add_prefix_to_folder_names: bool = False,
     ) -> list[str]:
         """
         Creates study files for parametric scans.
@@ -449,6 +460,8 @@ class GenerateScan:
                 Defaults to None.
             dic_parameter_lists_for_naming (Optional[dict[str, Any]]): The dictionary of parameter
                 lists for naming. Defaults to None.
+            add_prefix_to_folder_names (bool): Whether to add a prefix to the folder names. Defaults
+                to False.
 
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
@@ -485,8 +498,8 @@ class GenerateScan:
             array_idx = range(len(array_param_values))
 
         # Loop over the parameters
-        for l_values, l_values_for_naming, l_idx in zip(
-            array_param_values, array_param_values_for_naming, array_idx
+        for idx, (l_values, l_values_for_naming, l_idx) in enumerate(
+            zip(array_param_values, array_param_values_for_naming, array_idx)
         ):
             # Check the idx to keep if conditions are present
             if array_conditions is not None and not array_conditions[l_idx]:
@@ -497,17 +510,23 @@ class GenerateScan:
             dic_mutated_parameters_for_naming = dict(
                 zip(dic_parameter_lists.keys(), l_values_for_naming)
             )
+
+            # Handle prefix
+            prefix_path = ""
+            if add_prefix_to_folder_names:
+                prefix_path = "ID_" + str(idx) + "_"
+
+            # Handle suffix
             suffix_path = "_".join(
                 [
                     f"{parameter}_{value}"
                     for parameter, value in dic_mutated_parameters_for_naming.items()
                 ]
             )
-
-            # Remove '_' at the beginning of the suffix path if needed (e.g. for generation)
             suffix_path = suffix_path.removeprefix("_")
+
             # Create final path
-            path = generation_path + suffix_path + "/"
+            path = generation_path + prefix_path + suffix_path + "/"
 
             # Add common parameters
             if generation in self.dic_common_parameters:
@@ -580,6 +599,7 @@ class GenerateScan:
         study_path: str,
         dic_parameter_lists: Optional[dict[str, Any]] = None,
         dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
+        add_prefix_to_folder_names: bool = False,
     ) -> list[str]:
         """
         Creates study files for the current generation.
@@ -587,12 +607,20 @@ class GenerateScan:
         Args:
             generation (str): The name of the current generation.
             study_path (str): The path to the study folder.
+            dic_parameter_lists (Optional[dict[str, Any]]): The dictionary of parameter lists.
+                Defaults to None.
+            dic_parameter_lists_for_naming (Optional[dict[str, Any]]): The dictionary of parameter
+                lists for naming. Defaults to None.
+            add_prefix_to_folder_names (bool): Whether to add a prefix to the folder names. Defaults
+                to False.
 
         Returns:
             tuple[list[str], list[str]]: The list of study file strings and the list of study paths.
         """
         executable_path = self.config["structure"][generation]["executable"]
-        path_local_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_scripts/"
+        path_local_template = (
+            f"{os.path.dirname(inspect.getfile(GenerateScan))}/../assets/template_scripts/"
+        )
 
         # Check if the executable path corresponds to a file
         if not os.path.isfile(executable_path):
@@ -620,44 +648,17 @@ class GenerateScan:
             executable_path,
             dic_parameter_lists,
             dic_parameter_lists_for_naming,
+            add_prefix_to_folder_names,
         )
 
-    def create_study(
+    def browse_and_creat_study(
         self,
-        tree_file: bool = True,
-        force_overwrite: bool = False,
-        dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]] = None,
-        dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]] = None,
-    ) -> None:
+        dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]],
+        dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]],
+        add_prefix_to_folder_names: bool,
+    ) -> dict:
         l_study_path = [self.config["name"] + "/"]
         dictionary_tree = {}
-        """
-        Creates study files for the entire study.
-
-        Args:
-            tree_file (bool, optional): Whether to write the study tree structure to a YAML file. 
-                Defaults to True.
-            force_overwrite (bool, optional): Whether to overwrite existing study files. 
-                Defaults to False.
-
-        Returns:
-            list[str]: The list of study file strings.
-        """
-        # Raise an error if dic_parameter_all_gen_naming is not None while dic_parameter_all_gen is None
-        if dic_parameter_all_gen is None and dic_parameter_all_gen_naming is not None:
-            raise ValueError(
-                "If dic_parameter_all_gen_naming is defined, dic_parameter_all_gen must be defined."
-            )
-
-        # Remove existing study if force_overwrite
-        if os.path.exists(self.config["name"]):
-            if not force_overwrite:
-                logging.info(
-                    f"Study {self.config['name']} already exists. Set force_overwrite to True to "
-                    "overwrite. Continuing without overwriting."
-                )
-                return
-            shutil.rmtree(self.config["name"])
 
         # Browse through the generations
         l_generations = list(self.config["structure"].keys())
@@ -684,6 +685,7 @@ class GenerateScan:
                     study_path,
                     dic_parameter_current_gen,
                     dic_parameter_naming_current_gen,
+                    add_prefix_to_folder_names,
                 )
                 # Update tree
                 dictionary_tree = self.complete_tree(
@@ -695,13 +697,65 @@ class GenerateScan:
             # Update study path for next later
             l_study_path = l_study_path_all_next_generation
 
+        return dictionary_tree
+
+    def create_study(
+        self,
+        tree_file: bool = True,
+        force_overwrite: bool = False,
+        dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]] = None,
+        dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]] = None,
+        add_prefix_to_folder_names: bool = False,
+    ) -> None:
+        """
+        Creates study files for the entire study.
+
+        Args:
+            tree_file (bool, optional): Whether to write the study tree structure to a YAML file.
+                Defaults to True.
+            force_overwrite (bool, optional): Whether to overwrite existing study files.
+                Defaults to False.
+            dic_parameter_all_gen (Optional[dict[str, dict[str, Any]]]): The dictionary of parameter
+                lists for all generations. Defaults to None.
+            dic_parameter_all_gen_naming (Optional[dict[str, dict[str, Any]]]): The dictionary of
+                parameter lists for all generations for naming. Defaults to None.
+            add_prefix_to_folder_names (bool): Whether to add a prefix to the folder names. Defaults
+                to False.
+
+        Returns:
+            list[str]: The list of study file strings.
+        """
+
+        # Raise an error if dic_parameter_all_gen_naming is not None while dic_parameter_all_gen is None
+        if dic_parameter_all_gen is None and dic_parameter_all_gen_naming is not None:
+            raise ValueError(
+                "If dic_parameter_all_gen_naming is defined, dic_parameter_all_gen must be defined."
+            )
+
+        # Remove existing study if force_overwrite
+        if os.path.exists(self.config["name"]):
+            if not force_overwrite:
+                logging.info(
+                    f"Study {self.config['name']} already exists. Set force_overwrite to True to "
+                    "overwrite. Continuing without overwriting."
+                )
+                return
+            shutil.rmtree(self.config["name"])
+
+        # Browse through the generations and create the study
+        dictionary_tree = self.browse_and_creat_study(
+            dic_parameter_all_gen,
+            dic_parameter_all_gen_naming,
+            add_prefix_to_folder_names,
+        )
+
         # Add dependencies to the study
         if "dependencies" in self.config:
             for dependency, path in self.config["dependencies"].items():
                 # Check if the dependency exists as a file
                 if not os.path.isfile(path):
                     # Check if the dependency exists as a file in the template folder
-                    path_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/template_configurations/{path}"
+                    path_template = f"{os.path.dirname(inspect.getfile(GenerateScan))}/../assets/configurations/{path}"
                     if not os.path.isfile(path_template):
                         raise FileNotFoundError(
                             f"Dependency file {path} not found locally nor in the study-da "

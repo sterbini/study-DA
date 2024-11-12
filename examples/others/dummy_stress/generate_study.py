@@ -12,4 +12,4 @@ from study_da import create
 # ==================================================================================================
 
 # Generate the study in the local directory
-create(path_config="config_scan.yaml", tree_file=True, force_overwrite=True)
+create(path_config_scan="config_scan.yaml", force_overwrite=True, add_prefix_to_folder_names=True)

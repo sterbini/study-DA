@@ -19,7 +19,7 @@ If you have some optics available on your machine or on AFS (e.g. HL-LHC v1.6), 
 
 Otherwise, please refer to the [installing the optics](installation/installing_the_optics.md) section to get the optics you need.
 
-Do not hesitate to refer to the detailed explanations in case you need more guidance to [install Python](installation/installing_python.md), or if you want to [install locally](installing_locally.md) (for instance to contribute to the package).
+Do not hesitate to refer to the detailed explanations in case you need more guidance to [install Python](installation/installing_python.md), or if you want to [install locally](installation/installing_locally.md) (for instance to contribute to the package).
 
 !!! warning "HTCondor must be installed and properly configured"
 

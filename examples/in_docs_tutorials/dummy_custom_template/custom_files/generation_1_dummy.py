@@ -20,21 +20,21 @@ from study_da.utils import (
 # ==================================================================================================
 # --- Script functions
 # ==================================================================================================
-def multiply_and_dump(configuration):
-    y = float(configuration["y"])
-    x_plus_z = float(configuration["result"]["x_plus_z"])
-
-    # Dump result to txt file
-    with open("result.txt", "w") as f:
-        f.write(str(x_plus_z * y))
+def add(configuration):
+    x = float(configuration["a_random_nest"]["x"])
+    z = float(configuration["another_random_nest"]["and_another"]["z"])
+    configuration["result"] = {"x_plus_z": x + z}
+    return configuration
 
 
 # ==================================================================================================
-# --- Parameters definition
+# --- Parameters placeholders definition
 # ==================================================================================================
-dict_mutated_parameters = {{parameters}}
-path_configuration = "{{main_configuration}}"
-
+dict_mutated_parameters = {}  ###---parameters---###
+path_configuration = "{} ###---main_configuration---###"
+# In case the placeholders have not been replaced, use default path
+if path_configuration.startswith("{}"):
+    path_configuration = "config.yaml"
 # ==================================================================================================
 # --- Script for execution
 # ==================================================================================================
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         set_item_in_dic(full_configuration, key, value)
 
     # Add x and z and write to configuration
-    multiply_and_dump(full_configuration)
+    full_configuration = add(full_configuration)
 
     # Dump configuration
     name_configuration = os.path.basename(path_configuration)

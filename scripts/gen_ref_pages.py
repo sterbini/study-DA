@@ -1,5 +1,6 @@
 """Generate the code reference pages and navigation."""
 
+import os
 from pathlib import Path
 
 import mkdocs_gen_files
@@ -10,7 +11,7 @@ for filename, header in zip(
     ["config_hllhc16", "config_hllhc13", "config_runIII", "config_runIII_ions"],
     ["HL-LHC v1.6", "HL-LHC v1.3", "Run III", "Run III ions"],
 ):
-    path = f"study_da/generate/template_configurations/{filename}.yaml"
+    path = f"study_da/assets/configurations/{filename}.yaml"
     ryaml = ruamel.yaml.YAML()
     with open(path, "r") as fid:
         dic = ryaml.load(fid)
@@ -42,7 +43,7 @@ for filename, header in zip(
         "Generation 2 (configure and level by separation, track) template script",
     ],
 ):
-    path = f"study_da/generate/template_scripts/{filename}.py"
+    path = f"study_da/assets/template_scripts/{filename}.py"
     with open(path, "r") as f:
         content = f.read()
 
@@ -51,6 +52,15 @@ for filename, header in zip(
         f.write(f"""```py title="{filename}.py"\n""")
         f.write(content)
         f.write("""```\n""")
+
+##### Then update the list of filling schemes
+with open("docs/template_files/filling_schemes/index.md", "w") as f:
+    f.write("# List of available filling schemes\n\n")
+    # List files in the directory
+    for file in os.listdir("study_da/assets/filling_schemes"):
+        if file.endswith(".json"):
+            f.write(f"- {file}\n")
+        f.write("\n")
 
 
 ##### Then generate technical documentation

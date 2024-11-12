@@ -68,9 +68,8 @@ def configure_collider(full_configuration):
 
     # Do the leveling if requested
     if "config_lumi_leveling" in config_collider and not config_collider["skip_leveling"]:
-        xc.level_all_by_separation(
-            n_collisions_ip1_and_5, n_collisions_ip2, n_collisions_ip8, collider
-        )
+        xc.level_ip1_5_by_bunch_intensity(collider, n_collisions_ip1_and_5)
+        xc.level_ip2_8_by_separation(n_collisions_ip2, n_collisions_ip8, collider)
     else:
         logging.warning(
             "No leveling is done as no configuration has been provided, or skip_leveling"
@@ -156,10 +155,13 @@ def clean():
 
 
 # ==================================================================================================
-# --- Parameters definition
+# --- Parameters placeholders definition
 # ==================================================================================================
-dict_mutated_parameters = {{parameters}}
-path_configuration = "{{main_configuration}}"
+dict_mutated_parameters = {}  ###---parameters---###
+path_configuration = "{} ###---main_configuration---###"
+# In case the placeholders have not been replaced, use default path
+if path_configuration.startswith("{}"):
+    path_configuration = "config.yaml"
 
 # ==================================================================================================
 # --- Script for execution

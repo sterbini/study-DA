@@ -8,8 +8,8 @@ particle distribution and a collider from a MAD-X model."""
 # Import standard library modules
 import logging
 import os
+import sys
 
-# Import third-party modules
 # Import user-defined modules
 from study_da.generate import MadCollider, ParticlesDistribution
 from study_da.utils import (
@@ -18,7 +18,21 @@ from study_da.utils import (
     write_dic_to_path,
 )
 
+# Add path to custom_mad_collider (might need to add ../.., etc. depending on the generation)
+sys.path.append("..")
+import custom_ost
+
 # Set up the logger here if needed
+
+
+# ==================================================================================================
+# --- Override the MadCollider class
+# ==================================================================================================
+class MadColliderCustom(MadCollider):
+    def __init__(self, configuration: dict):
+        super().__init__(configuration)
+
+        self._ost = custom_ost
 
 
 # ==================================================================================================
@@ -36,8 +50,17 @@ def build_distribution(config_particles):
 
 
 def build_collider(config_mad):
-    # Build object for generating collider from mad
-    mc = MadCollider(config_mad)
+    # Build object for generating collider from custom MadCollider class
+    mc = MadColliderCustom(config_mad)
+
+    # Alternatively, you could directly use the MadCollider class and just update the OST
+    # mc = MadCollider(config_mad)
+    # mc._ost = custom_ost
+
+    # Or even more precise, you could define a function yourself and override it in the default ost
+    # ! Note that the number of arguments must be the same as the original function
+    # mc = MadCollider(config_mad)
+    # mc.ost.check_madx_lattices = lambda a: print("This is a fake check")
 
     # Build mad model
     mad_b1b2, mad_b4 = mc.prepare_mad_collider()
@@ -56,10 +79,13 @@ def build_collider(config_mad):
 
 
 # ==================================================================================================
-# --- Parameters definition
+# --- Parameters placeholders definition
 # ==================================================================================================
-dict_mutated_parameters = {{parameters}}
-path_configuration = "{{main_configuration}}"
+dict_mutated_parameters = {}  ###---parameters---###
+path_configuration = "{} ###---main_configuration---###"
+# In case the placeholders have not been replaced, use default path
+if path_configuration.startswith("{}"):
+    path_configuration = "config.yaml"
 
 # ==================================================================================================
 # --- Script for execution

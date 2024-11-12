@@ -15,8 +15,10 @@ nav:
     - Concepts: 
       - Generation: tutorials/concepts/1_generation.md
       - Submission: tutorials/concepts/2_submission.md
-    - Pratical example:
-      - Doing a tracking study: tutorials/tracking_studies/index.md
+    - A tracking study:
+      - tutorials/tracking_studies/index.md
+    - Customizing internal code:
+      - tutorials/modifying_code/index.md
   - Case studies: 
     - case_studies/index.md
     - A simple collider: case_studies/1_simple_collider.md
@@ -26,7 +28,8 @@ nav:
     - A 1-generational scan: case_studies/5_1_generational_scan.md
     - A 3 generational scan: case_studies/6_3_generational_scan.md
     - Tracking with GPU: case_studies/7_tracking_with_GPU.md
-  - Templates:
+
+  - Templates and assets:
     - template_files/index.md
     - Configurations:
       - HL-LHC v1.6: template_files/configurations/config_hllhc16.md
@@ -39,6 +42,8 @@ nav:
       - Generation 2 (level by separation): template_files/scripts/generation_2_level_by_sep.md
     - Mapping:
       - LHC parameters: template_files/mapping/parameters_lhc.md
+    - Filling schemes:
+      - template_files/filling_schemes/index.md
   - Code Reference: reference/
 
 plugins:

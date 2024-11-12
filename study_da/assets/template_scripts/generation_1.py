@@ -1,6 +1,3 @@
-# Generation 1 (generate xsuite collider from mad sequence) template script
-
-```py title="generation_1.py"
 """This is a template script for generation 1 of simulation study, in which ones generates a
 particle distribution and a collider from a MAD-X model."""
 
@@ -92,4 +89,3 @@ if __name__ == "__main__":
     build_collider(full_configuration["config_mad"])
 
     logging.info("Script finished")
-```
