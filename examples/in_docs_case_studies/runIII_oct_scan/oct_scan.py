@@ -57,4 +57,5 @@ submit(
     dic_dependencies_per_gen=dic_dependencies_per_gen,
     name_config=name_main_config,
     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+    one_generation_at_a_time=True,
 )

@@ -128,7 +128,7 @@ As you can see, this script is very similar to the one from the [previous case s
 
 One notable difference is that we don't modify the location of "acc-models-lhc" in the configuration since the path is already absolute.
 
-In addition, since we've specified `one_generation_at_a_time=True`, even if you relaunch the script while some jobs of the second generation are ready to be launched (because the first generation is already partially finished), no jobs will be submitted. In this case, a generation can only be submitted all at once, i.e. if all the jobs from the generation above are finished (or failed).
+In addition, note that we've specified `one_generation_at_a_time=True`. Therefore, even if you relaunch the script while some jobs of the second generation are ready to be launched (because the first generation is already partially finished), no jobs will be submitted. In this case, a generation can only be submitted all at once, i.e. if all the jobs from the generation above are finished (or failed). This is not so relevant for this example since there are only two generations, and generation has only 1 job, but it can be very useful for more complex studies (e.g. to run checks on all jobs of a generation, between generations submission).
 
 ## Study post-processing and plotting
 
