@@ -19,6 +19,7 @@ def create(
     force_overwrite: bool = False,
     dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]] = None,
     dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]] = None,
+    add_prefix_to_folder_names: bool = False,
 ) -> tuple[str, str]:
     """
     Create a study based on the configuration file.
@@ -32,6 +33,8 @@ def create(
         dic_parameter_all_gen_naming (Optional[dict[str, dict[str, Any]]], optional): Dictionary of
             parameters for the naming of the scan subfolders, if not provided through the scan
             config. Defaults to None.
+        add_prefix_to_folder_names (bool, optional): Whether to add a prefix to the folder names.
+            Defaults to False.
 
     Returns:
         tuple[str, str]: The path to the tree file and the name of the main configuration file.
@@ -42,6 +45,7 @@ def create(
         force_overwrite=force_overwrite,
         dic_parameter_all_gen=dic_parameter_all_gen,
         dic_parameter_all_gen_naming=dic_parameter_all_gen_naming,
+        add_prefix_to_folder_names=add_prefix_to_folder_names,
     )
 
     # Get variables of interest for the submission

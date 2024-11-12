@@ -19,5 +19,5 @@ study_sub.configure_jobs(force_configure=True)
 # %%
 # study_sub.submit()
 study_sub.keep_submit_until_done(
-    wait_time=1 / 20, name_config="custom_config.yaml", one_generation_at_a_time=True
+    wait_time=1 / 20, name_config="custom_config.yaml", one_generation_at_a_time=False
 )

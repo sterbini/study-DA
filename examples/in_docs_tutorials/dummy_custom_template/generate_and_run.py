@@ -21,7 +21,7 @@ path_tree, main_configuration_file = create(
     path_config_scan="config_scan.yaml", force_overwrite=False
 )
 
-# path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
+path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
 path_python_environment_container = "/usr/local/DA_study/miniforge_docker"
 path_container_image = (
     "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:ad541f20"
@@ -41,7 +41,7 @@ dic_config_jobs = {
     },
     "generation_2" + ".py": {
         "context": "cpu",
-        "submission_type": "local",
+        "submission_type": "htc_docker",
         "htc_flavor": "espresso",
     },
 }
