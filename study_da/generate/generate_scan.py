@@ -199,6 +199,15 @@ class GenerateScan:
 
         # Adapt the dict of dependencies to the current generation
         dic_dependencies = self.config["dependencies"] if "dependencies" in self.config else {}
+
+        # Unpacking list of dependencies
+        dic_dependencies = {
+                            **{key: value for key, value in dic_dependencies.items() if not isinstance(value, list)},
+                            **{f"{key}_{str(i).zfill(len(str(len(value))))}": i_value for key, value in dic_dependencies.items() if isinstance(value, list) for i, i_value in enumerate(value)}
+                            }
+        self.config["dependencies"] = dic_dependencies
+
+        # print(dic_dependencies)
         # Always load configuration from above generation
         depth_gen = 1
         # Initial dependencies are always copied at the root of the study (hence value.split("/")[-1])
