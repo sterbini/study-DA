@@ -7,6 +7,7 @@ distribution."""
 # ==================================================================================================
 
 # Import standard library modules
+import argparse
 import contextlib
 import logging
 import os
@@ -169,6 +170,15 @@ if path_configuration.startswith("{}"):
 
 if __name__ == "__main__":
     logging.info("Starting script to configure collider and track")
+
+    # Parse potential arguments, e.g. to save output collider
+    aparser = argparse.ArgumentParser()
+    aparser.add_argument(
+        "-s", "--save", help="Save output collider for inspection", action="store_true"
+    )
+    args = aparser.parse_args()
+    if args.save:
+        dict_mutated_parameters["save_output_collider"] = True
 
     # Load full configuration
     full_configuration, ryaml = load_dic_from_path(path_configuration)
