@@ -119,11 +119,16 @@ submit(
     dic_dependencies_per_gen=dic_dependencies_per_gen,
     name_config=name_main_config,
     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+    one_generation_at_a_time=True,
 )
 
 ```
 
-As you can see, this script is very similar to the one from the [previous case study](./2_tune_scan.md). One notable difference is that we don't modify the location of "acc-models-lhc" in the configuration since the path is already absolute.
+As you can see, this script is very similar to the one from the [previous case study](./2_tune_scan.md).
+
+One notable difference is that we don't modify the location of "acc-models-lhc" in the configuration since the path is already absolute.
+
+In addition, since we've specified `one_generation_at_a_time=True`, even if you relaunch the script while some jobs of the second generation are ready to be launched (because the first generation is already partially finished), no jobs will be submitted. In this case, a generation can only be submitted all at once, i.e. if all the jobs from the generation above are finished (or failed).
 
 ## Study post-processing and plotting
 
