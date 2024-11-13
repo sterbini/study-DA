@@ -10,6 +10,7 @@ nav:
     - Installing Python: installation/installing_python.md
     - Installing Study-DA locally: installation/installing_locally.md
     - Installing the optics: installation/installing_the_optics.md
+    - Using HPC clusters: installation/using_HPC_clusters.md
   - Tutorials:
     - tutorials/index.md
     - Concepts: 
@@ -19,7 +20,6 @@ nav:
       - A tracking study: tutorials/advanced/tracking_study.md
       - Setting custom parameters: tutorials/advanced/setting_custom_parameters.md
       - Customizing internal code: tutorials/advanced/modifying_code.md
-      - Using HPC clusters: tutorials/advanced/using_HPC_clusters.md
       - Tracking with GPUs: tutorials/advanced/tracking_with_GPUs.md
   - Case studies: 
     - case_studies/index.md
