@@ -74,13 +74,13 @@ dic_dependencies_per_gen = {
 dic_config_jobs = {
     "generation_1" + ".py": {
         # We leave CPU for gen 1 context as it doesn't do tracking
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "local",
     },
     "generation_2" + ".py": {
         # We use GPU for gen 2 context as it does tracking
         # Note that the context is also set in the config file
-        "context": "cupy",
+        "gpu": True,
         "submission_type": "htc_docker",
         "htc_flavor": "tomorrow",
     },

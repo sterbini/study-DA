@@ -81,11 +81,11 @@ def test_build_single_collider(name_template_config: str) -> None:
     # Preconfigure submission to local
     dic_config_jobs = {
         "generation_1" + ".py": {
-            "context": "cpu",
+            "gpu": False,
             "submission_type": "local",
         },
         "generation_2" + ".py": {
-            "context": "cpu",
+            "gpu": False,
             "submission_type": "local",
         },
     }

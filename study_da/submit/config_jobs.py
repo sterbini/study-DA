@@ -12,7 +12,7 @@ from typing import Any, Optional
 
 # Local imports
 from .ask_user_config import (
-    ask_and_set_context,
+    ask_and_set_gpu,
     ask_and_set_htc_flavour,
     ask_and_set_run_on,
     ask_keep_setting,
@@ -128,11 +128,11 @@ class ConfigJobs:
                     if self.skip_configured_jobs:
                         return
 
-                # If it's the first time we find the job, ask for context and run_on
+                # If it's the first time we find the job, ask for gpu and run_on
                 # Note that a job can be configured and not be in self.dic_config_jobs
                 # self.dic_config_jobs contains the archetypical main jobs (one per gen), not all jobs
                 if job_name not in self.dic_config_jobs:
-                    self._get_context_and_run_on(depth, value, dic_gen, job_name)
+                    self._get_gpu_and_run_on(depth, value, dic_gen, job_name)
                 else:
                     # Check that the config for the current job is ok
                     self.check_config_jobs(job_name)
@@ -165,9 +165,9 @@ class ConfigJobs:
         if "status" not in self.dic_config_jobs[job_name]:
             self.dic_config_jobs[job_name]["status"] = "to_submit"
 
-    def _get_context_and_run_on(self, depth: int, value: str, dic_gen: dict, job_name: str) -> None:
+    def _get_gpu_and_run_on(self, depth: int, value: str, dic_gen: dict, job_name: str) -> None:
         """
-        Sets the context and run-on parameters for a job, updates the job configuration,
+        Sets the gpu request and run-on parameters for a job, updates the job configuration,
         and stores it in the job dictionary if the user chooses to keep the settings.
 
         Args:
@@ -180,8 +180,8 @@ class ConfigJobs:
             None
         """
         logging.info(f"Found job at depth {depth}: {value}")
-        # Set context and run_on
-        ask_and_set_context(dic_gen)
+        # Set GPU request and run_on
+        ask_and_set_gpu(dic_gen)
         ask_and_set_run_on(dic_gen)
         if dic_gen["submission_type"] in ["htc", "htc_docker"]:
             ask_and_set_htc_flavour(dic_gen)
@@ -197,7 +197,7 @@ class ConfigJobs:
             # Ask the user if they want to keep the settings for all jobs of the same type
             if ask_keep_setting(job_name):
                 self.dic_config_jobs[job_name] = {
-                    "context": dic_gen["context"],
+                    "gpu": dic_gen["gpu"],
                     "submission_type": dic_gen["submission_type"],
                     "status": dic_gen["status"],
                     "htc_flavor": dic_gen["htc_flavor"],

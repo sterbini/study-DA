@@ -59,7 +59,7 @@ dic_dependencies_per_gen = {
 # Preconfigure submission to HTC
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "htc_docker",
         "htc_flavor": "testmatch",
     }

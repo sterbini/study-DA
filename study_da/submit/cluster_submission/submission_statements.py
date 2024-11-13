@@ -16,16 +16,16 @@ class SubmissionStatement:
     Attributes:
         sub_filename (str): The name of the submission file.
         path_job_folder (str): The path to the job folder, ensuring no trailing slash.
-        request_GPUs (int): The number of GPUs requested based on the context.
-        slurm_queue_statement (str): The SLURM queue statement based on the context.
+        request_GPUs (int): The number of GPUs requested.
+        slurm_queue_statement (str): The SLURM queue statement.
 
     Methods:
-        __init__(sub_filename: str, path_job_folder: str, context: str | None):
+        __init__(sub_filename: str, path_job_folder: str, gpu: bool | None):
             Initializes the SubmissionStatement with the given filename, job folder path, and
-            context.
+            gpu request.
     """
 
-    def __init__(self, sub_filename: str, path_job_folder: str, context: str | None):
+    def __init__(self, sub_filename: str, path_job_folder: str, gpu: bool | None):
         """
         Initialize the submission statement configuration.
 
@@ -33,16 +33,14 @@ class SubmissionStatement:
             sub_filename (str): The name of the submission file.
             path_job_folder (str): The path to the job folder. Trailing slash will be removed if
                 present.
-            context (str | None): The context for GPU configuration. If 'cupy' or 'opencl', GPU
-                will be requested.
+            gpu (bool | None): If a GPU must be requested.
 
         Attributes:
             sub_filename (str): The name of the submission file.
             path_job_folder (str): The path to the job folder without trailing slash.
-            request_GPUs (int): Number of GPUs requested. 1 if context is 'cupy' or 'opencl',
-                otherwise 0.
-            slurm_queue_statement (str): SLURM queue statement. Empty if context is 'cupy' or
-                'opencl', otherwise set to '#SBATCH --partition=slurm_hpc_acc'.
+            request_GPUs (int): Number of GPUs requested. 1 if gpu is True, 0 otherwise.
+            slurm_queue_statement (str): SLURM queue statement. Empty if gpu requested, otherwise
+                set to '#SBATCH --partition=slurm_hpc_acc'.
         """
         self.sub_filename: str = sub_filename
         self.path_job_folder: str = (
@@ -50,7 +48,7 @@ class SubmissionStatement:
         )
 
         # GPU configuration
-        if context in {"cupy", "opencl"}:
+        if gpu:
             self.request_GPUs: int = 1
             self.slurm_queue_statement: str = ""
         else:
@@ -69,21 +67,21 @@ class LocalPC(SubmissionStatement):
         submit_command (str): The command to submit the job.
 
     Methods:
-        __init__(sub_filename, path_job_folder, context=None): Initializes the LocalPC submission
+        __init__(sub_filename, path_job_folder, gpu=None): Initializes the LocalPC submission
             statement.
         get_submit_command(sub_filename): Returns the command to submit the job.
     """
 
-    def __init__(self, sub_filename: str, path_job_folder: str, context: str | None = None):
+    def __init__(self, sub_filename: str, path_job_folder: str, gpu: bool | None = None):
         """
         Initializes the LocalPC submission statement.
 
         Args:
             sub_filename (str): The name of the submission file.
             path_job_folder (str): The path to the job folder.
-            context (str, optional): The context for the submission. Defaults to None.
+            gpu (bool, optional): If a GPU must be requested for the submission. Defaults to None.
         """
-        super().__init__(sub_filename, path_job_folder, context)
+        super().__init__(sub_filename, path_job_folder, gpu)
 
         self.head: str = "# Running on local pc"
         self.body: str = f"bash {self.path_job_folder}/run.sh &"
@@ -115,20 +113,20 @@ class Slurm(SubmissionStatement):
         submit_command (str): The command to submit the job.
 
     Methods:
-        __init__(sub_filename, path_job_folder, context): Initializes the SLURM submission statement.
+        __init__(sub_filename, path_job_folder, gpu): Initializes the SLURM submission statement.
         get_submit_command(sub_filename): Returns the command to submit the job.
     """
 
-    def __init__(self, sub_filename: str, path_job_folder: str, context: str | None):
+    def __init__(self, sub_filename: str, path_job_folder: str, gpu: bool | None):
         """
         Initializes the SLURM submission statement.
 
         Args:
             sub_filename (str): The name of the submission file.
             path_job_folder (str): The path to the job folder.
-            context (str): The context for the submission.
+            gpu (bool|None): If a GPU must be requested for the submission.
         """
-        super().__init__(sub_filename, path_job_folder, context)
+        super().__init__(sub_filename, path_job_folder, gpu)
 
         self.head: str = "# Running on SLURM "
         if self.slurm_queue_statement != "":
@@ -168,7 +166,7 @@ class SlurmDocker(SubmissionStatement):
         submit_command (str): The command to submit the job.
 
     Methods:
-        __init__(sub_filename, path_job_folder, context, path_image, fix=False): Initializes the
+        __init__(sub_filename, path_job_folder, gpu, path_image, fix=False): Initializes the
             SLURM Docker submission statement.
         get_submit_command(sub_filename): Returns the command to submit the job.
     """
@@ -177,7 +175,7 @@ class SlurmDocker(SubmissionStatement):
         self,
         sub_filename: str,
         path_job_folder: str,
-        context: str,
+        gpu: bool,
         path_image: str,  # type: ignore
         fix: bool = False,
     ):
@@ -187,11 +185,11 @@ class SlurmDocker(SubmissionStatement):
         Args:
             sub_filename (str): The name of the submission file.
             path_job_folder (str): The path to the job folder.
-            context (str): The context for the submission.
+            gpu (bool): If a GPU must be requested for the submission.
             path_image (str): The path to the Docker image.
             fix (bool, optional): A flag to apply a fix for INFN. Defaults to False.
         """
-        super().__init__(sub_filename, path_job_folder, context)
+        super().__init__(sub_filename, path_job_folder, gpu)
 
         # ! Ugly fix, will need to be removed when INFN is fixed
         if fix:
@@ -240,13 +238,13 @@ class HTC(SubmissionStatement):
         submit_command (str): The command to submit the job.
 
     Methods:
-        __init__(sub_filename, path_job_folder, context, htc_flavor='espresso'):
+        __init__(sub_filename, path_job_folder, gpu, htc_flavor='espresso'):
             Initializes the HTCondor submission statement.
         get_submit_command(sub_filename): Returns the command to submit the job.
     """
 
     def __init__(
-        self, sub_filename: str, path_job_folder: str, context: str, htc_flavor: str = "espresso"
+        self, sub_filename: str, path_job_folder: str, gpu: bool, htc_flavor: str = "espresso"
     ):
         """
         Initializes the HTCondor submission statement.
@@ -254,10 +252,10 @@ class HTC(SubmissionStatement):
         Args:
             sub_filename (str): The name of the submission file.
             path_job_folder (str): The path to the job folder.
-            context (str): The context for the submission.
+            gpu (bool): If a GPU must be requested for the submission.
             htc_flavor (str, optional): The flavor of the HTCondor job. Defaults to "espresso".
         """
-        super().__init__(sub_filename, path_job_folder, context)
+        super().__init__(sub_filename, path_job_folder, gpu)
 
         self.head: str = (
             "# This is a HTCondor submission file\n"
@@ -300,7 +298,7 @@ class HTCDocker(SubmissionStatement):
         submit_command (str): The command to submit the job.
 
     Methods:
-        __init__(sub_filename, path_job_folder, context, path_image, htc_flavor='espresso'):
+        __init__(sub_filename, path_job_folder, gpu, path_image, htc_flavor='espresso'):
             Initializes the HTCondor Docker submission statement.
         get_submit_command(sub_filename): Returns the command to submit the job.
     """
@@ -309,7 +307,7 @@ class HTCDocker(SubmissionStatement):
         self,
         sub_filename: str,
         path_job_folder: str,
-        context: str,
+        gpu: bool,
         path_image: str,
         htc_flavor: str = "espresso",
     ):
@@ -319,11 +317,11 @@ class HTCDocker(SubmissionStatement):
         Args:
             sub_filename (str): The name of the submission file.
             path_job_folder (str): The path to the job folder.
-            context (str): The context for the submission.
+            gpu (bool): If a GPU must be requested for the submission.
             path_image (str): The path to the Docker image.
             htc_flavor (str, optional): The flavor of the HTCondor job. Defaults to "espresso".
         """
-        super().__init__(sub_filename, path_job_folder, context)
+        super().__init__(sub_filename, path_job_folder, gpu)
 
         self.head: str = (
             "# This is a HTCondor submission file using Docker\n"

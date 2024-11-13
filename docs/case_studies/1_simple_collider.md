@@ -84,11 +84,11 @@ path_python_environment = "path/to/python/environment"
 # Preconfigure submission to local, so that you don't get prompted for the submission type
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "local",
     },
     "generation_2" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "local",
     },
 }
@@ -140,7 +140,7 @@ And the final tree will be (the paths will be different for you):
 generation_1:
   generation_1:
     file: single_job_study_hllhc16/generation_1/generation_1.py
-    context: cpu
+    gpu: false
     submission_type: local
     status: finished
     path_run: 
@@ -148,7 +148,7 @@ generation_1:
   generation_2:
     generation_2:
       file: single_job_study_hllhc16/generation_1/generation_2/generation_2.py
-      context: cpu
+      gpu: false
       submission_type: local
       status: finished
       path_run: 

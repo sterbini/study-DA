@@ -93,7 +93,7 @@ After a dozen seconds, the script should finish for good. When checking the tree
 x_1:
   generation_1:
     file: example_dummy/x_1/generation_1.py
-    context: cpu
+    gpu: false
     submission_type: local
     htc_flavor:
     status: finished
@@ -102,7 +102,7 @@ x_1:
   y_1.0:
     generation_2:
       file: example_dummy/x_1/y_1.0/generation_2.py
-      context: cpu
+      gpu: false
       submission_type: local
       htc_flavor:
       status: finished
@@ -154,12 +154,12 @@ dic_copy_back_per_gen = {
 # Preconfigure submission to HTC
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "htc_docker",
         "htc_flavor": "espresso",
     },
     "generation_2" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "htc_docker",
         "htc_flavor": "espresso",
     },
@@ -184,7 +184,7 @@ Some new variables and/or arguments are introduced here:
 - `path_python_environment_container` is the path to the python environment that will be used to run the jobs. This time, we use a Docker container, so the path is different from the local one.
 - `path_container_image` is the path to the Docker image that will be used to run the jobs. This is a specific image that has been built for the study-da package.
 - `dic_copy_back_per_gen` is a dictionary that allows to specify which files will be copied back from the cluster to the local machine after the completion of the jobs. This is useful when you want to retrieve the results of the study, or some intermediate files that have been generated during the study. In this case, a text file has been produced during the second generation, so we set the value to `True` for `txt` for the second generation. Possible file extensions are `parquet`, `yaml`, `txt`, `json`, `zip` and `all` (in which case all files will be copied back).
-- dic_config_jobs is a dictionary that allows to preconfigure the submission of the jobs. This is useful when you don't want to get prompted for each job. In this case, we set the context to `cpu`, the submission type to `htc`, and the flavor to `espresso` for all the jobs, since our scripts are very simple.
+- dic_config_jobs is a dictionary that allows to preconfigure the submission of the jobs. This is useful when you don't want to get prompted for each job. In this case, we set `gpu` to `False`, the submission type to `htc`, and the flavor to `espresso` for all the jobs, since our scripts are very simple.
 - `max_try` is the maximum number of tries before the submission is considered as failed.Although failed jobs should not be re-submitted, this can prevent infinite loops in case of a problem with the submission. It is set to 100 by default.
 
 When running this script, you will get prompted for the configuration of the jobs, but only for the first generation. The second generation will be submitted automatically. You will also get some warnings and bugs that are specific to the submission to the cluster:

@@ -55,17 +55,17 @@ dic_additional_commands_per_gen = {
 # Preconfigure submission to HTC
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "htc",
         "htc_flavor": "microcentury",
     },
     "generation_2" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "htc",
         "htc_flavor": "microcentury",
     },
     "generation_3" + ".py": {
-        "context": "cpu",
+        "gpu": False,
         "submission_type": "htc",
         "htc_flavor": "espresso",
     },

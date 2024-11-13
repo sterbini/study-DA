@@ -2,7 +2,7 @@
 This module contains functions to prompt the user for various job configuration settings.
 
 Functions:
-    ask_and_set_context(dic_gen: dict[str, Any]) -> None:
+    ask_and_set_gpu(dic_gen: dict[str, Any]) -> None:
 
     ask_and_set_htc_flavour(dic_gen: dict[str, Any]) -> None:
 
@@ -23,33 +23,22 @@ from typing import Any
 # ==================================================================================================
 # --- Functions
 # ==================================================================================================
-def ask_and_set_context(dic_gen: dict[str, Any]) -> None:
+def ask_and_set_gpu(dic_gen: dict[str, Any]) -> None:
     """
-    Prompts the user to select a context for the job and sets it in the provided dictionary.
+    Prompts the user if a GPU must be used for the job and sets it in the provided dictionary.
 
     Args:
         dic_gen (dict[str, Any]): The dictionary containing job configuration.
     """
     while True:
-        try:
-            context = input(
-                f"What type of context do you want to use for job {dic_gen['file']}?"
-                " 1: cpu, 2: cupy, 3: opencl. Default is cpu."
-            )
-            context = 1 if context == "" else int(context)
-            if context in range(1, 4):
-                break
-            else:
-                raise ValueError
-        except ValueError:
-            print("Invalid input. Please enter a number between 1 and 3.")
+        gpu = input(
+            f"Do you want to request a GPU for job {dic_gen['file']}?" " (y/n). Default is n."
+        )
+        gpu = "n" if gpu == "" else gpu
+        if gpu in ["y", "n", ""]:
+            break
 
-    dict_context = {
-        1: "cpu",
-        2: "cupy",
-        3: "opencl",
-    }
-    dic_gen["context"] = dict_context[context]
+    dic_gen["gpu"] = gpu == "y"
 
 
 def ask_and_set_htc_flavour(dic_gen: dict[str, Any]) -> None:

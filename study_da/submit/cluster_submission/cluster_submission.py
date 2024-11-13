@@ -14,7 +14,7 @@ from typing import Optional
 import psutil
 
 # Third party imports
-from study_da.utils import nested_get
+from study_da.utils import nested_get, nested_set
 
 # Local imports
 from .submission_statements import HTC, HTCDocker, LocalPC, Slurm, SlurmDocker
@@ -60,7 +60,7 @@ class ClusterSubmission:
             queuing_jobs: list[str], list_of_jobs: list[str]) -> tuple[list[str], list[str]]:
             Writes submission files for Slurm Docker jobs.
         _get_Sub(job: str, submission_type: str, sub_filename: str, abs_path_job: str,
-            context: str) -> LocalPC | HTC | HTCDocker | Slurm | SlurmDocker:
+            gpu: bool) -> LocalPC | HTC | HTCDocker | Slurm | SlurmDocker:
             Returns the appropriate submission object based on the submission type.
         _write_sub_file(sub_filename: str, running_jobs: list[str], queuing_jobs: list[str],
             list_of_jobs: list[str], submission_type: str) -> tuple[list[str], list[str]]:
@@ -375,16 +375,19 @@ class ClusterSubmission:
             if self._test_job(job, path_job, running_jobs, queuing_jobs):
                 filename_sub = f"{sub_filename.split('.sub')[0]}_{idx_job}.sub"
 
-                # Get job context
+                # Get job GPU request
                 l_keys = self.dic_all_jobs[job]["l_keys"]
-                context = nested_get(self.dic_tree, l_keys + ["context"])
+                # Ensure GPU is defined and set it to False if not
+                if "gpu" not in nested_get(self.dic_tree, l_keys):
+                    gpu = nested_set(self.dic_tree, l_keys + ["gpu"], False)
+                gpu = nested_get(self.dic_tree, l_keys + ["gpu"])
 
                 # Write the submission files
                 # ! Careful, I implemented a fix for path due to the temporary home recovery folder
                 logging.info(f'Writing submission file for node "{abs_path_job}"')
                 fix = True
                 Sub = self.dic_submission["slurm_docker"](
-                    filename_sub, abs_path_job, context, self.dic_tree["container_image"], fix=fix
+                    filename_sub, abs_path_job, gpu, self.dic_tree["container_image"], fix=fix
                 )
                 # Create folder if it does not exist
                 folder = "/".join(Sub.sub_filename.split("/")[:-1])
@@ -399,7 +402,7 @@ class ClusterSubmission:
         return l_filenames, list_of_jobs_updated
 
     def _get_Sub(
-        self, job: str, submission_type: str, sub_filename: str, abs_path_job: str, context: str
+        self, job: str, submission_type: str, sub_filename: str, abs_path_job: str, gpu: bool
     ) -> LocalPC | HTC | HTCDocker | Slurm | SlurmDocker:
         """
         Generate a submission object based on the specified submission type.
@@ -410,7 +413,7 @@ class ClusterSubmission:
                 "slurm_docker", "local").
             sub_filename (str): The submission filename.
             abs_path_job (str): The absolute path to the job.
-            context (str): The context for the submission.
+            gpu (bool): Sets if a GPU must be requested for the submission.
 
         Returns:
             LocalPC | HTC | HTCDocker | Slurm | SlurmDocker: An instance of the appropriate
@@ -422,10 +425,10 @@ class ClusterSubmission:
         """
         match submission_type:
             case "slurm":
-                return self.dic_submission[submission_type](sub_filename, abs_path_job, context)
+                return self.dic_submission[submission_type](sub_filename, abs_path_job, gpu)
             case "htc":
                 return self.dic_submission[submission_type](
-                    sub_filename, abs_path_job, context, self._return_htc_flavour(job)
+                    sub_filename, abs_path_job, gpu, self._return_htc_flavour(job)
                 )
             case w if w in ["htc_docker", "slurm_docker"]:
                 # Path to singularity image
@@ -444,13 +447,13 @@ class ClusterSubmission:
                     return self.dic_submission[submission_type](
                         sub_filename,
                         abs_path_job,
-                        context,
+                        gpu,
                         self.path_image,
                         self._return_htc_flavour(job),
                     )
                 else:
                     return self.dic_submission[submission_type](
-                        sub_filename, abs_path_job, context, self.path_image
+                        sub_filename, abs_path_job, gpu, self.path_image
                     )
             case "local":
                 return self.dic_submission[submission_type](sub_filename, abs_path_job)
@@ -503,12 +506,15 @@ class ClusterSubmission:
                 if self._test_job(job, path_job, running_jobs, queuing_jobs):
                     logging.info(f'Writing submission command for node "{abs_path_job}"')
 
-                    # Get context
+                    # Get job GPU request
                     l_keys = self.dic_all_jobs[job]["l_keys"]
-                    context = nested_get(self.dic_tree, l_keys + ["context"])
+                    # Ensure GPU is defined, and set it to False if not
+                    if "gpu" not in nested_get(self.dic_tree, l_keys):
+                        gpu = nested_set(self.dic_tree, l_keys + ["gpu"], False)
+                    gpu = nested_get(self.dic_tree, l_keys + ["gpu"])
 
                     # Get Submission object
-                    Sub = self._get_Sub(job, submission_type, sub_filename, abs_path_job, context)
+                    Sub = self._get_Sub(job, submission_type, sub_filename, abs_path_job, gpu)
 
                     # Take the first job as reference for head
                     if not header_written:
@@ -577,7 +583,7 @@ class ClusterSubmission:
 
         This method categorizes jobs to be submitted by their submission type, writes the
         corresponding submission files, and returns a dictionary containing the submission
-        files and their associated job contexts.
+        files and their associated job GPU requests.
 
         Returns:
             dict: A dictionary where keys are submission types and values are tuples containing
@@ -605,7 +611,7 @@ class ClusterSubmission:
                     submission_type,
                 )
 
-                # Record submission files and context
+                # Record submission files and and GPU requests
                 dic_submission_files[submission_type] = (
                     list_of_jobs_updated,
                     l_submission_filenames,
