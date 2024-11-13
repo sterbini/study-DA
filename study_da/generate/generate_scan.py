@@ -202,12 +202,18 @@ class GenerateScan:
 
         # Unpacking list of dependencies
         dic_dependencies = {
-                            **{key: value for key, value in dic_dependencies.items() if not isinstance(value, list)},
-                            **{f"{key}_{str(i).zfill(len(str(len(value))))}": i_value for key, value in dic_dependencies.items() if isinstance(value, list) for i, i_value in enumerate(value)}
-                            }
+            **{
+                key: value for key, value in dic_dependencies.items() if not isinstance(value, list)
+            },
+            **{
+                f"{key}_{str(i).zfill(len(str(len(value))))}": i_value
+                for key, value in dic_dependencies.items()
+                if isinstance(value, list)
+                for i, i_value in enumerate(value)
+            },
+        }
         self.config["dependencies"] = dic_dependencies
 
-        # print(dic_dependencies)
         # Always load configuration from above generation
         depth_gen = 1
         # Initial dependencies are always copied at the root of the study (hence value.split("/")[-1])
@@ -507,7 +513,7 @@ class GenerateScan:
             array_idx = range(len(array_param_values))
 
         # Loop over the parameters
-        to_disk_len  = np.sum(array_conditions) if array_conditions is not None else 1
+        to_disk_len = np.sum(array_conditions) if array_conditions is not None else 1
         to_disk_idx = 0
         for idx, (l_values, l_values_for_naming, l_idx) in enumerate(
             zip(array_param_values, array_param_values_for_naming, array_idx)
