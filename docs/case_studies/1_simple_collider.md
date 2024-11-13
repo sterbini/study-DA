@@ -84,7 +84,6 @@ path_python_environment = "path/to/python/environment"
 # Preconfigure submission to local, so that you don't get prompted for the submission type
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "request_gpu": False,
         "submission_type": "local",
     },
     "generation_2" + ".py": {
@@ -112,7 +111,9 @@ submit(
 )
 ```
 
-This will complete the tree with the submission settings, generate the run files to launch the jobs, and the study will be executed in the local environment. Everytime a generation job is launched, the configuration file is mutated copied from the above generation folder, before being mutated at the end of the generation job, with the requested parameters (in this case, none, since no scan is being performed).
+This will complete the tree with the submission settings, generate the run files to launch the jobs, and the study will be executed in the local environment. Note that the `"request_gpu"` parameter is optional (`False` by default).
+
+Everytime a generation job is launched, the configuration file is mutated copied from the above generation folder, before being mutated at the end of the generation job, with the requested parameters (in this case, none, since no scan is being performed).
 
 After running the jobs, the directory should therefore looks like something like this (ignoring the intermediate and temporary files):
 
