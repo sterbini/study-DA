@@ -84,11 +84,11 @@ path_python_environment = "path/to/python/environment"
 # Preconfigure submission to local, so that you don't get prompted for the submission type
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "gpu": False,
+        "request_gpu": False,
         "submission_type": "local",
     },
     "generation_2" + ".py": {
-        "gpu": False,
+        "request_gpu": False,
         "submission_type": "local",
     },
 }

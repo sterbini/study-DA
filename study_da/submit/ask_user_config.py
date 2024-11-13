@@ -38,7 +38,7 @@ def ask_and_set_gpu(dic_gen: dict[str, Any]) -> None:
         if gpu in ["y", "n", ""]:
             break
 
-    dic_gen["gpu"] = gpu == "y"
+    dic_gen["request_gpu"] = gpu == "y"
 
 
 def ask_and_set_htc_flavour(dic_gen: dict[str, Any]) -> None:

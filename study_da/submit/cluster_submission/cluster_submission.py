@@ -378,9 +378,9 @@ class ClusterSubmission:
                 # Get job GPU request
                 l_keys = self.dic_all_jobs[job]["l_keys"]
                 # Ensure GPU is defined and set it to False if not
-                if "gpu" not in nested_get(self.dic_tree, l_keys):
-                    gpu = nested_set(self.dic_tree, l_keys + ["gpu"], False)
-                gpu = nested_get(self.dic_tree, l_keys + ["gpu"])
+                if "request_gpu" not in nested_get(self.dic_tree, l_keys):
+                    gpu = nested_set(self.dic_tree, l_keys + ["request_gpu"], False)
+                gpu = nested_get(self.dic_tree, l_keys + ["request_gpu"])
 
                 # Write the submission files
                 # ! Careful, I implemented a fix for path due to the temporary home recovery folder
@@ -509,9 +509,9 @@ class ClusterSubmission:
                     # Get job GPU request
                     l_keys = self.dic_all_jobs[job]["l_keys"]
                     # Ensure GPU is defined, and set it to False if not
-                    if "gpu" not in nested_get(self.dic_tree, l_keys):
-                        gpu = nested_set(self.dic_tree, l_keys + ["gpu"], False)
-                    gpu = nested_get(self.dic_tree, l_keys + ["gpu"])
+                    if "request_gpu" not in nested_get(self.dic_tree, l_keys):
+                        gpu = nested_set(self.dic_tree, l_keys + ["request_gpu"], False)
+                    gpu = nested_get(self.dic_tree, l_keys + ["request_gpu"])
 
                     # Get Submission object
                     Sub = self._get_Sub(job, submission_type, sub_filename, abs_path_job, gpu)

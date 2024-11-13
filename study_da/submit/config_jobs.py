@@ -197,7 +197,7 @@ class ConfigJobs:
             # Ask the user if they want to keep the settings for all jobs of the same type
             if ask_keep_setting(job_name):
                 self.dic_config_jobs[job_name] = {
-                    "gpu": dic_gen["gpu"],
+                    "request_gpu": dic_gen["request_gpu"],
                     "submission_type": dic_gen["submission_type"],
                     "status": dic_gen["status"],
                     "htc_flavor": dic_gen["htc_flavor"],

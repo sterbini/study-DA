@@ -154,12 +154,12 @@ dic_copy_back_per_gen = {
 # Preconfigure submission to HTC
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "gpu": False,
+        "request_gpu": False,
         "submission_type": "htc_docker",
         "htc_flavor": "espresso",
     },
     "generation_2" + ".py": {
-        "gpu": False,
+        "request_gpu": False,
         "submission_type": "htc_docker",
         "htc_flavor": "espresso",
     },
