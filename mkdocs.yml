@@ -15,10 +15,12 @@ nav:
     - Concepts: 
       - Generation: tutorials/concepts/1_generation.md
       - Submission: tutorials/concepts/2_submission.md
-    - A tracking study:
-      - tutorials/tracking_studies/index.md
-    - Customizing internal code:
-      - tutorials/modifying_code/index.md
+    - Advanced:
+      - A tracking study: tutorials/advanced/tracking_study.md
+      - Setting custom parameters: tutorials/advanced/setting_custom_parameters.md
+      - Customizing internal code: tutorials/advanced/modifying_code.md
+      - Using HPC clusters: tutorials/advanced/using_HPC_clusters.md
+      - Tracking with GPUs: tutorials/advanced/tracking_with_GPUs.md
   - Case studies: 
     - case_studies/index.md
     - A simple collider: case_studies/1_simple_collider.md
@@ -27,7 +29,7 @@ nav:
     - A 3D scan: case_studies/4_3D_scan.md
     - A 1-generational scan: case_studies/5_1_generational_scan.md
     - A 3 generational scan: case_studies/6_3_generational_scan.md
-    - Tracking with GPU: case_studies/7_tracking_with_GPU.md
+    # - Tracking with GPU: case_studies/7_tracking_with_GPU.md
 
   - Templates and assets:
     - template_files/index.md

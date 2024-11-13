@@ -132,7 +132,7 @@ class GenerateScan:
         template_name = os.path.basename(template_path)
         environment = Environment(
             loader=FileSystemLoader(directory_path),
-            variable_start_string="{} ###---",
+            variable_start_string="{}  ###---",
             variable_end_string="---###",
         )
         template = environment.get_template(template_name)
