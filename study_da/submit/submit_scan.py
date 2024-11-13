@@ -255,6 +255,9 @@ class SubmitScan:
             with open(path_run_job, "w") as f:
                 f.write(run_str)
 
+            # Change permissions to make the file executable
+            os.chmod(path_run_job, 0o755)
+
             # Record the path to the run file in the tree
             nested_set(dic_tree, l_keys + ["path_run"], path_run_job)
 

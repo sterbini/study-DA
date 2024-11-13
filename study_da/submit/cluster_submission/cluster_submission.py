@@ -386,14 +386,15 @@ class ClusterSubmission:
                 Sub = self.dic_submission["slurm_docker"](
                     filename_sub, abs_path_job, context, self.dic_tree["container_image"], fix=fix
                 )
-                with open(filename_sub, "w") as fid:
+                # Create folder if it does not exist
+                folder = "/".join(Sub.sub_filename.split("/")[:-1])
+                Path(folder).mkdir(parents=True, exist_ok=True)
+                with open(Sub.sub_filename, "w") as fid:
                     fid.write(Sub.head + "\n")
-                    if fix:
-                        fid.write(Sub.str_fixed_run + "\n")
                     fid.write(Sub.body + "\n")
                     fid.write(Sub.tail + "\n")
 
-                l_filenames.append(filename_sub)
+                l_filenames.append(Sub.sub_filename)
                 list_of_jobs_updated.append(job)
         return l_filenames, list_of_jobs_updated
 

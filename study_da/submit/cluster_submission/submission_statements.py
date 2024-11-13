@@ -200,9 +200,6 @@ class SlurmDocker(SubmissionStatement):
             self.path_job_folder: str = self.path_job_folder.replace(to_replace, replacement)
             path_image: str = path_image.replace(to_replace, replacement)
             self.sub_filename: str = self.sub_filename.replace(to_replace, replacement)
-            self.str_fixed_run: str = (
-                f"sed -i 's/{to_replace}/{replacement}/' {self.path_job_folder}/run.sh\n"
-            )
 
         self.head: str = (
             "#!/bin/bash\n"

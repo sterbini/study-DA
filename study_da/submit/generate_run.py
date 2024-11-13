@@ -60,6 +60,7 @@ def generate_run_file(
     job_name: str,
     setup_env_script: str,
     htc: bool = False,
+    slurm_docker_fix: bool = True,
     additionnal_command: str = "",
     **kwargs_htc_run_files: Any,
 ) -> str:
@@ -71,6 +72,8 @@ def generate_run_file(
         job_name (str): The name of the job script.
         setup_env_script (str): The script to set up the environment.
         htc (bool, optional): Whether the job shoud be run on HTCondor. Defaults to False.
+        slurm_docker_fix (bool, optional): Whether to fix the Docker issue with recovery path on
+            Slurm. Defaults to False.
         additionnal_command (str, optional): Additional command to run. Defaults to "".
         **kwargs_htc_run_files (Any): Additional keyword arguments for the generate_run_files method
                 when submitting HTC jobs.
@@ -84,6 +87,7 @@ def generate_run_file(
             job_name,
             setup_env_script,
             additionnal_command,
+            slurm_docker_fix=slurm_docker_fix,
         )
     if kwargs_htc_run_files["l_dependencies"] is None:
         kwargs_htc_run_files["l_dependencies"] = []
@@ -101,6 +105,7 @@ def _generate_run_file(
     job_name: str,
     setup_env_script: str,
     additionnal_command: str = "",
+    slurm_docker_fix: bool = False,
 ) -> str:
     """
     Generates a run file for local or Slurm environments.
@@ -110,10 +115,18 @@ def _generate_run_file(
         job_name (str): The name of the job script.
         setup_env_script (str): The script to set up the environment.
         additionnal_command (str, optional): Additional command to run. Defaults to "".
+        slurm_docker_fix (bool, optional): Whether to fix the Docker issue with recovery path on
+            Slurm. Defaults to False.
 
     Returns:
         str: The generated run file content.
     """
+    # ! Ugly fix, will need to be removed when INFN is fixed
+    if slurm_docker_fix:
+        to_replace = "/storage-hpc/gpfs_data/HPC/home_recovery"
+        replacement = "/home/HPC"
+        job_folder = job_folder.replace(to_replace, replacement)
+
     return (
         "#!/bin/bash\n"
         f"# Load the environment\n"
@@ -195,9 +208,9 @@ def _generate_run_file_htc(
     sed_commands = ""
     for dependency in dic_to_mutate:
         dependency_value = find_item_in_dic(config, dependency)
-        path_dependency = dependency_value.replace("/", "\/")  # type: ignore
-        new_path_dependency = dic_to_mutate[dependency].replace("/", "\/")  # type: ignore
-        sed_commands += f'sed -i "s/{path_dependency}/{new_path_dependency}/g" ../{name_config}\n'
+        path_dependency = dependency_value  # .replace("/", "\/")  # type: ignore
+        new_path_dependency = dic_to_mutate[dependency]  # .replace("/", "\/")  # type: ignore
+        sed_commands += f'sed -i "s|{path_dependency}|{new_path_dependency}|g" ../{name_config}\n'
 
     # Prepare the copy back commands
     copy_back_commands = "cp -f"
