@@ -67,7 +67,6 @@ force_configure = False
 # Preconfigure submission to local
 dic_config_jobs = {
     "generation_1" + ".py": {
-        "request_gpu": False,
         "submission_type": "local",
     },
     "generation_2" + ".py": {
