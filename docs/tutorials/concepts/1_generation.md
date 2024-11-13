@@ -193,7 +193,8 @@ name: example_dummy
 # These files are placed at the root of the study
 dependencies:
   main_configuration: custom_files/config_dummy.yaml
-
+  # - custom_files/other_file.yaml
+  # - custom_files/module.py
 structure:
   # First generation is always at the root of the study
   # such that config_dummy.yaml is accessible as ../config_dummy.yaml
