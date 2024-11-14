@@ -123,6 +123,7 @@ def submit(
     keep_submit_until_done: bool = False,
     wait_time: float = 30,
     max_try: int = 100,
+    force_submit: bool = False,
     dic_additional_commands_per_gen: Optional[dict[int, str]] = None,
     dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
     dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
@@ -153,6 +154,8 @@ def submit(
         keep_submit_until_done (bool, optional): Whether to keep submitting jobs until all jobs
             are finished or failed. Defaults to False.
         max_try (int, optional): The maximum number of tries to submit a job. Defaults to 100.
+        force_submit (bool, optional): If True, jobs are resubmitted even though they failed.
+            Defaults to False.
         wait_time (float, optional): The wait time between submissions in minutes. Defaults to 30.
         dic_additional_commands_per_gen (dict[int, str], optional): Additional commands per
             generation. Defaults to None.
@@ -189,6 +192,7 @@ def submit(
             dic_dependencies_per_gen=dic_dependencies_per_gen,
             dic_copy_back_per_gen=dic_copy_back_per_gen,
             name_config=name_config,
+            force_submit=force_submit,
         )
     else:
         study_sub.submit(
@@ -197,4 +201,5 @@ def submit(
             dic_dependencies_per_gen=dic_dependencies_per_gen,
             dic_copy_back_per_gen=dic_copy_back_per_gen,
             name_config=name_config,
+            force_submit=force_submit,
         )

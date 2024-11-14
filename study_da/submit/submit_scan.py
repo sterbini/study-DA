@@ -339,6 +339,37 @@ class SubmitScan:
 
         return dic_all_jobs, final_status
 
+    def reset_failed_jobs(self, dic_tree: dict[str, Any]) -> dict[str, Any]:
+        """
+        Resets the status of jobs that have failed to "to_submit".
+
+        Args:
+            dic_tree (dict[str, Any]): The dictionary tree structure.
+
+        Returns:
+            dict[str, Any]: The updated dictionary tree structure.
+        """
+
+        dic_all_jobs = self.get_all_jobs()
+        with self.lock:
+            # First pass to update the state of the tree
+            for job in dic_all_jobs:
+                # Skip jobs that are not failed
+                if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "failed":
+                    continue
+
+                # Reset the state of the others
+                relative_job_folder = os.path.dirname(job)
+                absolute_job_folder = f"{self.abs_path}/{relative_job_folder}"
+                if os.path.exists(f"{absolute_job_folder}/.failed"):
+                    os.remove(f"{absolute_job_folder}/.failed")
+                    nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "to_submit")
+
+            # Update dic_tree from cluster_submission
+            self.dic_tree = dic_tree
+
+        return dic_tree
+
     def submit(
         self,
         one_generation_at_a_time: bool = False,
@@ -346,6 +377,7 @@ class SubmitScan:
         dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
         dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
         name_config: str = "config.yaml",
+        force_submit: bool = False,
     ) -> str:
         """
         Submits the jobs to the cluster. Note that copying back large files (e.g. json colliders)
@@ -370,6 +402,8 @@ class SubmitScan:
                 back only "light" files, i.e. parquet, yaml and txt.
             name_config (str, optional): The name of the configuration file for the study.
                 Defaults to "config.yaml".
+            force_submit (bool, optional): If True, jobs are resubmitted even though they failed.
+                Defaults to False.
 
         Returns:
             str: The final status of the jobs.
@@ -381,6 +415,19 @@ class SubmitScan:
             dic_dependencies_per_gen = {}
         if dic_copy_back_per_gen is None:
             dic_copy_back_per_gen = {}
+
+        # Handle force submit
+        if force_submit:
+            logging.warning("Forcing submission of all jobs.")
+            with self.lock:
+                # Acquire tree from disk
+                dic_tree = self.dic_tree
+
+                # Reset the tree by deleting the failed tags
+                dic_tree = self.reset_failed_jobs(dic_tree)
+
+                # Write the tree back to disk
+                self.dic_tree = dic_tree
 
         # Update the status of all jobs before submitting
         dic_all_jobs, final_status = self.check_and_update_all_jobs_status()
@@ -613,6 +660,7 @@ class SubmitScan:
         dic_dependencies_per_gen: Optional[dict[int, list[str]]] = None,
         dic_copy_back_per_gen: Optional[dict[int, dict[str, bool]]] = None,
         name_config: str = "config.yaml",
+        force_submit: bool = False,
     ) -> None:
         """
         Keeps submitting jobs until all jobs are finished or failed.
@@ -639,6 +687,8 @@ class SubmitScan:
                 back only "light" files, i.e. parquet, yaml and txt.
             name_config (str, optional): The name of the configuration file for the study.
                 Defaults to "config.yaml".
+            force_submit (bool, optional): If True, jobs are resubmitted even though they failed.
+                Defaults to False.
 
 
         Returns:
@@ -664,6 +714,7 @@ class SubmitScan:
                 dic_dependencies_per_gen,
                 dic_copy_back_per_gen,
                 name_config,
+                force_submit=force_submit,
             )
             not in ["finished", "finished with issues"]
             and max_try > 0
