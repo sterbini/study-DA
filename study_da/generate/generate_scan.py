@@ -109,6 +109,7 @@ class GenerateScan:
         self,
         str_parameters: str,
         template_path: str,
+        study_path: Optional[str] = None,
         dependencies: Optional[dict[str, str]] = None,
     ) -> str:
         """
@@ -137,7 +138,11 @@ class GenerateScan:
         )
         template = environment.get_template(template_name)
 
-        return template.render(parameters=str_parameters, **dependencies)
+        if study_path is None:
+            return template.render(parameters=str_parameters, **dependencies)
+        return template.render(
+            parameters=str_parameters, path_root_study=study_path, **dependencies
+        )
 
     def write(self, study_str: str, file_path: str, format_with_black: bool = True):
         """
@@ -167,6 +172,7 @@ class GenerateScan:
         gen_name: str,
         study_path: str,
         template_path: str,
+        depth_gen: int,
         dic_mutated_parameters: dict[str, Any] = {},
     ) -> list[str]:  # sourcery skip: default-mutable-arg
         """
@@ -176,6 +182,7 @@ class GenerateScan:
             gen_name (str): The name of the generation.
             study_path (str): The path to the study folder.
             template_path (str): The path to the template folder.
+            depth_gen (int): The depth of the generation in the tree.
             dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters.
                 Defaults to {}.
 
@@ -214,17 +221,19 @@ class GenerateScan:
         }
         self.config["dependencies"] = dic_dependencies
 
-        # Always load configuration from above generation
-        depth_gen = 1
         # Initial dependencies are always copied at the root of the study (hence value.split("/")[-1])
         dic_dependencies = {
             key: "../" * depth_gen + value.split("/")[-1] for key, value in dic_dependencies.items()
         }
 
+        # Always load configuration from above generation
+        dic_dependencies["main_configuration"] = "../" + "config.yaml"
+
         # Render and write the study file
         study_str = self.render(
             str_parameters,
             template_path=template_path,
+            study_path=directory_path_gen,
             dependencies=dic_dependencies,
         )
 
@@ -457,6 +466,7 @@ class GenerateScan:
         generation: str,
         generation_path: str,
         template_path: str,
+        depth_gen: int,
         dic_parameter_lists: Optional[dict[str, Any]] = None,
         dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
         add_prefix_to_folder_names: bool = False,
@@ -471,6 +481,7 @@ class GenerateScan:
             generation (str): The generation name.
             generation_path (str): The path to the layer folder.
             template_path (str): The path to the template folder.
+            depth_gen (int): The depth of the generation in the tree.
             dic_parameter_lists (Optional[dict[str, Any]]): The dictionary of parameter lists.
                 Defaults to None.
             dic_parameter_lists_for_naming (Optional[dict[str, Any]]): The dictionary of parameter
@@ -531,7 +542,7 @@ class GenerateScan:
             # Handle prefix
             prefix_path = ""
             if add_prefix_to_folder_names:
-                prefix_path = "ID_" + str(to_disk_idx).zfill(len(str(to_disk_len))) + "_"
+                prefix_path = f"ID_{str(to_disk_idx).zfill(len(str(to_disk_len)))}_"
                 to_disk_idx += 1
 
             # Handle suffix
@@ -560,6 +571,7 @@ class GenerateScan:
                 generation,
                 path,
                 template_path,
+                depth_gen,
                 dic_mutated_parameters=dic_mutated_parameters,
             )
 
@@ -615,6 +627,7 @@ class GenerateScan:
         self,
         generation: str,
         study_path: str,
+        depth_gen: int,
         dic_parameter_lists: Optional[dict[str, Any]] = None,
         dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
         add_prefix_to_folder_names: bool = False,
@@ -625,6 +638,7 @@ class GenerateScan:
         Args:
             generation (str): The name of the current generation.
             study_path (str): The path to the study folder.
+            depth_gen (int): The depth of the generation in the tree.
             dic_parameter_lists (Optional[dict[str, Any]]): The dictionary of parameter lists.
                 Defaults to None.
             dic_parameter_lists_for_naming (Optional[dict[str, Any]]): The dictionary of parameter
@@ -664,6 +678,7 @@ class GenerateScan:
             generation,
             study_path,
             executable_path,
+            depth_gen,
             dic_parameter_lists,
             dic_parameter_lists_for_naming,
             add_prefix_to_folder_names,
@@ -701,6 +716,7 @@ class GenerateScan:
                 l_study_path_next_generation = self.create_study_for_current_gen(
                     generation,
                     study_path,
+                    idx+1,
                     dic_parameter_current_gen,
                     dic_parameter_naming_current_gen,
                     add_prefix_to_folder_names,

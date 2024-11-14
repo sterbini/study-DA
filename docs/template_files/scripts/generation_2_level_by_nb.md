@@ -14,6 +14,7 @@ import contextlib
 import logging
 import os
 import time
+import sys
 
 # Import third-party modules
 import numpy as np
@@ -162,9 +163,17 @@ def clean():
 # ==================================================================================================
 dict_mutated_parameters = {}  ###---parameters---###
 path_configuration = "{}  ###---main_configuration---###"
+path_root_study = "{}  ###---path_root_study---###"
+
 # In case the placeholders have not been replaced, use default path
 if path_configuration.startswith("{}"):
     path_configuration = "config.yaml"
+
+if path_root_study.startswith("{}"):
+    path_root_study = "."
+
+sys.path.append(path_root_study)
+# Import modules placed at the root of the study here
 
 # ==================================================================================================
 # --- Script for execution
