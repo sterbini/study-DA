@@ -227,7 +227,9 @@ class GenerateScan:
         }
 
         # Always load configuration from above generation
-        dic_dependencies["main_configuration"] = "../" + "config.yaml"
+        dic_dependencies["main_configuration"] = (
+            "../" + dic_dependencies["main_configuration"].split("/")[-1]
+        )
 
         # Render and write the study file
         study_str = self.render(
@@ -716,7 +718,7 @@ class GenerateScan:
                 l_study_path_next_generation = self.create_study_for_current_gen(
                     generation,
                     study_path,
-                    idx+1,
+                    idx + 1,
                     dic_parameter_current_gen,
                     dic_parameter_naming_current_gen,
                     add_prefix_to_folder_names,
@@ -783,7 +785,7 @@ class GenerateScan:
             add_prefix_to_folder_names,
         )
 
-        # Add dependencies to the study
+        # Add dependencies to root of the study
         if "dependencies" in self.config:
             for dependency, path in self.config["dependencies"].items():
                 # Check if the dependency exists as a file

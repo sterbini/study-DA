@@ -101,7 +101,7 @@ class SubmitScan:
 
         else:
             # Ensure that the path is not of the form path/bin/activate environment_name
-            split_path = path_python_environment.split(" ")[0]
+            split_path = path_python_environment.split(" ")
             real_path = split_path[0]
             env_name = split_path[1] if len(split_path) > 1 else ""
 
@@ -109,8 +109,12 @@ class SubmitScan:
             self.path_python_environment = (
                 real_path if os.path.isabs(real_path) else os.path.abspath(real_path)
             )
+
             # Add /bin/activate to the path_python_environment if needed
             if "bin/activate" not in self.path_python_environment:
+                # Ensure there's no / at the end of the path
+                if self.path_python_environment[-1] == "/":
+                    self.path_python_environment = self.path_python_environment[:-1]
                 self.path_python_environment += "/bin/activate"
 
             # Add environment name to the path_python_environment if needed

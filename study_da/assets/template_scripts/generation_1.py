@@ -8,6 +8,7 @@ particle distribution and a collider from a MAD-X model."""
 # Import standard library modules
 import logging
 import os
+import sys
 
 # Import third-party modules
 # Import user-defined modules
@@ -60,10 +61,17 @@ def build_collider(config_mad):
 # ==================================================================================================
 dict_mutated_parameters = {}  ###---parameters---###
 path_configuration = "{}  ###---main_configuration---###"
+path_root_study = "{}  ###---path_root_study---###"
+
 # In case the placeholders have not been replaced, use default path
 if path_configuration.startswith("{}"):
     path_configuration = "config.yaml"
 
+if path_root_study.startswith("{}"):
+    path_root_study = "."
+
+sys.path.append(path_root_study)
+# Import modules placed at the root of the study here
 # ==================================================================================================
 # --- Script for execution
 # ==================================================================================================
