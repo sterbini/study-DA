@@ -23,6 +23,8 @@ config["config_mad"]["links"]["acc-models-lhc"] = (
     "../../../../../external_dependencies/acc-models-lhc"
 )
 
+config["my_file"] = "../my_file.txt"
+
 # Drop the configuration locally
 write_dic_to_path(config, name_template_config, ryaml)
 

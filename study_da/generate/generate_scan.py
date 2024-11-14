@@ -109,8 +109,9 @@ class GenerateScan:
         self,
         str_parameters: str,
         template_path: str,
+        path_main_configuration: str,
         study_path: Optional[str] = None,
-        dependencies: Optional[dict[str, str]] = None,
+        str_dependencies: Optional[dict[str, str]] = None,
     ) -> str:
         """
         Renders the study file using a template.
@@ -118,6 +119,8 @@ class GenerateScan:
         Args:
             str_parameters (str): The string representation of parameters to declare/mutate.
             template_path (str): The path to the template file.
+            path_main_configuration (str): The path to the main configuration file.
+            study_path (str, optional): The path to the root of the study. Defaults to None.
             dependencies (dict[str, str], optional): The dictionary of dependencies. Defaults to {}.
 
         Returns:
@@ -125,8 +128,10 @@ class GenerateScan:
         """
 
         # Handle mutable default argument
-        if dependencies is None:
-            dependencies = {}
+        if str_dependencies is None:
+            dependencies = ""
+        if study_path is None:
+            study_path = ""
 
         # Generate generations from template
         directory_path = os.path.dirname(template_path)
@@ -138,10 +143,14 @@ class GenerateScan:
         )
         template = environment.get_template(template_name)
 
-        if study_path is None:
-            return template.render(parameters=str_parameters, **dependencies)
+        # Better not to render the dependencies path this way, as it becomes too cumbersome to
+        # handle the paths when using clusters
+
         return template.render(
-            parameters=str_parameters, path_root_study=study_path, **dependencies
+            parameters=str_parameters,
+            main_configuration=path_main_configuration,
+            path_root_study=study_path,
+            # dependencies = str_dependencies,
         )
 
     def write(self, study_str: str, file_path: str, format_with_black: bool = True):
@@ -170,7 +179,7 @@ class GenerateScan:
     def generate_render_write(
         self,
         gen_name: str,
-        study_path: str,
+        job_directory_path: str,
         template_path: str,
         depth_gen: int,
         dic_mutated_parameters: dict[str, Any] = {},
@@ -180,7 +189,7 @@ class GenerateScan:
 
         Args:
             gen_name (str): The name of the generation.
-            study_path (str): The path to the study folder.
+            study_path (str): The path to the job folder.
             template_path (str): The path to the template folder.
             depth_gen (int): The depth of the generation in the tree.
             dic_mutated_parameters (dict[str, Any], optional): The dictionary of mutated parameters.
@@ -190,11 +199,12 @@ class GenerateScan:
             tuple[str, list[str]]: The study file string and the list of study paths.
         """
 
-        directory_path_gen = f"{study_path}"
+        directory_path_gen = f"{job_directory_path}"
         if not directory_path_gen.endswith("/"):
             directory_path_gen += "/"
         file_path_gen = f"{directory_path_gen}{gen_name}.py"
         logging.info(f'Now rendering generation "{file_path_gen}"')
+
         # Generate the string of parameters
         str_parameters = "{"
         for key, value in dic_mutated_parameters.items():
@@ -226,17 +236,22 @@ class GenerateScan:
             key: "../" * depth_gen + value.split("/")[-1] for key, value in dic_dependencies.items()
         }
 
-        # Always load configuration from above generation
-        dic_dependencies["main_configuration"] = (
-            "../" + dic_dependencies["main_configuration"].split("/")[-1]
-        )
+        # Always load configuration from above generation, and remove the path from dependencies
+        path_main_configuration = "../" + dic_dependencies.pop("main_configuration").split("/")[-1]
+
+        # Create the str for the dependencies
+        str_dependencies = "{"
+        for key, value in dic_dependencies.items():
+            str_dependencies += f"'{key}' : '{value}', "
+        str_dependencies += "}"
 
         # Render and write the study file
         study_str = self.render(
             str_parameters,
             template_path=template_path,
-            study_path=directory_path_gen,
-            dependencies=dic_dependencies,
+            path_main_configuration=path_main_configuration,
+            study_path=os.path.abspath(self.config["name"]),
+            str_dependencies=str_dependencies,
         )
 
         self.write(study_str, file_path_gen)
@@ -481,7 +496,7 @@ class GenerateScan:
 
         Args:
             generation (str): The generation name.
-            generation_path (str): The path to the layer folder.
+            generation_path (str): The (relative) path to the generation folder.
             template_path (str): The path to the template folder.
             depth_gen (int): The depth of the generation in the tree.
             dic_parameter_lists (Optional[dict[str, Any]]): The dictionary of parameter lists.
@@ -628,7 +643,7 @@ class GenerateScan:
     def create_study_for_current_gen(
         self,
         generation: str,
-        study_path: str,
+        generation_path: str,
         depth_gen: int,
         dic_parameter_lists: Optional[dict[str, Any]] = None,
         dic_parameter_lists_for_naming: Optional[dict[str, Any]] = None,
@@ -639,7 +654,8 @@ class GenerateScan:
 
         Args:
             generation (str): The name of the current generation.
-            study_path (str): The path to the study folder.
+            directory_path (str): The (relative) path to the directory folder for the current
+                generation.
             depth_gen (int): The depth of the generation in the tree.
             dic_parameter_lists (Optional[dict[str, Any]]): The dictionary of parameter lists.
                 Defaults to None.
@@ -678,7 +694,7 @@ class GenerateScan:
 
         return self.create_scans(
             generation,
-            study_path,
+            generation_path,
             executable_path,
             depth_gen,
             dic_parameter_lists,

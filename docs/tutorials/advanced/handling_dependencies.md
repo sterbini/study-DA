@@ -24,8 +24,9 @@ name: example_tune_scan
 # These files are placed at the root of the study
 dependencies:
   main_configuration: config_hllhc16.yaml
-  - other_config.yaml
-  - input_data.parquet
+  others:
+    - other_config.yaml
+    - input_data.parquet
 
 structure:
   # First generation is always at the root of the study
@@ -71,18 +72,45 @@ Note that we don't need to put the main main_configuration (here `config_hllhc16
 
 Python dependencies are modules that are required by the study to run. They could be dealt with just like data dependencies, but they are not parameters of the study and don't really belong in the study configuration file.
 
-Most likely, the simplest approach is to add the path of the folder containing them in your `sys.path` in the template script. For instance, if you have a folder `my_modules` containing the modules `module1.py` and `module2.py`, you could add the following lines at the beginning of your template script:
+Most likely, the simplest approach is to simply add your python modules as dependencies in the scan configuration, and to import them in your template script. Indeed, the python modules will be copied to the root of the study, and, in the provided template scripts, the path to the root of the study is automatically added to the `sys.path` of the python script. This way, you can import your modules directly in your template script (after the lines corresponding to adding the path to the root of the study to the `sys.path`, of course).
 
-```python
-import sys
-sys.path.append('path/to/my_modules')
+For instance, your scan configuration could look like something like this:
+
+```yaml
+# ==================================================================================================
+# --- Structure of the study ---
+# ==================================================================================================
+name: example_tune_scan
+
+# List all useful files that will be used by executable in generations below
+# These files are placed at the root of the study
+dependencies:
+  main_configuration: config_hllhc16.yaml
+  others:
+    - modules/my_module.py
+
+structure:
+  # First generation is always at the root of the study
+  # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
+  generation_1:
+    executable: generation_1.py
+
+  # Second generation depends on the config from the first generation
+  generation_2:
+    executable: generation_2_level_by_nb.py
+    scans:
+      qx:
+        subvariables: [lhcb1, lhcb2]
+        linspace: [62.305, 62.330, 26]
 ```
 
-This path can be relative (more portable, but you need to adapt the path for each generation) or absolute. When submitting your study on a cluster, you need to use an absolute path to the folder containing the modules, as the script will be executed on the node.
-
-Note that, if you add the python modules as dependencies to the config scan (just like for data dependencies), they will also be copied to the root of the job folder, which can be still be useful to have simpler relative paths in your template scripts. And in practice, nothing prevents you to follow the same workflow as with data dependencies, i.e. add the path to these modules to the main configuration file, and add them to the dictionary of dependencies `dic_dependencies_per_gen` when submitting the study on a cluster to mutate the paths to absolute. You can then load them in your template script by adding the path from the configuration file in your `sys.path`:
+In this case, you can import your module directly in your template script (providing also the placeholder to be replaced by the path to the root of the study):
 
 ```python
-import sys
-sys.path.append(config['path_to_modules'])
+...
+path_root_study = "{}  ###---path_root_study---###"
+sys.path.append(path_root_study)
+import my_module
 ```
+
+This import will also work from clusters since the path to the root of the study is absolute.

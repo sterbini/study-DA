@@ -86,6 +86,11 @@ path_configuration = "{}  ###---main_configuration---###""
 
 The `{}  ###---`and `---###` are used to indicate placeholders for the actual values that will be filled in by the study-da package, using [jinja2](https://jinja.palletsprojects.com/en/3.1.x/) under the hood. In practice, as it will be shown later in this tutorial, the `{}  ###---parameters---###` will be replaced by a dictionary of parameters (the ones being scanned), and `{}  ###---main_configuration---###` will be replaced by the path to the main configuration file. This allows to mutate selectively some of the parameters in the configuration file, and to write the modified configuration back to the disk. The parameter values are specific to each generated job.
 
+!!! info "Why these placeholders?"
+
+    You may wonder why we use these weird `{}  ###---` and `---###` placeholders, instead of the usual `{{` and `}}` from jinja2. The reason is that we want to keep the template script executable, and this choice of placeholders allows to do so. This is however quite arbitrary.
+    
+
 If you don't understand, no worries, it will get clearer as we go along and actually generate some jobs.
 
 ##### Understanding the script

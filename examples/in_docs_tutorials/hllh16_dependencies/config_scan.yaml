@@ -7,13 +7,15 @@ name: example_dependencies
 # These files are placed at the root of the study
 dependencies:
   main_configuration: config_hllhc16.yaml
-  my_script: dependencies/my_script.py
+  others:
+    - dependencies/my_script.py
+    - dependencies/my_file.txt
 
 structure:
   # First generation is always at the root of the study
   # such that config_hllhc16.yaml is accessible as ../config_hllhc16.yaml
   generation_1:
-    executable: generation_1.py
+    executable: custom_scripts/generation_1.py
 
   # Second generation depends on the config from the first generation
   generation_2:
