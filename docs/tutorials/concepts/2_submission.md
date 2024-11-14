@@ -32,6 +32,10 @@ The first part of this code is identical to what was done in the first part of t
 - keep_submit_until_done is a boolean that allows to keep the submission script running until all jobs are done. This is useful when you want to submit a study and wait for it to be completed.
 - wait_time is the time in seconds between each check of the status of the jobs. This is useful to avoid overloading the system with too many checks. We asked for 0.1 minutes here, meaning that the jobs will be checked and potentially re-submitted every 6 seconds.
 
+!!! warning "You should always generate and submit from the same folder"
+
+    Although the package leaves you the freedom of separating the generation and submission steps, it is highly recommended to generate and submit in the same folder. This is because the package keeps track of the status of the jobs/ If you generate and submit in different folders, the package might have issues locating your job, and worse, wrongly handle the dependencies.
+
 When running this script, you get prompted to configure the submission for each job. In this case, we assume that we run all the jobs locally, on the CPU. Directly after the submission, you should get the following output:
 
 ```bash

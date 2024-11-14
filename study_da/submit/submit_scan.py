@@ -87,15 +87,25 @@ class SubmitScan:
             )
 
         # Path to the python environment, activate with `source path_python_environment`
+
+        # Ensure that the path is not of the form path/bin/activate environment_name
+        split_path = path_python_environment.split(" ")[0]
+        real_path = split_path[0]
+        env_name = split_path[1] if len(split_path) > 1 else ""
+
         # Turn to absolute path if it is not already
-        if not os.path.isabs(path_python_environment):
-            self.path_python_environment = os.path.abspath(path_python_environment)
+        if not os.path.isabs(real_path):
+            self.path_python_environment = os.path.abspath(real_path)
         else:
-            self.path_python_environment = path_python_environment
+            self.path_python_environment = real_path
 
         # Add /bin/activate to the path_python_environment if needed
         if "bin/activate" not in self.path_python_environment:
             self.path_python_environment += "/bin/activate"
+
+        # Add environment name to the path_python_environment if needed
+        if env_name:
+            self.path_python_environment += f" {env_name}"
 
         # Lock file to avoid concurrent access (softlock as several platforms are used)
         self.lock = SoftFileLock(f"{self.path_tree}.lock", timeout=60)
