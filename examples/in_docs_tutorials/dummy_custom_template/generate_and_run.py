@@ -41,7 +41,7 @@ dic_config_jobs = {
     },
     "generation_2" + ".py": {
         "request_gpu": False,
-        "submission_type": "htc_docker",
+        "submission_type": "local",
         "htc_flavor": "espresso",
     },
 }
@@ -50,10 +50,12 @@ dic_config_jobs = {
 submit(
     path_tree=path_tree,
     name_config=main_configuration_file,
+    path_python_environment=path_python_environment,
     path_python_environment_container=path_python_environment_container,
     path_container_image=path_container_image,
     dic_copy_back_per_gen=dic_copy_back_per_gen,
     dic_config_jobs=dic_config_jobs,
     keep_submit_until_done=True,
     wait_time=0.1,
+    force_submit=True,
 )

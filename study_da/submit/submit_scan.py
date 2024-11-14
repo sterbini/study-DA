@@ -87,26 +87,27 @@ class SubmitScan:
             )
 
         # Path to the python environment, activate with `source path_python_environment`
+        if not path_python_environment:
+            logging.warning("No local python environment provided.")
+            self.path_python_environment = ""
 
-        # Ensure that the path is not of the form path/bin/activate environment_name
-        split_path = path_python_environment.split(" ")[0]
-        real_path = split_path[0]
-        env_name = split_path[1] if len(split_path) > 1 else ""
-
-        # Turn to absolute path if it is not already
-        if not os.path.isabs(real_path):
-            self.path_python_environment = os.path.abspath(real_path)
         else:
-            self.path_python_environment = real_path
+            # Ensure that the path is not of the form path/bin/activate environment_name
+            split_path = path_python_environment.split(" ")[0]
+            real_path = split_path[0]
+            env_name = split_path[1] if len(split_path) > 1 else ""
 
-        # Add /bin/activate to the path_python_environment if needed
-        if "bin/activate" not in self.path_python_environment:
-            self.path_python_environment += "/bin/activate"
+            # Turn to absolute path if it is not already
+            self.path_python_environment = (
+                real_path if os.path.isabs(real_path) else os.path.abspath(real_path)
+            )
+            # Add /bin/activate to the path_python_environment if needed
+            if "bin/activate" not in self.path_python_environment:
+                self.path_python_environment += "/bin/activate"
 
-        # Add environment name to the path_python_environment if needed
-        if env_name:
-            self.path_python_environment += f" {env_name}"
-
+            # Add environment name to the path_python_environment if needed
+            if env_name:
+                self.path_python_environment += f" {env_name}"
         # Lock file to avoid concurrent access (softlock as several platforms are used)
         self.lock = SoftFileLock(f"{self.path_tree}.lock", timeout=60)
 
@@ -363,7 +364,7 @@ class SubmitScan:
                 absolute_job_folder = f"{self.abs_path}/{relative_job_folder}"
                 if os.path.exists(f"{absolute_job_folder}/.failed"):
                     os.remove(f"{absolute_job_folder}/.failed")
-                    nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "to_submit")
+                nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "to_submit")
 
             # Update dic_tree from cluster_submission
             self.dic_tree = dic_tree
@@ -418,16 +419,17 @@ class SubmitScan:
 
         # Handle force submit
         if force_submit:
-            logging.warning("Forcing submission of all jobs.")
+            logging.warning("Forcing resubmission of all failed jobs.")
             with self.lock:
                 # Acquire tree from disk
                 dic_tree = self.dic_tree
 
                 # Reset the tree by deleting the failed tags
                 dic_tree = self.reset_failed_jobs(dic_tree)
-
+                dic_tree["status"] = "to_finish"
                 # Write the tree back to disk
                 self.dic_tree = dic_tree
+                print(self.dic_tree)
 
         # Update the status of all jobs before submitting
         dic_all_jobs, final_status = self.check_and_update_all_jobs_status()
