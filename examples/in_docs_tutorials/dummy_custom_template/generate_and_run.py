@@ -57,5 +57,5 @@ submit(
     dic_config_jobs=dic_config_jobs,
     keep_submit_until_done=True,
     wait_time=0.1,
-    force_submit=True,
+    force_submit=False,
 )

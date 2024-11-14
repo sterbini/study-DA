@@ -57,6 +57,14 @@ class SubmitScan:
         # Absolute path to the study folder (get from the path_tree)
         self.abs_path = os.path.abspath(self.study_name).split(f"/{self.study_name}")[0]
 
+        # Check that the current working directory is one step above the study folder
+        if os.getcwd() != self.abs_path:
+            raise ValueError(
+                "The current working directory must be the parent folder of the study folder, "
+                "i.e. the folder from which the study was generated. "
+                "Please submit from there."
+            )
+
         # Container image (Docker or Singularity, if any)
         # Turn to absolute path if it is not already
         if path_container_image is None:
