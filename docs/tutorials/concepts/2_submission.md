@@ -180,6 +180,7 @@ submit(
     keep_submit_until_done=True,
     wait_time=2,
     max_try=100,
+    force_submit=False,
 )
 ```
 
@@ -190,7 +191,12 @@ Some new variables and/or arguments are introduced here:
 - `dic_copy_back_per_gen` is a dictionary that allows to specify which files will be copied back from the cluster to the local machine after the completion of the jobs. This is useful when you want to retrieve the results of the study, or some intermediate files that have been generated during the study. In this case, a text file has been produced during the second generation, so we set the value to `True` for `txt` for the second generation. Possible file extensions are `parquet`, `yaml`, `txt`, `json`, `zip` and `all` (in which case all files will be copied back).
 - dic_config_jobs is a dictionary that allows to preconfigure the submission of the jobs. This is useful when you don't want to get prompted for each job. In this case, we set `request_gpu` to `False`, the submission type to `htc`, and the flavor to `espresso` for all the jobs, since our scripts are very simple. Note that the `request_gpu` argument is optional and set to `False` by default.
 - `max_try` is the maximum number of tries before the submission is considered as failed.Although failed jobs should not be re-submitted, this can prevent infinite loops in case of a problem with the submission. It is set to 100 by default.
+- `force_submit` is a boolean that allows to force the submission of the failed jobs, even if the study is already tagged as finished. This is useful when you want to re-submit the jobs after a failure which, you believe, is not due to the job itself. It is set to `False` by default.
 
+!!! warning "Keep forcing the resubmission is not a good idea"
+
+    When submitting jobs with the option `keep_submit_until_done=True`, the package will, by default, keep track of the status of the jobs and will not re-submit the jobs that have been tagged as failed. If you force the submission of the failed jobs with `force_submit = True`, you might end up in an infinite loop of submission (limited by the `max_try` argument). This is not a good idea, and you should always try to understand why the jobs are failing before re-submitting them.
+    
 When running this script, you will get prompted for the configuration of the jobs, but only for the first generation. The second generation will be submitted automatically. You will also get some warnings and bugs that are specific to the submission to the cluster:
 
 ```bash
@@ -242,7 +248,7 @@ path_job=/afs/cern.ch/work/c/cdroin/private/study-DA/tests/generate_and_submit/d
 
 ```
 
-The file should have self-explanatory comments. There are however severla difference:
+The file should have self-explanatory comments. There are however several difference:
 
 - The environment is loaded from the Docker container
 - The configuration file is copied in the job folder on the node (and the output configuration file is copied back to the local machine after the completion of the job)
