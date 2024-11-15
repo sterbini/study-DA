@@ -54,6 +54,7 @@ class XsuiteCollider:
         config_lumi_leveling (dict): Configuration for luminosity leveling.
         config_lumi_leveling_ip1_5 (dict or None): Configuration for luminosity leveling at IP1 and
             IP5.
+        config_collider (dict): Configuration for the collider.
         ver_hllhc_optics (float): Version of the HL-LHC optics.
         ver_lhc_run (float): Version of the LHC run.
         ions (bool): Flag indicating if ions are used.
@@ -119,7 +120,10 @@ class XsuiteCollider:
         self.config_lumi_leveling: dict[str, Any] = configuration["config_lumi_leveling"]
 
         # self.config_lumi_leveling_ip1_5 will be None if not present in the configuration
-        self.config_lumi_leveling_ip1_5 = configuration.get("config_lumi_leveling_ip1_5")
+        self.config_lumi_leveling_ip1_5: dict[str, Any] = configuration.get("config_lumi_leveling_ip1_5")
+
+        # Collider configuration
+        self.config_collider: dict[str, Any] = configuration["config_collider"]
 
         # Optics version (needed to select the appropriate optics specific functions)
         self.ver_hllhc_optics: float = ver_hllhc_optics
