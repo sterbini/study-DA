@@ -87,6 +87,9 @@ def configure_collider(full_configuration):
     # Assert that tune, chromaticity and linear coupling are correct one last time
     xc.assert_tune_chroma_coupling(collider)
 
+    # Record beta functions in the configuration
+    xc.record_beta_functions(collider)
+    
     # Configure beam-beam if needed
     if not xc.config_beambeam["skip_beambeam"]:
         xc.configure_beam_beam(collider)

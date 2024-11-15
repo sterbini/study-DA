@@ -35,7 +35,7 @@ config["config_mad"]["links"]["acc-models-lhc"] = (
 config["config_simulation"]["n_turns"] = 500
 
 # Change the context to cupy
-config["config_simulation"]["context"] = "cupy"
+config["config_simulation"]["context"] = "cpu"
 
 # Save the collider produced after the configuration step
 config["config_collider"]["save_output_collider"] = False
@@ -78,7 +78,7 @@ dic_config_jobs = {
     },
     "generation_2" + ".py": {
         "request_gpu": True,
-        "submission_type": "htc_docker",
+        "submission_type": "local",
         "htc_flavor": "microcentury",
     },
 }

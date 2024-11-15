@@ -174,8 +174,6 @@ df_final = aggregate_output_data(
 
 title = get_title_from_configuration(
     df_final,
-    betx_value=0.15,
-    bety_value=0.15,
     display_LHC_version=True,
     display_energy=True,
     display_bunch_index=True,
@@ -236,10 +234,6 @@ Basically, the ```aggregate_output_data``` function will gather all the output d
 Finally,  ```only_keep_lost_particles``` tells the function if it should only keep the data from lost particles (if you're only interested in the DA, for example); this is useful since the output data can be quite large.
 
 From here, you will have to customize the title of the plot to your liking. I won't detail every single parameters as there are many, but they should be quite explicit.
-
-!!! warning "Beta function values must be specified manually"
-    
-    Beta functions are not stored in the output data, so you should remember to specify them manually. In this case, I used 0.15 for both horizontal and vertical beta functions.
 
 Finally, you can plot the result, with, again, many possibilities for customization. I only used the parameters that I thought were the most important, but you can find more in the documentation of the ```plot_heatmap``` function.
 

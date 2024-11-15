@@ -166,6 +166,16 @@ final_on_sep8v:
     "final_on_sep8v",
   ]
 
+# Beta functions
+beta_x_ip1: ["config_collider", "beta_x_ip1"]
+beta_y_ip1: ["config_collider", "beta_y_ip1"]
+beta_x_ip2: ["config_collider", "beta_x_ip2"]
+beta_y_ip2: ["config_collider", "beta_y_ip2"]
+beta_x_ip5: ["config_collider", "beta_x_ip5"]
+beta_y_ip5: ["config_collider", "beta_y_ip5"]
+beta_x_ip8: ["config_collider", "beta_x_ip8"]
+beta_y_ip8: ["config_collider", "beta_y_ip8"]
+
 # Configuration beam-beam
 sigma_z: ["config_collider", "config_beambeam", "sigma_z"]
 nemitt_x: ["config_collider", "config_beambeam", "nemitt_x"]

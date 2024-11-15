@@ -208,8 +208,6 @@ df_final = aggregate_output_data(
 
 title = get_title_from_configuration(
     df_final,
-    betx_value=0.485,
-    bety_value=0.485,
     crossing_type="vh",
     display_LHC_version=True,
     display_energy=True,
@@ -274,10 +272,6 @@ The DataFrame is then saved to disk (if the argument ```write_output``` is set t
 The second function being called, ```get_title_from_configuration```, is used to get a title for the plot. This title is generated from the configuration file of the collider (which is itself stored in the ```output_particles.parquet```), and is used to display the main parameters of the collider in the plot. The arguments should be relatively self-explanatory, but you can check the documentation of the function for more details.
 
 In this case, since I'm scanning over the horizontal tune, I'm not displaying it in the title (since it's already displayed in the horizontal axis of the plot). However, I'm displaying the vertical tune. By default, we never display the number of turns in the title (it should always be 1M for DA computations), but you can change this by setting ```display_number_of_turns=True```.
-
-!!! warning "Don't forget to specify manually the beta functions"
-
-    The beta functions are not stored in the output files, so you need to specify them manually in the function. Same for the crossing, which is not always inferred from the name of the optics.
 
 Finally, the last function being called, ```plot_heatmap```, is used to plot the heatmap. The function takes the DataFrame, the horizontal and vertical variables, the color variable, and a bunch of other arguments to customize the plot. In particular, the ```green_contour``` is to highlight the target DA (very useful to easily detect the islands of viable DA). In this case, we don't plot contours at all since the plot is very small.
 

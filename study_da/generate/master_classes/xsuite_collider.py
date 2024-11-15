@@ -680,6 +680,22 @@ class XsuiteCollider:
                 f" {self.config_knobs_and_tuning['delta_cmr']}, got {tw.c_minus}"
             )
 
+    def record_beta_functions(self, collider: xt.Multiline) -> None:
+        """
+        Records the beta functions at the IPs in the collider.
+
+        Args:
+            collider (xt.Multiline): The collider object to record the beta functions.
+
+        Returns:
+            None
+        """
+        # Record beta functions at the IPs
+        for ip in ["ip1", "ip2", "ip5", "ip8"]:
+            tw = collider.lhcb1.twiss()
+            self.config_collider[f"beta_x_{ip}"] = np.round(float(tw['betx', ip]), 5)
+            self.config_collider[f"beta_y_{ip}"] = np.round(float(tw['bety', ip]), 5)
+
     def configure_beam_beam(self, collider: xt.Multiline) -> None:
         """
         Configures the beam-beam interactions for the collider.

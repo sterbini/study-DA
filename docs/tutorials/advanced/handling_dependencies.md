@@ -10,11 +10,13 @@ Data dependencies are files that are required by the study to run. In the approa
 2. Declared as parameters in the study's main configuration, with relative or absolute paths.
 3. If running the study on a cluster, declared in the dictionary of dependencies `dic_dependencies_per_gen` which is passed to the `submit()` function.
 
-Indeed, dependencies which are declared in the study scan configuration will be automatically copied and placed at the root of the study. This way, the study can access them using relative paths (which must be adapted for each generation, of course. You can do that either by having several paths in the configuration, or by prefixing appropriately the path using '../' in the template script), or absolute path (simpler, but less portable). In any case, if the study is run on a cluster, the relative paths will be mutated to be absolute paths.
+Indeed, dependencies which are declared in the study scan configuration will be automatically copied and placed at the root of the study. This way, the study can access them using relative paths (which must be adapted for each generation, of course. 
+
+You can do that either by having several paths in the configuration, or by prefixing appropriately the path using `../` in the template script), or absolute path (simpler, but less portable). In any case, if the study is run on a cluster, the relative paths will be mutated to be absolute paths.
 
 For instance, your scan configuration could look like something like this:
 
-```yaml
+```yaml config_scan.yaml
 # ==================================================================================================
 # --- Structure of the study ---
 # ==================================================================================================
@@ -45,7 +47,7 @@ structure:
 
 In this case, your main configuration should be adapted to have the following field (in the appropriate section):
 
-```yaml
+```yaml config_hllhc16.yaml
 # Assuming other config will be called from generation 1
 other_config: ../other_config.yaml
 # Assuming input data will be called from generation 2
@@ -54,7 +56,7 @@ input_data: ../../input_data.parquet
 
 If you run this simulation on a cluster, dont forget to declare the dependencies in the dictionary `dic_dependencies_per_gen`:
 
-```python
+```python submit.py
 dic_dependencies_per_gen = {
     1: ['other_config.yaml'],
     2: ['input_data.parquet']

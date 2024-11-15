@@ -23,8 +23,6 @@ df_final = aggregate_output_data(
 
 title = get_title_from_configuration(
     df_final,
-    betx_value=0.15,
-    bety_value=0.15,
     display_LHC_version=True,
     display_energy=True,
     display_bunch_index=True,

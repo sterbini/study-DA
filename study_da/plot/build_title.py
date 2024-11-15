@@ -229,17 +229,19 @@ def get_bunch_intensity_str(dataframe_data: pd.DataFrame) -> str:
         return ""
 
 
-def get_beta_str(betx_value: float, bety_value: float) -> str:
+def get_beta_str(dataframe_data: pd.DataFrame) -> str:
     """
-    Retrieves the beta functions from the dataframe.
-
+    Retrieves the beta function string from the dataframe.
+    
     Args:
-        betx_value (float): The value of the horizontal beta function.
-        bety_value (float): The value of the vertical beta function.
-
+        dataframe_data (pd.DataFrame): The dataframe containing beta function information.
+        
     Returns:
         str: The beta function string.
     """
+    if "beta_x_ip1" in dataframe_data.columns and "beta_y_ip1" in dataframe_data.columns:
+        betx_value = dataframe_data["betx"].unique()[0]
+        bety_value = dataframe_data["bety"].unique()[0]
 
     betx_str = r"$\beta^{*}_{x,1}$"
     bety_str = r"$\beta^{*}_{y,1}$"
@@ -654,8 +656,6 @@ def get_number_of_turns_str(dataframe_data: pd.DataFrame) -> str:
 def get_title_from_configuration(
     dataframe_data: pd.DataFrame,
     ions: bool = False,
-    betx_value: float = np.nan,
-    bety_value: float = np.nan,
     crossing_type: Optional[str] = None,
     display_LHC_version: bool = True,
     display_energy: bool = True,
@@ -693,10 +693,9 @@ def get_title_from_configuration(
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing configuration data.
         ions (bool, optional): Whether the beam is composed of ions. Defaults to False.
-        betx_value (float, optional): The value of the horizontal beta function. Defaults to np.nan.
-        bety_value (float, optional): The value of the vertical beta function. Defaults to np.nan.
         crossing_type (str, optional): The type of crossing: 'vh' or 'hv'. Defaults to None, meaning
             it will try to be inferred from the optics file name. Back to 'hv' if not found.
+        display_betx_bety (bool, optional): Whether to display the beta functions. Defaults to True.
         display_LHC_version (bool, optional): Whether to display the LHC version. Defaults to True.
         display_energy (bool, optional): Whether to display the energy. Defaults to True.
         display_bunch_index (bool, optional): Whether to display the bunch index. Defaults to True.
@@ -767,7 +766,7 @@ def get_title_from_configuration(
     bunch_index_str = get_bunch_index_str(dataframe_data)
     CC_crossing_str = get_CC_crossing_str(dataframe_data)
     bunch_intensity_str = get_bunch_intensity_str(dataframe_data)
-    beta_str = get_beta_str(betx_value, bety_value)
+    beta_str = get_beta_str(dataframe_data)
     xing_IP1_str, xing_IP5_str = get_crossing_IP_1_5_str(dataframe_data, crossing_type)
     xing_IP2_str, xing_IP8_str = get_crossing_IP_2_8_str(dataframe_data)
     bunch_length_str = get_bunch_length_str(dataframe_data)
