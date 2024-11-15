@@ -267,7 +267,7 @@ config_simulation:
   beam: lhcb1 #lhcb1 or lhcb2
 
   # Context for the simulation
-  context: cpu   # 'cupy' # opencl
+  context: cupy  # 'cupy' # opencl
 
   # Device number for GPU simulation
   device_number: # 0

@@ -35,7 +35,7 @@ config["config_mad"]["links"]["acc-models-lhc"] = (
 config["config_simulation"]["n_turns"] = 500
 
 # Change the context to cupy
-config["config_simulation"]["context"] = "cpu"
+config["config_simulation"]["context"] = "cupy"
 
 # Save the collider produced after the configuration step
 config["config_collider"]["save_output_collider"] = False
@@ -66,7 +66,7 @@ os.remove(local_config_name)
 path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
 path_python_environment_container = "/usr/local/DA_study/miniforge_docker"
 path_container_image = (
-    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:228a1834"
+    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:931c8598"
 )
 force_configure = False
 
@@ -107,6 +107,6 @@ submit(
     dic_config_jobs=dic_config_jobs,
     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
     dic_dependencies_per_gen=dic_dependencies_per_gen,
-    keep_submit_until_done=True,
-    wait_time=5,
+    # keep_submit_until_done=True,
+    # wait_time=5,
 )
