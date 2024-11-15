@@ -364,22 +364,32 @@ class SubmitScan:
         """
 
         dic_all_jobs = self.get_all_jobs()
-        with self.lock:
-            # First pass to update the state of the tree
-            for job in dic_all_jobs:
-                # Skip jobs that are not failed
-                if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "failed":
-                    continue
+        # First pass to update the state of the tree
+        for job in dic_all_jobs:
+            # Skip jobs that are not failed
+            if nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"]) != "failed":
+                continue
 
-                # Reset the state of the others
-                relative_job_folder = os.path.dirname(job)
-                absolute_job_folder = f"{self.abs_path}/{relative_job_folder}"
-                if os.path.exists(f"{absolute_job_folder}/.failed"):
-                    os.remove(f"{absolute_job_folder}/.failed")
-                nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "to_submit")
+            # Reset the state of the others
+            relative_job_folder = os.path.dirname(job)
+            absolute_job_folder = f"{self.abs_path}/{relative_job_folder}"
 
-            # Update dic_tree from cluster_submission
-            self.dic_tree = dic_tree
+            # Remove failed tag
+            if os.path.exists(f"{absolute_job_folder}/.failed"):
+                os.remove(f"{absolute_job_folder}/.failed")
+            else:
+                logging.warning(f"Failed file not found for job {job}.")
+
+            # Remove run file
+            if "path_run" in nested_get(dic_tree, dic_all_jobs[job]["l_keys"]):
+                path_run_curr = nested_get(dic_tree, dic_all_jobs[job]["l_keys"] + ["path_run"])
+                if path_run_curr is not None and os.path.exists(path_run_curr):
+                    os.remove(path_run_curr)
+                else:
+                    logging.warning(f"Run file not found for job {job}.")
+
+            # Reset the status of the job
+            nested_set(dic_tree, dic_all_jobs[job]["l_keys"] + ["status"], "to_submit")
 
         return dic_tree
 
@@ -441,7 +451,6 @@ class SubmitScan:
                 dic_tree["status"] = "to_finish"
                 # Write the tree back to disk
                 self.dic_tree = dic_tree
-                print(self.dic_tree)
 
         # Update the status of all jobs before submitting
         dic_all_jobs, final_status = self.check_and_update_all_jobs_status()

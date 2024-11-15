@@ -14,6 +14,9 @@ from study_da.utils import (
     write_dic_to_path,
 )
 
+# Set up logger
+logging.basicConfig(level=logging.INFO)
+
 # ==================================================================================================
 # --- Script to generate a study
 # ==================================================================================================
@@ -29,7 +32,7 @@ config["config_mad"]["links"]["acc-models-lhc"] = (
 )
 
 # Track for 10 turn just to ensure there's no issue with the collider
-config["config_simulation"]["n_turns"] = 1000
+config["config_simulation"]["n_turns"] = 500
 
 # Change the context to cupy
 config["config_simulation"]["context"] = "cupy"
@@ -48,7 +51,7 @@ path_tree = create_single_job(
     name_executable_generation_1="generation_1.py",
     name_executable_generation_2="generation_2_level_by_nb.py",
     name_study="single_job_study_hllhc16",
-    force_overwrite=True,
+    force_overwrite=False,
 )
 
 # Delete the configuration file (it's copied in the study folder anyway)
@@ -87,6 +90,12 @@ dic_additional_commands_per_gen = {
     2: "",
 }
 
+# Dependencies for the executable of each generation. Only needed if one uses HTC or Slurm.
+dic_dependencies_per_gen = {
+    1: ["acc-models-lhc"],
+    2: ["path_collider_file_for_configuration_as_input", "path_distribution_folder_input"],
+}
+
 # Submit the study
 submit(
     path_tree=path_tree,
@@ -97,6 +106,7 @@ submit(
     name_config=local_config_name,
     dic_config_jobs=dic_config_jobs,
     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
+    dic_dependencies_per_gen=dic_dependencies_per_gen,
     keep_submit_until_done=True,
-    wait_time=1,
+    wait_time=5,
 )
