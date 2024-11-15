@@ -61,7 +61,7 @@ submit(
     path_tree=path_tree,
     path_python_environment="/afs/cern.ch/work/c/cdroin/private/study-DA/.venv",
     path_python_environment_container="/usr/local/DA_study/miniforge_docker",
-    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:ad541f20",
+    path_container_image="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:931c8598",
     dic_dependencies_per_gen=dic_dependencies_per_gen,
     name_config=name_main_config,
     dic_additional_commands_per_gen=dic_additional_commands_per_gen,
