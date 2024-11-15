@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "study-da"
 version = "0.4.4"
-description = "A tool to create large-scale DA simulations."
+description = "A tool to create and submit large-scale DA simulations."
 authors = ["Colas <colasdroin@gmail.com>"]
 readme = "README.md"
 
@@ -13,18 +13,25 @@ pyyaml = "^6.0.2"
 cpymad = "^1.16.3"
 ruamel-yaml = "^0.18.6"
 jinja2 = "^3.1.4"
-xsuite = "^0.18.6"
-fastparquet = "^2024.5.0"
-nafflib = "^2.0.2"
+xsuite = "^0.18.10"
+fastparquet = "^2024.11.0"
 filelock = "^3.16.1"
-# Xmask commented out as external_dependencies are not supported by pypi
-# xmask = {path = "external_dependencies/xmask", develop = true}
 black = "^24.10.0"
 seaborn = "^0.13.2"
 qrcode = "^8.0"
+matplotlib = "^3.9.2"
 matplotlib-inline = "^0.1.7"
 ipython = "^8.29.0"
 psutil = "^6.1.0"
+numba = "^0.60.0"
+llvmlite = "^0.43.0"
+
+# Nafflib may create problems through llvmlite... See installation instructions
+nafflib = "^2.0.2"
+
+# Xmask commented out as external_dependencies are not supported by pypi
+# xmask = {path = "external_dependencies/xmask", develop = true}
+
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"

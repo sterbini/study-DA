@@ -12,12 +12,12 @@ generation_1:
       request_gpu: true
       submission_type: htc
       htc_flavor: microcentury
-      status: to_submit
+      status: failed
       path_run: 
         /afs/cern.ch/work/c/cdroin/private/study-DA/examples/others/single_collider_GPU/single_job_study_hllhc16/generation_1/generation_2/run.sh
       id_sub: 7247253
 python_environment: /afs/cern.ch/work/c/cdroin/private/study-DA/.venv/bin/activate
 container_image: /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:228a1834
 absolute_path: /afs/cern.ch/work/c/cdroin/private/study-DA/examples/others/single_collider_GPU
-status: to_finish
+status: finished with issues
 configured: true
