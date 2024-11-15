@@ -28,7 +28,7 @@ For easier submission later, impose the virtual environment to be created in the
 poetry config virtualenvs.in-project true
 ```
 
-!!! warning "Still be careful where Python is installed"
+!!! warning "Be careful where Python is installed"
 
     If you're from CERN and intend to submit jobs to HTCondor from your local Python environment, ensure that the executable that Poetry will use to spawn a virtual environment is available on AFS.
 
@@ -44,18 +44,21 @@ If needed (for instance, if your Python base executable is not on AFS), you can 
 poetry env use /full/path/to/python
 ```
 
-If you're not interested in using GPUs, you can jump directly to the [Installing dependencies](#installing-dependencies) section. Otherwise, follow the next section.
+If you're not interested in using GPUs, you should jump directly to the [Installing dependencies](#installing-dependencies) section. Otherwise, follow the next section.
+
+!!! warning "Are you sure you want to install study-DA locally?"
+    
+        If you're not planning to contribute to the package, it is recommended to install it with pip from PyPI, from a conda environment. Installing the package locally makes it much harder to have it compatible with GPUs.
+      
 
 ### Installing with Poetry for GPUs
 
 Using Poetry along with GPUs is a bit more complicated, as conda is not natively supported by Poetry. However, not all is lost as a simple trick allows to bypass this issue. First, from a conda-compatible Python environment (not the one you used to install Poetry), create a virtual environment with the following command:
 
 ```bash
-conda create -n gpusim python=3.9
+conda create -n gpusim python=3.11
 conda activate gpusim
 ```
-
-⚠️ **Make sure that the Python version is 3.9 as, for now, a bug with Poetry prevents using 3.10 or above.**
 
 Now configure Poetry to use the virtual environment you just created:
   
@@ -104,19 +107,21 @@ poetry install
 
 At this point, ensure that a `.venv` folder has been created in the repository folder (except if you modified the procedure to use GPUs, as explained above). If not, follow the fix described in the next section.
 
-⚠️ **If you have a bug with nafflib installation, do the following:**
-  
-  ```bash
-  poetry run pip install nafflib
-  poetry install
-  ```
+!!! bug "Nafflib dependencies"
 
-  ⚠️ **If you have a bug with conda compilers, do the following:**
+    If you encounter an error while installing nafflib, you can install it manually with:
+    ```bash
+    poetry run pip install nafflib
+    poetry install
+    ```
 
-  ```bash
-  poetry shell
-  conda install compilers cmake
-  ```
+!!! bug "Conda compilers"
+    
+    If you encounter an error while installing the dependencies, you may need to install the compilers and cmake with conda. You can do so by running the following commands:
+    ```bash
+    poetry shell
+    conda install compilers cmake
+    ```
 
 Finally, you can make xsuite faster by precompiling the kernel, with:
 
@@ -147,7 +152,7 @@ pip install -e xmask
 
 ## Installing locally without Poetry
 
-It is strongly recommended to use Poetry as it will handle all the packages dependencies and the virtual environment for you. However, if you prefer to install the dependencies manually, you can do so by running the following commands (granted that you have Python installed along with pip):
+For local installations, it is strongly recommended to use Poetry as it will handle all the packages dependencies and the virtual environment for you. However, if you prefer to install the dependencies manually, you can do so by running the following commands (granted that you have Python installed along with pip):
 
 ```bash
 pip install -r requirements.txt

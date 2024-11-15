@@ -7,8 +7,9 @@ which python # Tells you the path to the python executable
 python --version # Tells you the version of Python
 ```
 
-If Python (>3.8) is not available, you can install it with, for instance, miniforge or miniconda.
-For instance, to install the latest version of Python with miniforge in your home directory, run the following commands:
+If Python (>3.11) is not available, you can install it with, for instance, miniforge or miniconda.
+
+To install the latest version of Python with miniforge in your home directory, run the following commands:
 
 ```bash
 cd
@@ -20,4 +21,4 @@ source miniforge/bin/activate
 
 !!! warning "Be careful where Python is installed"
 
-    Note that, if you're from CERN and intend to submit job to HTCondor without using a CVMFS environment or Docker environment, your environment must be available on AFS (i.e. must be installed on AFS).
+    If you're from CERN and intend to submit job to HTCondor without using a CVMFS environment or Docker environment, your environment must be available on AFS (i.e. must be installed on AFS).
