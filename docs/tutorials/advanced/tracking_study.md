@@ -20,7 +20,11 @@ The collider configuration file is then saved with the mutated parameters, so th
 
 !!! info "You'll have to adapt these templates to your needs"
 
-    The template scripts provided in the package are just that: templates. They should be adapted to your needs, especially if you have a more complex collider configuration. For example, you might want to add some checks to ensure that the collider is correctly built, or that the particle distribution is correctly generated. You might also want to add some logging to keep track of what is happening in the script. You're basically free to not use at all the convenience functions provided with the package. 
+    The template scripts provided in the package are just that: templates. They should be adapted to your needs, especially if you have a more complex collider configuration.
+    
+    For example, you might want to add some checks to ensure that the collider is correctly built, or that the particle distribution is correctly generated. You might also want to add some logging to keep track of what is happening in the script.
+    
+    You're basically free to not use at all the convenience functions provided with the package. 
 
 #### Generation 2
 
@@ -99,7 +103,9 @@ structure:
 
     This is just an example to show you how to scan over some parameters. In practice, scanning the number of turns doesn't really make sense, as you could just do one scan with a large number of turns and regularly save the output to disk (e.g. every 1000 turns).
 
-Thre are several things to notice. First, and contrary to the dummy studies presented in the concepts, we don't run an parametric scan in the first generation: we just take the collider with the configuration as it is. However, there is an exception for the `n_split` parameter. It is declared in the `common_parameters` of the first generation, and then used in the second generation as a variable. This is because it is used for parallelization and sets how many subsets there will be for the particles distribution (in this case, each job will track one fifth of the particles distribution, which corresponds to the files ```00.parquet```, ```01.parquet```, etc.).
+Thre are several things to notice. 
+
+First, and contrary to the dummy studies presented in the concepts, we don't run an parametric scan in the first generation: we just take the collider with the configuration as it is. However, there is an exception for the `n_split` parameter. It is declared in the `common_parameters` of the first generation, and then used in the second generation as a variable. This is because it is used for parallelization and sets how many subsets there will be for the particles distribution (in this case, each job will track one fifth of the particles distribution, which corresponds to the files ```00.parquet```, ```01.parquet```, etc.).
 
 Then, in this case, the executables ```generation_1.py``` and ```generation_2_level_by_nb.py``` are directly provided by the package (we don't need to place them in the same folder as the configuration, altough we could).
 
@@ -167,7 +173,9 @@ Finally, the ```submit``` function is called with the path to the study, the pat
 
 And that's it! If you run this file, you will be prompted how to do the submission (although this can also be preconfigured, as explained in the [concepts](../concepts/2_submission.md)) and the first generation will be submitted.
 
-Running the same script a bit later will submit the second generation (although you can try to re-run it right away, to have the package explaining you which jobs are running and why it doesn't submit the second generation). Alternatively, you can just add the argument ```keep_submit_until_done=True``` to the ```submit``` function to have the package regularly try to re-submit the second generation.
+Running the same script a bit later will submit the second generation (although you can try to re-run it right away, to have the package explaining you which jobs are running and why it doesn't submit the second generation). 
+
+Alternatively, you can just add the argument ```keep_submit_until_done=True``` to the ```submit``` function to have the package regularly try to re-submit the second generation.
 
 ## Analyzing the results
 
@@ -281,7 +289,7 @@ In addition, it's quite often that some values are missing in the plots, because
 
 Just for illustration, here is the output of the plot (not vectorized):
 
-![Tune scan](qx_turns.png)
+![Tune scan](plots/qx_turns.png)
 
 I used a png version as it's lighter to display for the browser but you should probably use a vectorized format for your plots, especially if you want to print them or include them in a presentation (you can always convert them to png afterwards if you need to).
 
