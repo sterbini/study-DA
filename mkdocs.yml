@@ -20,7 +20,8 @@ nav:
       - A tracking study: tutorials/advanced/tracking_study.md
       - Setting custom parameters: tutorials/advanced/setting_custom_parameters.md
       - Customizing internal code: tutorials/advanced/modifying_code.md
-      - Tracking with GPUs: tutorials/advanced/tracking_with_GPUs.md
+      - Handling dependencies: tutorials/advanced/handling_dependencies.md
+      - Tracking with GPUs: tutorials/advanced/tracking_with_GPU.md
   - Case studies: 
     - case_studies/index.md
     - A simple collider: case_studies/1_simple_collider.md
