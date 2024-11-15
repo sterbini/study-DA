@@ -455,7 +455,7 @@ class SubmitScan:
         # Update the status of all jobs before submitting
         dic_all_jobs, final_status = self.check_and_update_all_jobs_status()
         if final_status == "finished":
-            print("All jobs are finished. No need to submit.")
+            print("All jobs are finished.")
             return final_status
         elif final_status == "finished with issues":
             print("All jobs are finished but some did not run properly.")
