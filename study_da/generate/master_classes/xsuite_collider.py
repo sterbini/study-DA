@@ -120,10 +120,12 @@ class XsuiteCollider:
         self.config_lumi_leveling: dict[str, Any] = configuration["config_lumi_leveling"]
 
         # self.config_lumi_leveling_ip1_5 will be None if not present in the configuration
-        self.config_lumi_leveling_ip1_5: dict[str, Any] = configuration.get("config_lumi_leveling_ip1_5")
+        self.config_lumi_leveling_ip1_5: dict[str, Any] = configuration.get(
+            "config_lumi_leveling_ip1_5"
+        )
 
         # Collider configuration
-        self.config_collider: dict[str, Any] = configuration["config_collider"]
+        self.config_collider: dict[str, Any] = configuration
 
         # Optics version (needed to select the appropriate optics specific functions)
         self.ver_hllhc_optics: float = ver_hllhc_optics
@@ -697,8 +699,8 @@ class XsuiteCollider:
         # Record beta functions at the IPs
         for ip in ["ip1", "ip2", "ip5", "ip8"]:
             tw = collider.lhcb1.twiss()
-            self.config_collider[f"beta_x_{ip}"] = np.round(float(tw['betx', ip]), 5)
-            self.config_collider[f"beta_y_{ip}"] = np.round(float(tw['bety', ip]), 5)
+            self.config_collider[f"beta_x_{ip}"] = float(np.round(float(tw["betx", ip]), 5))
+            self.config_collider[f"beta_y_{ip}"] = float(np.round(float(tw["bety", ip]), 5))
 
     def configure_beam_beam(self, collider: xt.Multiline) -> None:
         """
