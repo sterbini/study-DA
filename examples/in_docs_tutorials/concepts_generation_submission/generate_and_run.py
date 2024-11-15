@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 # Generate the study in the local directory
 path_tree, main_configuration_file = create(
-    path_config_scan="config_scan.yaml", force_overwrite=False
+    path_config_scan="config_scan.yaml", force_overwrite=True
 )
 
 path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
@@ -41,7 +41,7 @@ dic_config_jobs = {
     },
     "generation_2" + ".py": {
         "request_gpu": False,
-        "submission_type": "local",
+        "submission_type": "htc",
         "htc_flavor": "espresso",
     },
 }
@@ -56,6 +56,6 @@ submit(
     dic_copy_back_per_gen=dic_copy_back_per_gen,
     dic_config_jobs=dic_config_jobs,
     keep_submit_until_done=True,
-    wait_time=0.1,
+    wait_time=1,
     force_submit=False,
 )

@@ -88,7 +88,7 @@ The `{}  ###---`and `---###` are used to indicate placeholders for the actual va
 
 !!! info "Why these placeholders?"
 
-    You may wonder why we use these weird `{}  ###---` and `---###` placeholders, instead of the usual `{{` and `}}` from jinja2. The reason is that we want to keep the template script executable, and this choice of placeholders allows to do so. This is however quite arbitrary.
+    You may wonder why we use these weird `{}  ###---` and `---###` placeholders, instead of the usual `{{` and `}}` from jinja2. The reason is that we want to keep the template script a valid Python executable, and this choice of placeholders allows to do so. This is however quite arbitrary.
     
 
 If you don't understand, no worries, it will get clearer as we go along and actually generate some jobs.
@@ -101,7 +101,15 @@ It is assumed that the main configuration is always loaded from the above genera
 
 ???+ warning "Be careful with parameter names"
 
-    As you can see in the script, parameter are accessed only with their names. No key is provided, while the corresponding yaml file might have a nested structure. This is because the `set_item_in_dic` function is used to set the value of the parameter. This function will look for the parameter in the configuration file (everywhere) and set its value. Now, if two parameters have the same name, but are in different parts of the configuration file, the script will not work as expected. This is the price of making the package as simple as possible. If you happen to have two parameters with the same name, you will have to modify one of them in the configuration file.
+    As you can see in the script, parameter are accessed only with their names. No key is provided, while the corresponding yaml file might have a nested structure.
+    
+    This is because the `set_item_in_dic` function is used to set the value of the parameter. This function will look for the parameter in the configuration file (everywhere) and set its value. Now, if two parameters have the same name, but are in different parts of the configuration file, the script will not work as expected. 
+    
+    This is the price of making the package as simple as possible. If you happen to have two parameters with the same name, you will have to modify one of them in the configuration file.
+
+!!! info "Why don't you generate all the configuration files directly?"
+
+    You might very legitimately wonder why we don't produce the configuration files for all generations, mutating them appropriately, and then run the jobs. This is because, in a generic workflow, the scripts of each generation will modify the configuration file, and the next generation will depend on the modified configuration file. Therefore, it can't be created in advance.
 
 #### Generation 2
 
@@ -198,8 +206,9 @@ name: example_dummy
 # These files are placed at the root of the study
 dependencies:
   main_configuration: custom_files/config_dummy.yaml
-  # - custom_files/other_file.yaml
-  # - custom_files/module.py
+  # others:
+    # - custom_files/other_file.yaml
+    # - custom_files/module.py
 structure:
   # First generation is always at the root of the study
   # such that config_dummy.yaml is accessible as ../config_dummy.yaml
@@ -221,15 +230,17 @@ structure:
 
 Let's exlain the different fields in the scan configuration:
 
-- name: the name of the study, which will also correspond to the name of the rood folder of the study
-- dependencies: a list of files that are needed by the executable scripts. These files will be copied to the root of the study, so that they can be accessed by the scripts. Note that some configuration files are already provided by the package, and can be used directly (see e.g. [1_simple_collider](../../case_studies/1_simple_collider.md) and [2_tune_scan](../../case_studies/2_tune_scan.md) for examples)
+- name: the name of the study, which will also correspond to the name of the rood folder of the study.
+- dependencies: a list of files that are needed by the executable scripts. These files will be copied to the root of the study, so that they can be accessed by the scripts. Note that some configuration files are already provided by the package, and can be used directly (see e.g. [1_simple_collider](../../case_studies/1_simple_collider.md)  and [2_tune_scan](../../case_studies/2_tune_scan.md) for examples). Understand teh dependencies is not so straightforward, and we will come back to it in the [advanced tutorial](../advanced/handling_dependencies.md).
 - structure: the structure of the study, with the different generations:
-  - Each generation has an `executable` field, which is the path to the script that will be executed. These paths can correspond to local files (as in here), or to predefined templates (as, for instance, in the [case studies](../../case_studies/2_tune_scan.md), in which case just the name of the template is enough)
-  - The `scans` field is a dictionary of parameters that will be scanned, and the values they will take. The values can be given as a list, a linspace or a logspace. Other possibilities (e.g. scanning generated string names, using nested variables, defining parameter in terms of other through mathematical expression) are all presented in the [Case studies](../../case_studies/index.md).
+  
+  1. Each generation has an `executable` field, which is the path to the script that will be executed. These paths can correspond to local files (as in here), or to predefined templates (as, for instance, in the [case studies](../../case_studies/2_tune_scan.md), in which case just the name of the template is enough).
+   
+  2. The `scans` field is a dictionary of parameters that will be scanned, and the values they will take. The values can be given as a list, a linspace or a logspace. Other possibilities (e.g. scanning generated string names, using nested variables, defining parameter in terms of other through mathematical expression) are all presented in the [Case studies](../../case_studies/index.md).
 
 By default (if no specific keyword is provided), the cartesian product of all the parameter values will be considered to generate the jobs. This means that the number of jobs will be the product of the number of values for each parameter. In the example above, the number of jobs will be 6 (2 values for `x` and 3 values for `y`).
 
-Conversely, one can decide to scan two parameters at the same time (useful, for instance, when scanning the tune diagonal in a collider) using the `concomitant` keyword. This is also used in tune scan [case studie](../../case_studies/2_tune_scan.md).
+Conversely, one can decide to scan two parameters at the same time (useful, for instance, when scanning the tune diagonal in a collider) using the `concomitant` keyword. This is also used in tune scan [case studie](../../case_studies/2_tune_scan.md) section.
 
 ## Generating the study
 
@@ -252,6 +263,7 @@ def create(
     force_overwrite: bool = False,
     dic_parameter_all_gen: Optional[dict[str, dict[str, Any]]] = None,
     dic_parameter_all_gen_naming: Optional[dict[str, dict[str, Any]]] = None,
+    add_prefix_to_folder_names: bool = False,
 ) -> tuple[str, str]:
 ```
 
@@ -260,6 +272,7 @@ Let's detail the arguments:
 - `force_overwrite` can be useful if you want to overwrite an existing study. However, in most of the case, we submit the study in the same script, meaning that we might have to run the script several times. In this case, the `force_overwrite` argument must be set to `False`, otherwise the study will be overwritten at each run, and you will lose whatever has already been computed.
 - `dic_parameter_all_gen` is a dictionary that allows to specify the parameters that will be scanned for each generation, instead of defining them the scan configuration file. This doesn't free you from defining the structure of the study in the scan configuration file! This can be useful when the way to define your parameters is more complex than a simple list, linspace or logspace, or if your parameters are functions of each other. This is explained in [one of the case studies](../../case_studies/6_3_generational_scan.md).
 - `dic_parameter_all_gen_naming` is similar to `dic_parameter_all_gen`, but allows to specify the parameters that will be scanned for each generation, and the way they will be named in the study folder. This is useful when you want to have a specific naming for your parameters, or if parameters are nested. This is also explained in [the same case study](../../case_studies/6_3_generational_scan.md).
+- `add_prefix_to_folder_names` is a boolean that allows to add a prefix to the folder names (each folder corresponding to a given job) of the study. This can sometimes help browsing the study, especially when the number of jobs is large.
 
 ### The tree and study structure
 
@@ -290,7 +303,9 @@ x_1:
   ...
 ```
 
-As you can observe, by default, each folder corresponds to a given generation, and is named after the parameter value it corresponds to. In each folder, an executable script (a `.py` file) has been created, along with potential subgenerations. If you open a given script, you will see that the placeholders have been replaced by the actual values of the parameters. For instance, for the parameter definition in the `generation_1.py` script in the `x_1` folder now looks like:
+As you can observe, by default, each folder corresponds to a given generation, and is named after the parameter value it corresponds to. In each folder, an executable script (a `.py` file) has been created, along with potential subgenerations. 
+
+If you open a given script, you will see that the placeholders have been replaced by the actual values of the parameters. For instance, for the parameter definition in the `generation_1.py` script in the `x_1` folder now looks like:
 
 ```py
 dict_mutated_parameters = {

@@ -28,13 +28,15 @@ The first part of this code is identical to what was done in the first part of t
 
 - `path_tree` is the path to the study folder. We get this directly from the `create` function.
 - `path_python_environment` is the path to the python environment that will be used to run the jobs. You have to configure this path according to your own environment.
-- name_config is the name of the main configuration file for your study. This is also directly returned by the `create` function, from the configuration scan file.
-- keep_submit_until_done is a boolean that allows to keep the submission script running until all jobs are done. This is useful when you want to submit a study and wait for it to be completed.
-- wait_time is the time in seconds between each check of the status of the jobs. This is useful to avoid overloading the system with too many checks. We asked for 0.1 minutes here, meaning that the jobs will be checked and potentially re-submitted every 6 seconds.
+- `name_config` is the name of the main configuration file for your study. This is also directly returned by the `create` function, from the configuration scan file.
+- `keep_submit_until_done` is a boolean that allows to keep the submission script running until all jobs are done. This is useful when you want to submit a study and wait for it to be completed.
+- `wait_time` is the time in seconds between each check of the status of the jobs. This is useful to avoid overloading the system with too many checks. We asked for 0.1 minutes here, meaning that the jobs will be checked and potentially re-submitted every 6 seconds.
 
 !!! warning "You should always generate and submit from the same folder"
 
-    Although the package leaves you the freedom of separating the generation and submission steps, it is highly recommended to generate and submit in the same folder. This is because the package keeps track of the status of the jobs/ If you generate and submit in different folders, the package might have issues locating your job, and worse, wrongly handle the dependencies.
+    Although the package leaves you the freedom of separating the generation and submission steps, it is highly recommended to generate and submit in the same folder. This is because the package keeps track of the status of the jobs.
+    
+    If you generate and submit in different folders, the package might have issues locating your job, and worse, wrongly handle the dependencies.
 
 When running this script, you get prompted to configure the submission for each job. In this case, we assume that we run all the jobs locally, on the CPU. Directly after the submission, you should get the following output:
 
@@ -189,17 +191,17 @@ Some new variables and/or arguments are introduced here:
 - `path_python_environment_container` is the path to the python environment that will be used to run the jobs. This time, we use a Docker container, so the path is different from the local one.
 - `path_container_image` is the path to the Docker image that will be used to run the jobs. This is a specific image that has been built for the study-da package.
 - `dic_copy_back_per_gen` is a dictionary that allows to specify which files will be copied back from the cluster to the local machine after the completion of the jobs. This is useful when you want to retrieve the results of the study, or some intermediate files that have been generated during the study. In this case, a text file has been produced during the second generation, so we set the value to `True` for `txt` for the second generation. Possible file extensions are `parquet`, `yaml`, `txt`, `json`, `zip` and `all` (in which case all files will be copied back).
-- dic_config_jobs is a dictionary that allows to preconfigure the submission of the jobs. This is useful when you don't want to get prompted for each job. In this case, we set `request_gpu` to `False`, the submission type to `htc`, and the flavor to `espresso` for all the jobs, since our scripts are very simple. Note that the `request_gpu` argument is optional and set to `False` by default.
+- `dic_config_jobs` is a dictionary that allows to preconfigure the submission of the jobs. This is useful when you don't want to get prompted for each job. In this case, we set `request_gpu` to `False`, the submission type to `htc`, and the flavor to `espresso` for all the jobs, since our scripts are very simple. Note that the `request_gpu` argument is optional and set to `False` by default.
 - `max_try` is the maximum number of tries before the submission is considered as failed.Although failed jobs should not be re-submitted, this can prevent infinite loops in case of a problem with the submission. It is set to 100 by default.
 - `force_submit` is a boolean that allows to force the submission of the failed jobs, even if the study is already tagged as finished. This is useful when you want to re-submit the jobs after a failure which, you believe, is not due to the job itself. It is set to `False` by default.
 
 !!! warning "Keep forcing the resubmission is not a good idea"
 
-    When submitting jobs with the option `keep_submit_until_done=True`, the package will, by default, keep track of the status of the jobs and will not re-submit the jobs that have been tagged as failed. If you force the submission of the failed jobs with `force_submit = True`, you might end up in an infinite loop of submission (limited by the `max_try` argument). This is not a good idea, and you should always try to understand why the jobs are failing before re-submitting them.
+    When submitting jobs with the option `keep_submit_until_done=True`, the package will, by default, keep track of the status of the jobs and will not re-submit the jobs that have been tagged as failed. 
     
-When running this script, you will get prompted for the configuration of the jobs, but only for the first generation. The second generation will be submitted automatically. You will also get some warnings and bugs that are specific to the submission to the cluster:
-
-```bash
+    If you force the submission of the failed jobs with `force_submit = True`, you might end up in an infinite loop of submission (still limited by the `max_try` argument). This is not a good idea, and you should always try to understand why the jobs are failing before re-submitting them.
+    
+When running this script, you will get prompted for the configuration of the jobs, but only for the first generation. The second generation will be submitted automatically. 
 
 !!! warning "Copying back large file is not recommended"
 
@@ -209,7 +211,9 @@ When running this script, you will get prompted for the configuration of the job
 
     If you submit on HTC but don't use a Docker container (or submit locally), you have to provide the path to the python environment on the cluster using the `path_python_environment` argument.
 
-You should get more or less the same output as before, except that your jobs are now most likely queued on the cluster (for confirmation, you can check the status of your jobs using the `condor_q` command). In the meanwhile, we can have a look at one of the new run files, for instance for the second generation (if you run the script above, remember that you have to wait for the second generation to be submitted to have the run files created):
+You should get more or less the same output as before, except that your jobs are now most likely queued on the cluster (for confirmation on HTCondor, you can check the status of your jobs using the `condor_q` command).
+
+In the meanwhile, we can have a look at one of the new run files, for instance for the second generation (if you run the script above, remember that you have to wait for the second generation to be submitted to have the run files created):
 
 ```bash title="dummy_custom_template/example_dummy/x_2/y_1.0/run.sh"
 #!/bin/bash
@@ -255,6 +259,6 @@ The file should have self-explanatory comments. There are however several differ
 - Some paths in the configuration file (declared as ```dependencies```) are mutated to be absolute, so that they can be accessed from the cluster node. In this case, there are no dependencies, but you can find many examples with dependencies in the [Case studies](../../case_studies/index.md) section (look for when the `dic_dependencies_per_gen`is defined in the generating script).
 - The output files are copied back to the local machine after the completion of the job. By default, only light files are copied back (parquet, yaml, txt). In we had set the ```dic_copy_back_per_gen``` argument to ```{"txt": False}```, the output would not have been copied back.
   
-If all goes well, after a while (this depends on the load on the cluster), the `result.txt` should be copied back to the local machine for each leaf of the tree that has been tagged as finished (all, normally).
+If all goes well, after a while (this depends on the load on the cluster), the `result.txt` should be copied back to the local machine for each leaf of the tree that has been tagged as finished (all of them, in theory).
 
 We should now have to automatically retrieve all these results. However, the study-da package only provides the tools to do this for tracking studies. You will therefore have to refer directly to the [tracking studies](../tracking_studies/index.md) section to see how to do this.
