@@ -22,4 +22,8 @@ git clone https://github.com/ColasDroin/hllhc13.git
 
 ## Run III and Run III ions optics
 
-Unfortunately, the Run III and Run III ions optics are not available as public repositories yet. They might be added to the [https://github.com/lhcopt](https://github.com/lhcopt) organization in the future. In the meanwhile, you will need to use the optics [directly from AFS](/afs/cern.ch/eng/lhc/optics/runIII) (you can copy the directory wherever you like of course, but that's not needed), as already done in the [template configuration files](../template_files/configurations/config_runIII.md).
+Unfortunately, the Run III and Run III ions optics are not available as public repositories yet. They might be added to the [https://github.com/lhcopt](https://github.com/lhcopt) organization in the future.
+
+In the meanwhile, you will need to use the optics directly from AFS (e.g. from `/afs/cern.ch/eng/lhc/optics/runIII`). Of course, you can copy the directory wherever you like, but that's not needed.
+
+An example of configuration with the optics loaded from AFS if provided in the [template configuration files](../template_files/configurations/config_runIII.md).

@@ -1,4 +1,4 @@
-# Using High-Performance Computing (HPC) Clusters w or w/o Docker
+# Using High-Performance Computing (HPC) Clusters
 
 ## Setting up the clusters
 
@@ -10,7 +10,7 @@ You will get prompted on which machine the jobs should run (HTC, Slurm or locall
 
 For reproducibility purposes and/or limiting the load on AFS drives (for CERN user), one can use Docker images to run the simulations. A registry of Docker images is available at ```/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/```, and some ready-to-use for DA simulations Docker images on HTC or Slurm are available at ```/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker```.
 
-To learn more about building Docker images and hosting them on the CERN registry, please consult the [corresponding tutorial](https://abpcomputing.web.cern.ch/guides/docker_on_htcondor/) abd the [corresponding repository](https://gitlab.cern.ch/unpacked/sync).
+To learn more about building Docker images and hosting them on the CERN registry, please consult the [corresponding tutorial](https://abpcomputing.web.cern.ch/guides/docker_on_htcondor/) and the [corresponding repository](https://gitlab.cern.ch/unpacked/sync).
 
 ### With HTCondor
 
