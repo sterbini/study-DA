@@ -94,12 +94,21 @@ Finally, install the dependencies by running the following command:
 poetry install
 ```
 
+!!! info "Developer installation"
+
+    If you plan to contribute to the package, you can install the dependencies needed for development (tests, documentation) with:
+
+    ```bash
+    poetry install --with test,docs,dev
+    ```
+
 At this point, ensure that a `.venv` folder has been created in the repository folder (except if you modified the procedure to use GPUs, as explained above). If not, follow the fix described in the next section.
 
 ⚠️ **If you have a bug with nafflib installation, do the following:**
   
   ```bash
   poetry run pip install nafflib
+  poetry install
   ```
 
   ⚠️ **If you have a bug with conda compilers, do the following:**
