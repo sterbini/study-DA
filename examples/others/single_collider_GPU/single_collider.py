@@ -78,7 +78,7 @@ dic_config_jobs = {
     },
     "generation_2" + ".py": {
         "request_gpu": True,
-        "submission_type": "local",
+        "submission_type": "htc_docker",
         "htc_flavor": "microcentury",
     },
 }
