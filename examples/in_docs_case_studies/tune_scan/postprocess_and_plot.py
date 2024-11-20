@@ -42,13 +42,13 @@ title = get_title_from_configuration(
     display_filling_scheme=True,
     display_tune=False,
     display_luminosity_1=True,
-    display_luminosity_2=False,
+    display_luminosity_2=True,
     display_luminosity_5=True,
-    display_luminosity_8=False,
+    display_luminosity_8=True,
     display_PU_1=True,
-    display_PU_2=False,
+    display_PU_2=True,
     display_PU_5=True,
-    display_PU_8=False,
+    display_PU_8=True,
 )
 
 fig, ax = plot_heatmap(

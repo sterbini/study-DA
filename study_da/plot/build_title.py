@@ -232,16 +232,20 @@ def get_bunch_intensity_str(dataframe_data: pd.DataFrame) -> str:
 def get_beta_str(dataframe_data: pd.DataFrame) -> str:
     """
     Retrieves the beta function string from the dataframe.
-    
+
     Args:
         dataframe_data (pd.DataFrame): The dataframe containing beta function information.
-        
+
     Returns:
         str: The beta function string.
     """
     if "beta_x_ip1" in dataframe_data.columns and "beta_y_ip1" in dataframe_data.columns:
-        betx_value = dataframe_data["betx"].unique()[0]
-        bety_value = dataframe_data["bety"].unique()[0]
+        betx_value = round(dataframe_data["beta_x_ip1"].unique()[0], 2)
+        bety_value = round(dataframe_data["beta_y_ip1"].unique()[0], 2)
+    else:
+        logging.warning("Beta functions not found in the dataframe")
+        betx_value = 0
+        bety_value = 0
 
     betx_str = r"$\beta^{*}_{x,1}$"
     bety_str = r"$\beta^{*}_{y,1}$"
