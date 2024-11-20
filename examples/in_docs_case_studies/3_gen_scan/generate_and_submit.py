@@ -24,7 +24,7 @@ path_tree, name_main_config = create(path_config_scan="config_scan.yaml", force_
 path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
 path_python_environment_container = "/usr/local/DA_study/miniforge_docker"
 path_container_image = (
-    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:0b46f2bb"
+    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:757f55da"
 )
 force_configure = False
 

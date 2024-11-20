@@ -21,7 +21,7 @@ When running simulations on HTCondor, Docker images are being pulled directly fr
 Things are a bit tricker with Slurm, as the Docker image must first be manually pulled from CVMFS, and then loaded on the node after Singularity-ize it. The pulling of the image is only needed the first time, and can be done with e.g. (for the image ```cdroin/da-study-docker```):
   
   ```bash
-  singularity pull docker://gitlab-registry.cern.ch/cdroin/da-study-docker:568403e2
+  singularity pull docker://gitlab-registry.cern.ch/cdroin/da-study-docker:757f55da
   ```
 
 !!! warning "Some nodes might not want to pull the image"
@@ -31,7 +31,7 @@ Things are a bit tricker with Slurm, as the Docker image must first be manually 
 For testing purposes, one can then run the image with Singularity directly on the node (not required):
   
   ```bash
-  singularity run da-study-docker_568403e2.sif
+  singularity run da-study-docker_757f55da.sif
   ```
 
 Once this is configured, you can just provide the path of the image to the `submit` function, and the script will take care of the rest.

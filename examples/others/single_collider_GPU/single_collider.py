@@ -66,7 +66,7 @@ os.remove(local_config_name)
 path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
 path_python_environment_container = "/usr/local/DA_study/miniforge_docker"
 path_container_image = (
-    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:931c8598"
+    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:757f55da"
 )
 force_configure = False
 

@@ -24,7 +24,7 @@ path_tree, main_configuration_file = create(
 path_python_environment = "/afs/cern.ch/work/c/cdroin/private/study-DA/.venv"
 path_python_environment_container = "/usr/local/DA_study/miniforge_docker"
 path_container_image = (
-    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:ad541f20"
+    "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cdroin/da-study-docker:757f55da"
 )
 
 # Dic copy_back_per_gen (only for HTC)
