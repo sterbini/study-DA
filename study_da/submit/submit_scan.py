@@ -86,6 +86,9 @@ class SubmitScan:
 
         # Add /bin/activate to the path_python_environment if needed
         if not self.path_python_environment_container.endswith("/bin/activate"):
+            # Remove potential / at the end of the path
+            if self.path_python_environment_container[-1] == "/":
+                self.path_python_environment_container = self.path_python_environment_container[:-1]
             self.path_python_environment_container += "/bin/activate"
 
         # Ensure the path to the python environment is not "" if the container image is not set

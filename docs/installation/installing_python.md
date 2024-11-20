@@ -7,7 +7,7 @@ which python # Tells you the path to the python executable
 python --version # Tells you the version of Python
 ```
 
-If Python (>3.11) is not available, you can install it with, for instance, miniforge or miniconda.
+If Python (>=3.11) is not available, you can install it with, for instance, miniforge or miniconda.
 
 To install the latest version of Python with miniforge in your home directory, run the following commands:
 

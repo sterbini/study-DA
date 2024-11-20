@@ -43,10 +43,9 @@ nav:
       - Generation 1: template_files/scripts/generation_1.md
       - Generation 2 (level by bunch intensity): template_files/scripts/generation_2_level_by_nb.md
       - Generation 2 (level by separation): template_files/scripts/generation_2_level_by_sep.md
-    - Mapping:
+    - Other files:
       - LHC parameters: template_files/mapping/parameters_lhc.md
-    - Filling schemes:
-      - template_files/filling_schemes/index.md
+      - Filling schemes: template_files/filling_schemes/index.md
   - Code Reference: reference/
 
 plugins:
