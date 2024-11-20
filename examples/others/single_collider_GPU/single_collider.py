@@ -50,7 +50,7 @@ path_tree = create_single_job(
     name_main_configuration=local_config_name,
     name_executable_generation_1="generation_1.py",
     name_executable_generation_2="generation_2_level_by_nb.py",
-    name_study="single_job_study_hllhc16",
+    name_study="example_single_job_study_hllhc16",
     force_overwrite=False,
 )
 
