@@ -1,4 +1,4 @@
-name: ci
+name: update doc workflow
 on:
   push:
     branches:
