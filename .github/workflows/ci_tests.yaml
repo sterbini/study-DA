@@ -1,4 +1,4 @@
-name: Python package
+name: integration tests workflow
 
 on:
   push:
