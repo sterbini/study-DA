@@ -47,7 +47,7 @@ structure:
 
 In this case, your main configuration should be adapted to have the following field (in the appropriate section):
 
-```yaml config_hllhc16.yaml
+```yaml title="config_hllhc16.yaml"
 # Assuming other config will be called from generation 1
 other_config: ../other_config.yaml
 # Assuming input data will be called from generation 2
@@ -56,7 +56,7 @@ input_data: ../../input_data.parquet
 
 If you run this simulation on a cluster, dont forget to declare the dependencies in the dictionary `dic_dependencies_per_gen`:
 
-```python submit.py
+```python title="submit.py"
 dic_dependencies_per_gen = {
     1: ['other_config.yaml'],
     2: ['input_data.parquet']
@@ -78,7 +78,7 @@ Most likely, the simplest approach is to simply add your python modules as depen
 
 For instance, your scan configuration could look like something like this:
 
-```yaml
+```yaml title="config_scan.yaml"
 # ==================================================================================================
 # --- Structure of the study ---
 # ==================================================================================================
