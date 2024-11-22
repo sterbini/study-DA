@@ -16,7 +16,7 @@ You can do that either by having several paths in the configuration, or by prefi
 
 For instance, your scan configuration could look like something like this:
 
-```yaml config_scan.yaml
+```yaml title="config_scan.yaml"
 # ==================================================================================================
 # --- Structure of the study ---
 # ==================================================================================================
