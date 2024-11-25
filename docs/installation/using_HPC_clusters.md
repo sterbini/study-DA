@@ -38,4 +38,4 @@ Once this is configured, you can just provide the path of the image to the `subm
 
 !!! bug "The slurm docker scripts are kind of experimental"
 
-    At the time of writing this documentation, symlinks path in the front-end node of INFN-CNAF are currently broken, meaning that some temporary fixs are implemented. This will hopefully be fixed byt the CNAF.INFN team in the future, and the fixs should not prevent the scripts from running anyway.
+    At the time of writing this documentation, symlinks path in the front-end node of INFN-CNAF are currently broken, meaning that some temporary fixes are implemented. This will hopefully be fixed by the CNAF.INFN team in the future, and the fixs should not prevent the scripts from running anyway.
